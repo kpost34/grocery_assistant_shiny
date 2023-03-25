@@ -37,87 +37,94 @@ ui<-f7Page(
                 choices=op_choices_main,
                 selected=NULL
         ),
+      
+      tableOutput("recipe_tab"),
+      tableOutput("ingred_tab"),
 
       
       ### Manual Data Input=========================================================================
       ## Recipe entry sheet
       f7Sheet(
-        id="man_input_recipe_sheet1",
+        id="man_input_recipeSheet",
         label="Please add a recipe",
         orientation="top",
         swipeToClose=TRUE,
         swipeToStep=TRUE,
+        swipeHandler=FALSE,
         hiddenItems=tagList(
-          f7Text(inputId="txt_recipe_sheet1",
+          f7Text(inputId="txt_recipe_recipeSheet",
                  label="Recipe:"),
           splitLayout(
-            f7CheckboxGroup(inputId="chkGrp_app_sheet1",
+            f7CheckboxGroup(inputId="chkGrp_app_recipeSheet",
                 label="Appliance(s) used:",
                 choices=app_choices_sheet1),
-            f7CheckboxGroup(inputId="chkGrp_protein_sheet1",
+            f7CheckboxGroup(inputId="chkGrp_protein_recipeSheet",
                             label="Protein source(s):",
                             choices=protein_choices_sheet1)
           ),
-          f7Button(inputId="btn_ingred_entry_sheet1",
-                   label="Click to enter ingredients")
+          f7Button(inputId="btn_ingred_entry_recipeSheet",
+                   label="Enter ingredients")
+          # splitLayout(
+          #   f7Button(inputId="btn_submit_recipe_sheet1",
+          #            label="Submit recipe info"),
+          #   f7Button(inputId="btn_ingred_entry_sheet1",
+          #            label="Enter ingredients")
         )
       ),
       
       ## Ingredient entry sheet 1
       f7Sheet(
-        id="man_input_ingred_sheet2",
+        id="man_input_ingredSheet1",
         label="Please enter ingredients",
         orientation="top",
         swipeToClose=TRUE,
         swipeToStep=TRUE,
+        swipeHandler=FALSE,
         hiddenItems=tagList( 
-          textOutput("txt_out_recipe_sheet2"),
-          
-          # f7Block("Enter first ingredient",
-          #   f7Text(inputId="txt_ingred1_nm_sheet1",
-          #        label="Name"),
-          #   splitLayout(cellWidths=c("75%","25%"),
-          #     f7Text(inputId="txt_ingred1_size_sheet1",
-          #        label="Size (e.g., 12 oz can)"),
-          #     div(class="label-left",
-          #       f7Stepper(inputId="txt_ingred1_n_sheet1",
-          #           label="Count",
-          #           min=0,
-          #           max=20,
-          #           value=1,
-          #           step=0.5,
-          #           size="large",
-          #           raised=TRUE),
-          #       #provides margins around text (which helps center stepper label with input)
-          #       style="padding: 40px 0px 0px 0px; font-size: 20px;"
-          #     ),
-          #     #aligns stepper input with text input
-          #     tags$style(type='text/css', "#txt_ingred1_n_sheet1 { vertical-align: middle;
-          #                width: 80%}")
-          #     
-          #   ), 
-            add_ingredients(n=4,sheet_num=1),
-            
-            f7Button(inputId="btn_ingred_entry_sheet2",
+          textOutput("txt_out_recipe_ingredSheet1"),
+          add_ingredients(n=4),
+          br(),
+          splitLayout(
+            f7Button(inputId="btn_return_recipe_ingredSheet1",
+                     label="Return to recipe info"),
+            f7Button(inputId="btn_ingred_entry_ingredSheet1",
                      label="Add more ingredients"),
           ),
-        br()
-        ),
+          linebreaks(2),
+          f7Button(inputId="btn_submit_recipe_ingred_ingredSheet1",
+                   label="Submit recipe info & ingredients")
+        )
+      ),
       
-        ## Ingredient entry sheet 2
-        f7Sheet(
-          id="man_input_ingred_sheet3",
-          label="Please enter ingredeints",
-          orientation="top",
-          swipeToClose=TRUE,
-          hiddenItems=tagList(
-            textOutput("tax_out_recipe_sheet3"),
-            add_ingredients(n_prev=4,n=4,sheet_num=2)
+      ## Ingredient entry sheet 2
+      f7Sheet(
+        id="man_input_ingredSheet2",
+        label="Please enter ingredeints",
+        orientation="top",
+        swipeToClose=TRUE,
+        swipeToStep=TRUE,
+        swipeHandler=FALSE,
+        hiddenItems=tagList(
+          textOutput("txt_out_recipe_ingredSheet2"),
+          add_ingredients(n_prev=4,n=4),
+          # f7Button(inputId="btn_submit_ingred_sheet3",
+          #          label="Submit ingredient info"),
+          splitLayout( 
+            f7Button(inputId="btn_previous_ingred_ingredSheet2",
+                     label="Previous ingredients"),
+            br()
+          ),
+          br(),
+          splitLayout(
+            f7Button(inputId="btn_return_recipe_ingredSheet2",
+                     label="Return to recipe info"),
+            br()
           )
         )
-      ) 
+      )
     ) 
-  )
+  ) 
+)
 
 
 
@@ -141,6 +148,11 @@ ui<-f7Page(
 # LATER
 #while typing ingredients, there will be a suggestion for one in database
 #shopping list will round counts up (e.g., ceiling)
+#figure out a way to always display sheet 3 in the background so that submit button is always
+  #visible
+#figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
+  #two sheets will actually manifest
+#add condition--if no ingredients selected then can't submit (same with recipe)
 
 
 # NEXT
@@ -153,10 +165,10 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#finally got ingredient size and counts to align
-#split recipe and ingredients into two sheets
-#functionalized ingredient list
-
+#added various buttons for ingredient info & made them functional
+#added eventReactive()s and made submit button functional
+#updated sheet names
+#got eventReactive() to grab inputs and populate DFs
 
 
 
