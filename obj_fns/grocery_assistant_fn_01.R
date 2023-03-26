@@ -14,7 +14,7 @@ add_ingredients<-function(n_prev=0,n) {
   pos<-ordinal(ns)
   
   map2(pos,ns,function(x,y) {
-    f7Block(paste("Enter",x,"ingredient"),
+    f7Block(h3(paste("Enter",x,"ingredient")),
             hairlines=FALSE,
       f7Text(inputId=paste0("txt_ingred",y,"_nm_ingredSheets"),
            label="Name"),

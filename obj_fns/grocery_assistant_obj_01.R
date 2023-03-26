@@ -1,17 +1,7 @@
 #Created by Keith Post on 3/19/23
 
 
-#### Main Menu======================================================================================
-op_choices_main<-c(
-  "Manually add recipe",
-  "Remove recipe",
-  "Browse recipes",
-  "Generate shopping list",
-  "Add recipes using file (computer recommended)"
-)
-
-
-#### Sheet1 Choices==================================================================================
+#### Recipe Sheet Choices===========================================================================
 ### Appliance Choices
 app_choices_sheet1<-c(
   "Stove",
@@ -33,3 +23,4 @@ protein_choices_sheet1<-c(
 )
 
 
+ 

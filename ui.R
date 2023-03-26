@@ -1,7 +1,5 @@
 #Created by Keith Post on 3/19/23
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
+
 
 #load packages
 pacman::p_load(shiny,here,shinyMobile,english,tidyverse)
@@ -17,8 +15,6 @@ source(here("obj_fns","grocery_assistant_fn_01.R"))
 ui<-f7Page(
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
 #   #spaceholder for theme
-#   useShinyjs(),
-#   
 #   ##### Create structure as f7Tabs (similar to tabsetPanel)
   f7Tabs(id="main_tabset",
 #               
@@ -32,17 +28,41 @@ ui<-f7Page(
          when available."),
       br(),
       strong(h3("What would you like to do today?")),
-        f7Radio(inputId="rad_op_main",
-                label=NULL,
-                choices=op_choices_main,
-                selected=NULL
-        ),
-      
+      #add block of buttons
+      f7Block(
+        f7Button(inputId="btn_add1_recipe_main",
+                 label="Manually add recipe"),
+        br(),
+        f7Button(inputId="btn_browse_recipe_main",
+                 label="Browse recipes"),
+        br(),
+        f7Button(inputId="btn_gen_list_main",
+                 label="Generate shopping list"),
+        br(),
+        f7Button(inputId="btn_remove_recipe_main",
+                 label="Remove recipe"),
+        br(),
+        f7Button(inputId="btn_addmult_recipe_main",
+                  label="Add recipes using file (computer recommended)")
+      ),
+      h4("recent recipe"),
       tableOutput("recipe_tab"),
+      br(),
+      h4("recipe database"),
+      tableOutput("recipe_database"),
+      br(),
+      h4("recent ingredient"),
       tableOutput("ingred_tab"),
+      br(),
+      h4("ingred database"),
+      tableOutput("ingred_database"),
 
       
       ### Manual Data Input=========================================================================
+      ## Blank sheet
+      f7Sheet(
+        id="blank_sheet"
+      ),
       ## Recipe entry sheet
       f7Sheet(
         id="man_input_recipeSheet",
@@ -52,6 +72,9 @@ ui<-f7Page(
         swipeToStep=TRUE,
         swipeHandler=FALSE,
         hiddenItems=tagList(
+          #right-aligns text
+          p("Click outside sheet to return to main menu",style="text-align: right"),
+          #inputs for recipe info
           f7Text(inputId="txt_recipe_recipeSheet",
                  label="Recipe:"),
           splitLayout(
@@ -64,11 +87,6 @@ ui<-f7Page(
           ),
           f7Button(inputId="btn_ingred_entry_recipeSheet",
                    label="Enter ingredients")
-          # splitLayout(
-          #   f7Button(inputId="btn_submit_recipe_sheet1",
-          #            label="Submit recipe info"),
-          #   f7Button(inputId="btn_ingred_entry_sheet1",
-          #            label="Enter ingredients")
         )
       ),
       
@@ -79,9 +97,11 @@ ui<-f7Page(
         orientation="top",
         swipeToClose=TRUE,
         swipeToStep=TRUE,
-        swipeHandler=FALSE,
+        swipeHandler=FALSE, 
         hiddenItems=tagList( 
-          textOutput("txt_out_recipe_ingredSheet1"),
+          #right-aligns text
+          p("Click outside sheet to return to main menu",style="text-align: right"),
+          h2(strong(textOutput("txt_out_recipe_ingredSheet1"))),
           add_ingredients(n=4),
           br(),
           splitLayout(
@@ -105,10 +125,10 @@ ui<-f7Page(
         swipeToStep=TRUE,
         swipeHandler=FALSE,
         hiddenItems=tagList(
-          textOutput("txt_out_recipe_ingredSheet2"),
+          #right-aligns text
+          p("Click outside sheet to return to main menu",style="text-align: right"),
+          h2(strong(textOutput("txt_out_recipe_ingredSheet2"))),
           add_ingredients(n_prev=4,n=4),
-          # f7Button(inputId="btn_submit_ingred_sheet3",
-          #          label="Submit ingredient info"),
           splitLayout( 
             f7Button(inputId="btn_previous_ingred_ingredSheet2",
                      label="Previous ingredients"),
@@ -153,9 +173,17 @@ ui<-f7Page(
 #figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
   #two sheets will actually manifest
 #add condition--if no ingredients selected then can't submit (same with recipe)
+#increase text size of recipe name when displayed on ingredients pages
+#password protection
+#auto-complete
+#change styling of buttons
+#fix delay/poor responsiveness with previous ingredient actionButton
+#use segment to bunch buttons
+
 
 
 # NEXT
+#reset sheet values after submitting info
 
 
 
@@ -165,10 +193,11 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#added various buttons for ingredient info & made them functional
-#added eventReactive()s and made submit button functional
-#updated sheet names
-#got eventReactive() to grab inputs and populate DFs
+#began creating code to generate a DF/DB
+#switched out radio buttons in main menu with action buttons
+#removed return to main menu button
+#added text explaining to click outside sheet to return to main menu
+#increased text size of blocks
 
 
 
