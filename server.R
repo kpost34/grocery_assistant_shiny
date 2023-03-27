@@ -14,7 +14,6 @@ server<-function(input,output,session){
       updateF7Sheet("man_input_recipeSheet")
     })
   
-  
 
   
   ### Recipe Sheet----------------------------------------------------------------------------------
@@ -43,12 +42,34 @@ server<-function(input,output,session){
     updateF7Sheet("man_input_ingredSheet2")
   })
   
-  ## Return to main menu when said button is pressed
-  observeEvent(input$btn_return_main_ingredSheet1,{
-    updateF7Sheet("blank_sheet")
+  ## Confirm submission of manual addition of recipe/ingredient info
+  observeEvent(input$btn_submit_recipe_ingred_ingredSheet1,{
+    f7Dialog(
+      id="dialog_confirm_manual_add",
+      title="Confirm submission",
+      type="confirm",
+      text="Click to confirm that you would like to submit recipe and ingredient information."
+    )
   })
   
+  ## Display toast notification after confirming submission
+  observeEvent(input$dialog_confirm_manual_add,{
+    req(input$dialog_confirm_manual_add)
+    f7Toast(
+      text=paste("Recipe and ingredient information for",input$txt_recipe_recipeSheet,
+                 "added to database"),
+      position="bottom",
+      closeButton=FALSE,
+      closeTimeout=3500
+    )
+  })
   
+  ## Cancel submission and return to page if "Cancel" is hit
+  observeEvent(input$dialog_confirm_manual_add,{
+    req(!input$dialog_confirm_manual_add)
+    updateF7Sheet("man_input_ingredSheet1")
+  })
+
   
   
   ### Ingredients (for recipe) Sheet 2--------------------------------------------------------------
@@ -71,8 +92,9 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
-  ## Submit recipe info
-  recipe_tmpDF<-eventReactive(input$btn_submit_recipe_ingred_ingredSheet1, {
+  ### Submit recipe info (after confirming in dialog)
+  recipe_tmpDF<-eventReactive(input$dialog_confirm_manual_add, {
+    req(input$dialog_confirm_manual_add)
     tibble(
       recipe=input$txt_recipe_recipeSheet,
       appliance=toString(sort(input$chkGrp_app_recipeSheet)),
@@ -88,8 +110,9 @@ server<-function(input,output,session){
   
   ### Develop recipe database
   recipe_db<-eventReactive(
-    eventExpr=input$btn_submit_recipe_ingred_ingredSheet1,
+    eventExpr=input$dialog_confirm_manual_add,
     valueExpr={
+      req(input$dialog_confirm_manual_add)
       newrows<-recipe_tmpDF()
       recipe_data<<-bind_rows(recipe_data,newrows)
     }
@@ -109,8 +132,9 @@ server<-function(input,output,session){
   
   ### Submit first ingredient info
   ingred_tmpDF<-eventReactive(
-    eventExpr=input$btn_submit_recipe_ingred_ingredSheet1,
+    eventExpr=input$dialog_confirm_manual_add,
     valueExpr={
+      req(input$dialog_confirm_manual_add)
       1:8 %>%
       map_df(function(x){
         #populates tibble rows if ingredient name & size have 1+ chr
@@ -133,8 +157,9 @@ server<-function(input,output,session){
   
   ### Develop ingredient database
   ingred_db<-eventReactive(
-    eventExpr=input$btn_submit_recipe_ingred_ingredSheet1,
+    eventExpr=input$dialog_confirm_manual_add,
     valueExpr={
+      req(input$dialog_confirm_manual_add)
       newrows<-ingred_tmpDF()
       ingred_data<<-bind_rows(ingred_data,newrows)
     }

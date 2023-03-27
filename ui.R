@@ -59,10 +59,6 @@ ui<-f7Page(
 
       
       ### Manual Data Input=========================================================================
-      ## Blank sheet
-      f7Sheet(
-        id="blank_sheet"
-      ),
       ## Recipe entry sheet
       f7Sheet(
         id="man_input_recipeSheet",
@@ -79,8 +75,8 @@ ui<-f7Page(
                  label="Recipe:"),
           splitLayout(
             f7CheckboxGroup(inputId="chkGrp_app_recipeSheet",
-                label="Appliance(s) used:",
-                choices=app_choices_sheet1),
+                            label="Appliance(s) used:",
+                            choices=app_choices_sheet1),
             f7CheckboxGroup(inputId="chkGrp_protein_recipeSheet",
                             label="Protein source(s):",
                             choices=protein_choices_sheet1)
@@ -95,21 +91,21 @@ ui<-f7Page(
         id="man_input_ingredSheet1",
         label="Please enter ingredients",
         orientation="top",
-        swipeToClose=TRUE,
+        swipeToClose=FALSE,
         swipeToStep=TRUE,
         swipeHandler=FALSE, 
         hiddenItems=tagList( 
-          #right-aligns text
-          p("Click outside sheet to return to main menu",style="text-align: right"),
-          h2(strong(textOutput("txt_out_recipe_ingredSheet1"))),
-          add_ingredients(n=4),
-          br(),
           splitLayout(
             f7Button(inputId="btn_return_recipe_ingredSheet1",
                      label="Return to recipe info"),
             f7Button(inputId="btn_ingred_entry_ingredSheet1",
                      label="Add more ingredients"),
           ),
+          br(),
+          #right-aligns text
+          p("Click outside sheet to return to main menu",style="text-align: right"),
+          h2(strong(textOutput("txt_out_recipe_ingredSheet1"))),
+          add_ingredients(n=4),
           linebreaks(2),
           f7Button(inputId="btn_submit_recipe_ingred_ingredSheet1",
                    label="Submit recipe info & ingredients")
@@ -125,10 +121,6 @@ ui<-f7Page(
         swipeToStep=TRUE,
         swipeHandler=FALSE,
         hiddenItems=tagList(
-          #right-aligns text
-          p("Click outside sheet to return to main menu",style="text-align: right"),
-          h2(strong(textOutput("txt_out_recipe_ingredSheet2"))),
-          add_ingredients(n_prev=4,n=4),
           splitLayout( 
             f7Button(inputId="btn_previous_ingred_ingredSheet2",
                      label="Previous ingredients"),
@@ -139,19 +131,16 @@ ui<-f7Page(
             f7Button(inputId="btn_return_recipe_ingredSheet2",
                      label="Return to recipe info"),
             br()
-          )
+          ),
+          #right-aligns text
+          p("Click outside sheet to return to main menu",style="text-align: right"),
+          h2(strong(textOutput("txt_out_recipe_ingredSheet2"))),
+          add_ingredients(n_prev=4,n=4),
         )
       )
     ) 
   ) 
 )
-
-
-
-
-
-
-
 
 
 
@@ -183,7 +172,8 @@ ui<-f7Page(
 
 
 # NEXT
-#reset sheet values after submitting info
+# reset values 1) after submitting new recipe/ingred info & 2) using a distinct button (maybe one 
+  #per page)
 
 
 
@@ -193,11 +183,10 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#began creating code to generate a DF/DB
-#switched out radio buttons in main menu with action buttons
-#removed return to main menu button
-#added text explaining to click outside sheet to return to main menu
-#increased text size of blocks
+#added confirmation modal & made it functional so that it adds to df/db if ok is hit and doesn't
+  #if cancelled
+#now app stays on sheet if cancel is hit
+#added toast notification after submitting new recipe
 
 
 
