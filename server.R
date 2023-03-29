@@ -7,21 +7,29 @@
 #--------------------------------------------------------------------------------------------------#
 server<-function(input,output,session){
   
+  ##### Main Tab####################################################################################
+  #### UI===========================================================================================
+  ### Main menu buttons
+  ## Display recipe sheet
+  observeEvent(input$btn_add1_recipe_main, {
+    updateF7Sheet("man_input_recipeSheet")
+  })
+
+  ## Move to recipe tab
+  observeEvent(input$btn_browse_recipe_main,{
+    updateF7Tabs(id="main_tabset",selected="recipe_tab")
+  })
+  
+  
+  
   ##### Manual Data Sheets##########################################################################
   #### UI===========================================================================================
-  ### Display recipe sheet
-  observeEvent(input$btn_add1_recipe_main, {
-      updateF7Sheet("man_input_recipeSheet")
-    })
-  
-
   
   ### Recipe Sheet----------------------------------------------------------------------------------
   ## Display ingredient sheet 1 (sheet 2 overall)
   observeEvent(input$btn_ingred_entry_recipeSheet, {
     updateF7Sheet("man_input_ingredSheet1")
   })
-  
   
   
   
@@ -214,10 +222,29 @@ server<-function(input,output,session){
   output$ingred_database<-renderTable({
     ingred_db()
   })
-  
+
+
+
+  ##### Search/Browse Recipes Tab###################################################################
+  #### UI===========================================================================================
+  ### Return to main menu
+  observeEvent(input$btn_return_main_recipe,{
+    updateF7Tabs(id="main_tabset",selected="main_tab")
+  })
   
 
-  
+  #### Back-end=====================================================================================
+  ### Display database as table
+  output$recipe_db_recipe<-renderDT(
+    recipe_db() %>%
+      left_join(ingred_db()),
+    rownames=FALSE,
+    options=list(
+      dom="Blfrtip",
+      pageLength=5,
+      lengthMenu=c(5,10,20)
+    )
+  )
   
   
 }

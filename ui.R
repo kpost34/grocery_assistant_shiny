@@ -2,7 +2,7 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT)
 
 #source in functions and objects
 source(here("obj_fns","grocery_assistant_obj_01.R"))
@@ -18,45 +18,49 @@ ui<-f7Page(
 #   #spaceholder for theme
 #   ##### Create structure as f7Tabs (similar to tabsetPanel)
   f7Tabs(id="main_tabset",
-#               
-#     ##### Main Menu===============================================================================
+                 
+    ##### Main Menu=================================================================================
     f7Tab(title="Main",
           tabName="main_tab",
           hidden=TRUE,
-      strong(h2("Welcome to the Grocery Assistant App!")),
-      h4("This application will help you develop a database of recipes, choose weekly menus,
-         and generate shopping lists. New features will be added periodically and listed here
-         when available."),
-      br(),
-      strong(h3("What would you like to do today?")),
-      #add block of buttons
-      f7Block(
-        f7Button(inputId="btn_add1_recipe_main",
-                 label="Manually add recipe"),
+      div(
+        strong(h2("Welcome to the Grocery Assistant App!")),
+        h4("This application will help you develop a database of recipes, choose weekly menus,
+           and generate shopping lists. New features will be added periodically and listed here
+           when available."),
         br(),
-        f7Button(inputId="btn_browse_recipe_main",
-                 label="Browse recipes"),
+        strong(h3("What would you like to do today?")),
+        #add block of buttons
+        f7Block(
+          f7Button(inputId="btn_add1_recipe_main",
+                   label="Manually add recipe"),
+          br(),
+          f7Button(inputId="btn_browse_recipe_main",
+                   label="Browse recipes"),
+          br(),
+          f7Button(inputId="btn_gen_list_main",
+                   label="Generate shopping list"),
+          br(),
+          f7Button(inputId="btn_remove_recipe_main",
+                   label="Remove recipe"),
+          br(),
+          f7Button(inputId="btn_addmult_recipe_main",
+                    label="Add recipes using file (computer recommended)")
+        ),
         br(),
-        f7Button(inputId="btn_gen_list_main",
-                 label="Generate shopping list"),
+        h4("recent recipe"),
+        tableOutput("recipe_tab"),
         br(),
-        f7Button(inputId="btn_remove_recipe_main",
-                 label="Remove recipe"),
+        h4("recipe database"),
+        tableOutput("recipe_database"),
         br(),
-        f7Button(inputId="btn_addmult_recipe_main",
-                  label="Add recipes using file (computer recommended)")
+        h4("recent ingredient"),
+        tableOutput("ingred_tab"),
+        br(),
+        h4("ingred database"),
+        tableOutput("ingred_database"),
+        style="margin-left:100px; margin-right: 100px"
       ),
-      h4("recent recipe"),
-      tableOutput("recipe_tab"),
-      br(),
-      h4("recipe database"),
-      tableOutput("recipe_database"),
-      br(),
-      h4("recent ingredient"),
-      tableOutput("ingred_tab"),
-      br(),
-      h4("ingred database"),
-      tableOutput("ingred_database"),
 
       
       ### Manual Data Input=========================================================================
@@ -141,8 +145,21 @@ ui<-f7Page(
                    label="Submit recipe info & ingredients")
         )
       )
-    ) 
-  ) 
+    ),
+    
+    ##### Search/Browse Recipes=====================================================================
+    f7Tab(title="Recipes",
+          tabName="recipe_tab",
+          hidden=TRUE,
+      div(
+        strong(h2("Here you can search/browse recipes")),
+        DTOutput("recipe_db_recipe"),
+        f7Button(inputId="btn_return_main_recipe",
+                 label="Return to main menu"),
+        style="margin-left:100px; margin-right: 100px"
+      ) 
+    )
+  )
 )
 
 
@@ -170,6 +187,7 @@ ui<-f7Page(
 #change styling of buttons
 #fix delay/poor responsiveness with previous ingredient actionButton
 #use segment to bunch buttons
+#slideshow of images (recipe)
 
 
 
@@ -184,8 +202,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#created second submit button and made functional
-#developed server code to transfer submitted recipe & ingred info to db and to clear forms when
-  #adding again
+#made browse recipes button functional, which moves user to newly created recipes tab
+#developed code to display recipe/ingredient database & began customizing datatable
+#added functional return to main menu button
+#added left-right margins to first two tabs
 
 
