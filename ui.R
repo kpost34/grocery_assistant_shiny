@@ -2,7 +2,7 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs)
 
 #source in functions and objects
 source(here("obj_fns","grocery_assistant_obj_01.R"))
@@ -13,12 +13,13 @@ source(here("obj_fns","grocery_assistant_fn_01.R"))
 ###### Define UI====================================================================================
 #--------------------------------------------------------------------------------------------------#
 ui<-f7Page(
+  useShinyjs(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
 #   #spaceholder for theme
 #   ##### Create structure as f7Tabs (similar to tabsetPanel)
   f7Tabs(id="main_tabset",
 #               
-#     ##### Main Menu=================================================================================
+#     ##### Main Menu===============================================================================
     f7Tab(title="Main",
           tabName="main_tab",
           hidden=TRUE,
@@ -136,6 +137,8 @@ ui<-f7Page(
           p("Click outside sheet to return to main menu",style="text-align: right"),
           h2(strong(textOutput("txt_out_recipe_ingredSheet2"))),
           add_ingredients(n_prev=4,n=4),
+          f7Button(inputId="btn_submit_recipe_ingred_ingredSheet2",
+                   label="Submit recipe info & ingredients")
         )
       )
     ) 
@@ -162,7 +165,6 @@ ui<-f7Page(
 #figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
   #two sheets will actually manifest
 #add condition--if no ingredients selected then can't submit (same with recipe)
-#increase text size of recipe name when displayed on ingredients pages
 #password protection
 #auto-complete
 #change styling of buttons
@@ -172,8 +174,7 @@ ui<-f7Page(
 
 
 # NEXT
-# reset values 1) after submitting new recipe/ingred info & 2) using a distinct button (maybe one 
-  #per page)
+
 
 
 
@@ -183,10 +184,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#added confirmation modal & made it functional so that it adds to df/db if ok is hit and doesn't
-  #if cancelled
-#now app stays on sheet if cancel is hit
-#added toast notification after submitting new recipe
-
+#created second submit button and made functional
+#developed server code to transfer submitted recipe & ingred info to db and to clear forms when
+  #adding again
 
 

@@ -43,26 +43,63 @@ server<-function(input,output,session){
   })
   
   ## Confirm submission of manual addition of recipe/ingredient info
-  observeEvent(input$btn_submit_recipe_ingred_ingredSheet1,{
+  # Display modal/dialog
+  #both submit buttons in {} for observeEvent to listen to them
+  observeEvent(eventExpr={
+    input$btn_submit_recipe_ingred_ingredSheet1|
+    input$btn_submit_recipe_ingred_ingredSheet2
+    }, {
     f7Dialog(
       id="dialog_confirm_manual_add",
       title="Confirm submission",
       type="confirm",
       text="Click to confirm that you would like to submit recipe and ingredient information."
     )
-  })
+  },
+  ignoreInit=TRUE)
   
-  ## Display toast notification after confirming submission
+  # Display toast notification & reset values after confirming submission
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
     f7Toast(
-      text=paste("Recipe and ingredient information for",input$txt_recipe_recipeSheet,
-                 "added to database"),
-      position="bottom",
+      text=paste(input$txt_recipe_recipeSheet,"added to database"),
+      position="center",
       closeButton=FALSE,
       closeTimeout=3500
     )
+    # Recipe sheet
+    #delay used because dialog confirm triggers eventReactive (moves data to db) and observeEvent
+      #(clears values)
+    delay(1000,
+          updateF7Text(inputId="txt_recipe_recipeSheet",
+                       value=character(0))
+    )
+    
+    c("chkGrp_app_recipeSheet","chkGrp_protein_recipeSheet") %>%
+      map(function(x){
+        delay(1000,
+              updateF7Checkbox(x,value=character(0)))
+      })
+    
+    # Ingred sheets
+    c(
+      paste0("txt_ingred",1:8,"_nm_ingredSheets"),
+      paste0("txt_ingred",1:8,"_size_ingredSheets"),
+      paste0("stp_ingred",1:8,"_n_ingredSheets")
+    ) %>%
+      map(function(x){
+        if(str_detect(x,"^txt")){
+          delay(1000,
+                updateF7Text(x,value=character(0)))
+        }
+        else if(str_detect(x,"^stp")){
+          delay(1000,
+                updateF7Stepper(inputId=x,value=1))
+        }
+      })
   })
+  
+  
   
   ## Cancel submission and return to page if "Cancel" is hit
   observeEvent(input$dialog_confirm_manual_add,{
