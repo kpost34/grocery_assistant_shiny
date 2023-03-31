@@ -35,14 +35,11 @@ ui<-f7Page(
           f7Button(inputId="btn_add1_recipe_main",
                    label="Manually add recipe"),
           br(),
-          f7Button(inputId="btn_browse_recipe_main",
-                   label="Browse recipes"),
+          f7Button(inputId="btn_manage_recipe_main",
+                   label="View/edit/delete recipes"),
           br(),
           f7Button(inputId="btn_gen_list_main",
                    label="Generate shopping list"),
-          br(),
-          f7Button(inputId="btn_remove_recipe_main",
-                   label="Remove recipe"),
           br(),
           f7Button(inputId="btn_addmult_recipe_main",
                     label="Add recipes using file (computer recommended)")
@@ -152,12 +149,12 @@ ui<-f7Page(
           tabName="recipe_tab",
           hidden=TRUE,
       div(
-        strong(h2("Here you can search/browse recipes")),
+        strong(h2("Feel free to browse, search, edit, and delete recipes")),
         DTOutput("recipe_db_recipe"),
         f7Button(inputId="btn_return_main_recipe",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
-      ) 
+      )
     )
   )
 )
@@ -188,11 +185,13 @@ ui<-f7Page(
 #fix delay/poor responsiveness with previous ingredient actionButton
 #use segment to bunch buttons
 #slideshow of images (recipe)
+#display recipe 'cards' (which have pictures of dishes--manual upload or auto-internet search)
 
 
 
 # NEXT
-
+# add buttons to view/edit and remove recipes
+# view/edit button generates cards (which also has delete option)
 
 
 
@@ -202,9 +201,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#made browse recipes button functional, which moves user to newly created recipes tab
-#developed code to display recipe/ingredient database & began customizing datatable
-#added functional return to main menu button
-#added left-right margins to first two tabs
+#customized datatable some more & reformatted it
+#borrowed function that adds inputs programmatically from SO
+#added view/edit and delete buttons to datatable
 
 

@@ -16,7 +16,7 @@ server<-function(input,output,session){
   })
 
   ## Move to recipe tab
-  observeEvent(input$btn_browse_recipe_main,{
+  observeEvent(input$btn_manage_recipe_main,{
     updateF7Tabs(id="main_tabset",selected="recipe_tab")
   })
   
@@ -234,17 +234,65 @@ server<-function(input,output,session){
   
 
   #### Back-end=====================================================================================
+  ### Create reactive of recipe df joined with ingredient df
+  dt_df<-reactive({
+    recipe_db() %>%
+      left_join(ingred_db()) %>%
+      unite(col="ingredient",n,size,name,sep=" ") %>%
+      mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
+      group_by(recipe,appliance,protein) %>%
+      summarize(ingredients=toString(ingredient)) %>%
+      ungroup() %>%
+      #add actionButtons to Actions column
+      mutate(Actions=paste(
+        shinyInput(actionButton, 
+                   nrow(recipe_db()),
+                   id="edit_",
+                   label="View/edit",
+                   onclick=paste0("Shiny.onInputChange( \"edit_button\" , this.id)")),
+        shinyInput(actionButton, 
+                   nrow(recipe_db()),
+                   id="delete_",
+                   label="Delete",
+                   onclick=paste0("Shiny.onInputChange( \"delete_button\" , this.id)"))),
+        row=row_number())
+  })
+  
+  
+  
   ### Display database as table
   output$recipe_db_recipe<-renderDT(
-    recipe_db() %>%
-      left_join(ingred_db()),
+    dt_df() %>%
+      select(-row),
+    server=FALSE,
+    selection="none",
     rownames=FALSE,
+    escape=FALSE,
+    extensions="Buttons",
     options=list(
-      dom="Blfrtip",
-      pageLength=5,
-      lengthMenu=c(5,10,20)
+      dom="Bfrtip",
+      pageLength=10,
+      buttons=list(
+        list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
+        list(extend="print",title="Grocery Assistant Database")
+      )
     )
   )
+  
+  
+  ### Show dialog after clicking delete button
+  recipe_db<-eventReactive(input$delete_button,{
+    deleted_row<-as.numeric(strsplit(input$delete_button,"_")[[1]][2])
+    nm<-dt_df()[[deleted_row,"recipe"]]
+    recipe_db<<-recipe_db() %>% filter(recipe!=nm)
+    # ingred_db<<-ingred_db() %>% filter(recipe!=nm)
+  },
+  ignoreInit=TRUE)
+  
+
+
+  
+
   
   
 }
