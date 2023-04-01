@@ -23,4 +23,37 @@ protein_choices_sheet1<-c(
 )
 
 
+
+
+#### App Test=======================================================================================
+### Generate recipe & ingredient data
+demo_recipeDF <- tibble(
+  recipe=c("chicken alfredo","chicken tacos"),
+  appliance=c("stove, slow cooker","slow cooker"),
+  protein=c("chicken","chicken")
+)
+
+
+demo_ingredDF <- tibble(
+  recipe=c(
+    rep("chicken alfredo",3),
+    rep("chicken tacos",3)
+  ),
+  name=c(
+    "chicken breast","alfredo sauce","pasta",
+    "chicken breast","salsa","taco seasoning"
+  ),
+  size=c(
+    "large","12 oz jar","16 oz package",
+    "large","12 oz jar","packet"
+  ),
+  n=c(
+    2,3,1,
+    2,1,1
+  )
+)
+
+
+demo_recipeDF
+demo_ingredDF
  

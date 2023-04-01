@@ -42,7 +42,10 @@ ui<-f7Page(
                    label="Generate shopping list"),
           br(),
           f7Button(inputId="btn_addmult_recipe_main",
-                    label="Add recipes using file (computer recommended)")
+                    label="Add recipes using file (computer recommended)"),
+          br(),
+          f7Button(inputId="btn_test_app_main",
+                   label="Test App with Pre-Loaded Data")
         ),
         br(),
         h4("recent recipe"),
@@ -190,8 +193,14 @@ ui<-f7Page(
 
 
 # NEXT
-# add buttons to view/edit and remove recipes
-# view/edit button generates cards (which also has delete option)
+# 1) recipe & ingredient databases to update (delete/edit/add) appropriately
+    # remove recipe button functionality
+# 2) view/edit button generates cards (which also has delete option)
+# 3) demonstration functionality
+# 4) batch add capability
+# 5) generate shopping list
+# 6) ability to save status with login
+
 
 
 
@@ -201,8 +210,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-#customized datatable some more & reformatted it
-#borrowed function that adds inputs programmatically from SO
-#added view/edit and delete buttons to datatable
+# created button for demo
+# created recipe and ingredient info for demo
+# re-thought approach to building recipe and ingredient databases using reactiveValues
 
 
