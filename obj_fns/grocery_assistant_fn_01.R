@@ -43,7 +43,7 @@ add_ingredients<-function(n_prev=0,n) {
 }
 
 
-### Create function that will programmatically create inputs
+### Create inputs programmatically
 shinyInput <- function(FUN, len, id, ...) {
   inputs <- character(len)
   for (i in seq_len(len)) {

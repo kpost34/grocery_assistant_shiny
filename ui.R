@@ -154,6 +154,7 @@ ui<-f7Page(
       div(
         strong(h2("Feel free to browse, search, edit, and delete recipes")),
         DTOutput("recipe_db_recipe"),
+        strong(h3(textOutput("blank_dt_df_recipe"))),
         f7Button(inputId="btn_return_main_recipe",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
@@ -175,7 +176,6 @@ ui<-f7Page(
 
 #---------------------------------------
 # LATER
-#while typing ingredients, there will be a suggestion for one in database
 #shopping list will round counts up (e.g., ceiling)
 #figure out a way to always display sheet 3 in the background so that submit button is always
   #visible
@@ -187,12 +187,19 @@ ui<-f7Page(
 #change styling of buttons
 #fix delay/poor responsiveness with previous ingredient actionButton
 #use segment to bunch buttons
-#slideshow of images (recipe)
+#slideshow of images (recipe) on main app page
 #display recipe 'cards' (which have pictures of dishes--manual upload or auto-internet search)
+#add nuance to observeEvent that generates dt--that adding recipe, loading saved db, loading
+  #demo, or batch loading can be the event
 
 
 
 # NEXT
+# add dialog for after clicking delete button
+# adjust observeEvent so that deletion occurs when dialog is confirmed
+# add toast notification that "recipe x" is removed from database
+
+
 # 1) recipe & ingredient databases to update (delete/edit/add) appropriately
     # remove recipe button functionality
 # 2) view/edit button generates cards (which also has delete option)
@@ -210,8 +217,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-# created button for demo
-# created recipe and ingredient info for demo
-# re-thought approach to building recipe and ingredient databases using reactiveValues
+# added message that no data in database when dt_db() is not defined
+# delete buttons are functional--they remove data in reactiveValues and the datatable
+# resolved issues so that delete buttons could be used multiple times
 
 

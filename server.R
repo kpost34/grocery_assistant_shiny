@@ -221,93 +221,6 @@ server<-function(input,output,session){
   })
   
   
-  
-  # OLD APPROACH==================
-  ### Submit recipe info (after confirming in dialog)
-  # recipe_tmpDF<-eventReactive(input$dialog_confirm_manual_add, {
-  #   req(input$dialog_confirm_manual_add)
-  #   tibble(
-  #     recipe=input$txt_recipe_recipeSheet,
-  #     appliance=toString(sort(input$chkGrp_app_recipeSheet)),
-  #     protein=toString(sort(input$chkGrp_protein_recipeSheet))
-  #   )
-  # })
-  # 
-  # 
-  # 
-  # #NOTE: this will change if pre-loaded
-  # recipe_data<-data.frame()
-  # 
-  # 
-  # ### Develop recipe database
-  # recipe_db<-eventReactive(
-  #   eventExpr=input$dialog_confirm_manual_add,
-  #   valueExpr={
-  #     req(input$dialog_confirm_manual_add)
-  #     newrows<-recipe_tmpDF()
-  #     recipe_data<<-bind_rows(recipe_data,newrows)
-  #   }
-  # )
-  # 
-  # 
-  # #temporary--see what's being stored
-  # output$recipe_tab<-renderTable({
-  #   recipe_tmpDF()
-  # })
-  # 
-  # #temporary--see what's being stored (multiple recipes)
-  # output$recipe_database<-renderTable({
-  #   recipe_db()
-  # })
-  # 
-  # 
-  # ### Submit first ingredient info
-  # ingred_tmpDF<-eventReactive(
-  #   eventExpr=input$dialog_confirm_manual_add,
-  #   valueExpr={
-  #     req(input$dialog_confirm_manual_add)
-  #     1:8 %>%
-  #     map_df(function(x){
-  #       #populates tibble rows if ingredient name & size have 1+ chr
-  #       if(nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
-  #          nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0) {
-  #       tibble(
-  #         recipe = input$txt_recipe_recipeSheet,
-  #         name = input[[paste0("txt_ingred",x,"_nm_ingredSheets")]],
-  #         size = input[[paste0("txt_ingred",x,"_size_ingredSheets")]],
-  #         n = input[[paste0("stp_ingred",x,"_n_ingredSheets")]]
-  #         )
-  #       } else {NULL}
-  #     }) 
-  #   }
-  # )
-  # 
-  # #NOTE: this will change if pre-loaded
-  # ingred_data<-data.frame()
-  # 
-  # 
-  # ### Develop ingredient database
-  # ingred_db<-eventReactive(
-  #   eventExpr=input$dialog_confirm_manual_add,
-  #   valueExpr={
-  #     req(input$dialog_confirm_manual_add)
-  #     newrows<-ingred_tmpDF()
-  #     ingred_data<<-bind_rows(ingred_data,newrows)
-  #   }
-  # )
-  # 
-  # 
-  # 
-  # #temporary--see what's being stored
-  # output$ingred_tab<-renderTable({
-  #   ingred_tmpDF()
-  # })
-  # 
-  # 
-  # #temporary--see what's being stored (multiple recipes)
-  # output$ingred_database<-renderTable({
-  #   ingred_db()
-  # })
 
 
 
@@ -318,65 +231,117 @@ server<-function(input,output,session){
     updateF7Tabs(id="main_tabset",selected="main_tab")
   })
   
+  ### Display modal/dialog
+  #both submit buttons in {} for observeEvent to listen to them
+  observeEvent(eventExpr={
+    input$delete_button #|
+    #PLACEHOLDER FOR DELETE BUTTON ON CARDS
+    }, {
+    f7Dialog(
+      id="dialog_confirm_delete",
+      title="Confirm delete",
+      type="confirm",
+      text="Click to confirm that you would like to remove recipe from database."
+    )
+  },
+  ignoreInit=TRUE)
+  
+  
 
   #### Back-end=====================================================================================
   ### Create reactive of recipe df joined with ingredient df
-  # dt_df<-reactive({
-  #   recipe_db() %>%
-  #     left_join(ingred_db()) %>%
-  #     unite(col="ingredient",n,size,name,sep=" ") %>%
-  #     mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
-  #     group_by(recipe,appliance,protein) %>%
-  #     summarize(ingredients=toString(ingredient)) %>%
-  #     ungroup() %>%
-  #     #add actionButtons to Actions column
-  #     mutate(Actions=paste(
-  #       shinyInput(actionButton, 
-  #                  nrow(recipe_db()),
-  #                  id="edit_",
-  #                  label="View/edit",
-  #                  onclick=paste0("Shiny.onInputChange( \"edit_button\" , this.id)")),
-  #       shinyInput(actionButton, 
-  #                  nrow(recipe_db()),
-  #                  id="delete_",
-  #                  label="Delete",
-  #                  onclick=paste0("Shiny.onInputChange( \"delete_button\" , this.id)"))),
-  #       row=row_number())
-  # })
+  # recipe_ingred<-reactiveValues(dt=tibble())
+  
+  dt_df<-reactive({
+    #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
+    if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
+      tibble()
+    }
+    #but if there are data in each, then a combined table is made
+    else if(nrow(recipe$db)>0 & nrow(ingred$db)>0){
+      recipe$db %>%
+        left_join(ingred$db) %>%
+        unite(col="ingredient",n,size,name,sep=" ") %>%
+        mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
+        group_by(recipe,appliance,protein) %>%
+        summarize(ingredients=toString(ingredient)) %>%
+        ungroup() %>%
+        #add actionButtons to Actions column
+        mutate(Actions=paste(
+          shinyInput(actionButton,
+                     nrow(.),
+                     id="edit_",
+                     label="View/edit",
+                     icon=shiny::icon("trash"),
+                     class="btn-danger",
+                     onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
+          shinyInput(actionButton,
+                     nrow(.),
+                     id="delete_",
+                     label="Delete",
+                     icon=shiny::icon("trash"),
+                     class="btn-danger",
+                     onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))")))
+    }
+    # } else{tibble()}
+  })
   
   
   
   ### Display database as table
-  # output$recipe_db_recipe<-renderDT(
-  #   dt_df() %>%
-  #     select(-row),
-  #   server=FALSE,
-  #   selection="none",
-  #   rownames=FALSE,
-  #   escape=FALSE,
-  #   extensions="Buttons",
-  #   options=list(
-  #     dom="Bfrtip",
-  #     pageLength=10,
-  #     buttons=list(
-  #       list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
-  #       list(extend="print",title="Grocery Assistant Database")
-  #     )
+  ## If data are available
+  output$recipe_db_recipe<-renderDT(
+    dt_df(),
+    server=FALSE,
+    selection="none",
+    rownames=FALSE,
+    escape=FALSE,
+    extensions="Buttons",
+    options=list(
+      dom="Bfrtip",
+      pageLength=10,
+      buttons=list(
+        list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
+        list(extend="print",title="Grocery Assistant Database")
+      )
+    )
+  )
+
+  ## If no data then message is returned
+  output$blank_dt_df_recipe<-renderText({
+    req(nrow(recipe$db)==0 & nrow(ingred$db)==0)
+    "No data in database."
+  })
+  
+  ### Display toast notification and remove values after confirming deletion
+  observeEvent(input$dialog_confirm_delete,{
+    req(input$dialog_confirm_delete)
+    deleted_row<-as.numeric(strsplit(input$delete_button,"_")[[1]][2])
+    nm<-dt_df()[[deleted_row,"recipe"]]
+    recipe$db<-recipe$db %>% filter(recipe!=nm)
+    ingred$db<-ingred$db %>% filter(recipe!=nm)
+    
+    f7Toast(
+      text=paste(nm,"removed from database"),
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=3500
+    )
+    
+  })
+  
+  
+  #   ###  after confirming deletion
+  # observeEvent(input$dialog_confirm_delete,{
+  #   req(input$dialog_confirm_delete)
+  #   f7Toast(
+  #     text=paste(nm,"removed from database"),
+  #     position="center",
+  #     closeButton=FALSE,
+  #     closeTimeout=3500
   #   )
-  # )
+  # })
   
-  
-  ### Show dialog after clicking delete button
-  # recipe_db<-eventReactive(input$delete_button,{
-  #   deleted_row<-as.numeric(strsplit(input$delete_button,"_")[[1]][2])
-  #   nm<-dt_df()[[deleted_row,"recipe"]]
-  #   recipe_db<<-recipe_db() %>% filter(recipe!=nm)
-  #   # ingred_db<<-ingred_db() %>% filter(recipe!=nm)
-  # },
-  # ignoreInit=TRUE)
-  
-
-
   
 
   
