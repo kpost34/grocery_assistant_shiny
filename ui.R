@@ -44,8 +44,11 @@ ui<-f7Page(
           f7Button(inputId="btn_addmult_recipe_main",
                     label="Add recipes using file (computer recommended)"),
           br(),
-          f7Button(inputId="btn_test_app_main",
-                   label="Test App with Pre-Loaded Data")
+          f7Button(inputId="btn_preload_data_main",
+                   label="Test App with Pre-Loaded Data"),
+          br(),
+          f7Button(inputId="btn_reset_db_main",
+                   label="Reset app")
         ),
         br(),
         h4("recent recipe"),
@@ -191,22 +194,18 @@ ui<-f7Page(
 #display recipe 'cards' (which have pictures of dishes--manual upload or auto-internet search)
 #add nuance to observeEvent that generates dt--that adding recipe, loading saved db, loading
   #demo, or batch loading can be the event
+#add checkboxes to customize what to display in datatable (i.e., user chooses columns)
+#see if any observeEvents can be combined
+# tinker with main menu buttons--size, color, spacing, etc.
 
 
 
 # NEXT
-# add dialog for after clicking delete button
-# adjust observeEvent so that deletion occurs when dialog is confirmed
-# add toast notification that "recipe x" is removed from database
+# 1) batch add capability
+# 2) generate shopping list
+# 3) view/edit button generates cards (which also has delete option)
+# 4) ability to save status with login
 
-
-# 1) recipe & ingredient databases to update (delete/edit/add) appropriately
-    # remove recipe button functionality
-# 2) view/edit button generates cards (which also has delete option)
-# 3) demonstration functionality
-# 4) batch add capability
-# 5) generate shopping list
-# 6) ability to save status with login
 
 
 
@@ -217,8 +216,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-# added message that no data in database when dt_db() is not defined
-# delete buttons are functional--they remove data in reactiveValues and the datatable
-# resolved issues so that delete buttons could be used multiple times
+# got pre-loaded data button to load (and thus replace existing data)
+# added dialog for pre-loaded data
+# re-organized server script so that code is associated in the right place based on UI
+# added functional reset button
 
 

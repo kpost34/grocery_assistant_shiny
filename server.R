@@ -21,6 +21,96 @@ server<-function(input,output,session){
   })
   
   
+  ## Display dialog for pre-loaded data
+  observeEvent(input$btn_preload_data_main,{
+    f7Dialog(
+      id="dialog_confirm_preload_data",
+      title="Confirm pre-loaded data",
+      type="confirm",
+      text="Click OK to use pre-loaded data. Note that this will remove all unsaved data."
+    )
+  })
+  
+  
+  ## Display dialog for resetting data
+  observeEvent(input$btn_reset_db_main,{
+    f7Dialog(
+      id="dialog_confirm_reset_db_data",
+      title="Confirm app reset",
+      type="confirm",
+      text="Click OK to reset app to initial conditions. Note that this will remove all unsaved data."
+    )
+  })
+  
+  
+  
+  #### Server=======================================================================================
+  ### Initialize tmp reactiveValues
+  ## Set recipe$tmp to an empty tibble
+  recipe<-reactiveValues(tmp=tibble())
+  
+  ## Set ingred$tmp to an empty tibble
+  ingred<-reactiveValues(tmp=tibble())
+  
+  
+  ### Initialize database reactiveValues
+  ## Set recipe$db to an empty tibble
+  recipe<-reactiveValues(db=tibble())
+  
+  ## Set ingred$db to an empty tibble
+  ingred<-reactiveValues(db=tibble())
+  
+  
+  ### Pre-loaded data
+  ## Populate recipe$db with pre-loaded recipes
+  observeEvent(input$dialog_confirm_preload_data,{
+    req(input$dialog_confirm_preload_data)
+    recipe$db<-demo_recipeDF
+    ingred$db<-demo_ingredDF
+  })
+  
+  
+  ### Reset
+  ## Reset app to initial conditions (clear dbs)
+  observeEvent(input$dialog_confirm_reset_db_data,{
+    req(input$dialog_confirm_reset_db_data)
+    recipe$db<-tibble()
+    ingred$db<-tibble()
+  })
+  
+  
+  
+  
+  #-------------------------------------------------------
+  #### NOTE: TEMP OUTPUT ####
+  #temporary--see what's being stored
+  output$recipe_tab<-renderTable({
+    recipe$tmp
+  })
+  
+  #temporary--see what's being stored (multiple recipes)
+  output$recipe_database<-renderTable({
+    recipe$db
+  })
+  #--------------------------------------------------------
+  
+  
+  #-----------------------------------------------
+  #### NOTE: TEMP OUTPUT ####
+  #temporary--see what's being stored
+  output$ingred_tab<-renderTable({
+    ingred$tmp
+  })
+  
+  
+  #temporary--see what's being stored (multiple recipes)
+  output$ingred_database<-renderTable({
+    ingred$db
+  })
+#-------------------------------------------------
+  
+  
+  
   
   ##### Manual Data Sheets##########################################################################
   #### UI===========================================================================================
@@ -45,6 +135,7 @@ server<-function(input,output,session){
     updateF7Sheet("man_input_recipeSheet")
   })
   
+  
   ## Display second ingredient sheet
   observeEvent(input$btn_ingred_entry_ingredSheet1, {
     updateF7Sheet("man_input_ingredSheet2")
@@ -61,7 +152,7 @@ server<-function(input,output,session){
       id="dialog_confirm_manual_add",
       title="Confirm submission",
       type="confirm",
-      text="Click to confirm that you would like to submit recipe and ingredient information."
+      text="Click OK to submit recipe and ingredient information."
     )
   },
   ignoreInit=TRUE)
@@ -137,9 +228,8 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
-  ### Submit recipe info (after confirming in dialog)
-  recipe<-reactiveValues(tmp=tibble())
-  
+  ### Temp recipe info
+  ## Submit recipe info (after confirming in dialog)
   observeEvent(input$dialog_confirm_manual_add, {
     req(input$dialog_confirm_manual_add)
     recipe$tmp<-tibble(
@@ -148,13 +238,10 @@ server<-function(input,output,session){
       protein=toString(sort(input$chkGrp_protein_recipeSheet))
     )
   })
-
   
   
-  #NOTE: this will change if pre-loaded
-  ### Develop recipe database
-  recipe<-reactiveValues(db=tibble())
-  
+  ### Recipe database info
+  ## Add new recipe to database
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
     # newrows<-recipe_tmpDF()
@@ -162,21 +249,10 @@ server<-function(input,output,session){
     }
   )
   
+
   
-  #temporary--see what's being stored
-  output$recipe_tab<-renderTable({
-    recipe$tmp
-  })
-  
-  #temporary--see what's being stored (multiple recipes)
-  output$recipe_database<-renderTable({
-    recipe$db
-  })
-  
-  
-  ### Submit first ingredient info
-  ingred<-reactiveValues(tmp=tibble())
-  
+  ### Temp ingredient info
+  ## Submit ingredient info
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
     1:8 %>%
@@ -195,30 +271,16 @@ server<-function(input,output,session){
     }
   )
   
-  #NOTE: this will change if pre-loaded
-  ingred<-reactiveValues(db=tibble())
   
   
-  ### Develop ingredient database
+  ### Ingredient database info
+  ## Add ingredients from new recipe to database
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
     # newrows<-ingred_tmpDF()
     ingred$db<-bind_rows(ingred$db,ingred$tmp)
     }
   )
-  
-  
-  
-  #temporary--see what's being stored
-  output$ingred_tab<-renderTable({
-    ingred$tmp
-  })
-  
-  
-  #temporary--see what's being stored (multiple recipes)
-  output$ingred_database<-renderTable({
-    ingred$db
-  })
   
   
 
@@ -241,7 +303,7 @@ server<-function(input,output,session){
       id="dialog_confirm_delete",
       title="Confirm delete",
       type="confirm",
-      text="Click to confirm that you would like to remove recipe from database."
+      text="Click OK to remove recipe from database."
     )
   },
   ignoreInit=TRUE)
@@ -249,9 +311,8 @@ server<-function(input,output,session){
   
 
   #### Back-end=====================================================================================
-  ### Create reactive of recipe df joined with ingredient df
-  # recipe_ingred<-reactiveValues(dt=tibble())
-  
+  ### Joined DF of recipes and ingredients
+  ## Create reactive of recipe df joined with ingredient df
   dt_df<-reactive({
     #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
     if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
@@ -283,13 +344,11 @@ server<-function(input,output,session){
                      class="btn-danger",
                      onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))")))
     }
-    # } else{tibble()}
   })
   
   
   
-  ### Display database as table
-  ## If data are available
+  ## Display database as table
   output$recipe_db_recipe<-renderDT(
     dt_df(),
     server=FALSE,
@@ -313,6 +372,8 @@ server<-function(input,output,session){
     "No data in database."
   })
   
+  
+  
   ### Display toast notification and remove values after confirming deletion
   observeEvent(input$dialog_confirm_delete,{
     req(input$dialog_confirm_delete)
@@ -331,18 +392,7 @@ server<-function(input,output,session){
   })
   
   
-  #   ###  after confirming deletion
-  # observeEvent(input$dialog_confirm_delete,{
-  #   req(input$dialog_confirm_delete)
-  #   f7Toast(
-  #     text=paste(nm,"removed from database"),
-  #     position="center",
-  #     closeButton=FALSE,
-  #     closeTimeout=3500
-  #   )
-  # })
-  
-  
+
 
   
   
