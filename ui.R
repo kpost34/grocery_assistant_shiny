@@ -2,7 +2,7 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,vroom)
 
 #source in functions and objects
 source(here("obj_fns","grocery_assistant_obj_01.R"))
@@ -41,8 +41,8 @@ ui<-f7Page(
           f7Button(inputId="btn_gen_list_main",
                    label="Generate shopping list"),
           br(),
-          f7Button(inputId="btn_addmult_recipe_main",
-                    label="Add recipes using file (computer recommended)"),
+          f7Button(inputId="btn_upload_recipe_main",
+                    label="Upload recipes from file (computer recommended)"),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
@@ -107,7 +107,7 @@ ui<-f7Page(
             f7Button(inputId="btn_return_recipe_ingredSheet1",
                      label="Return to recipe info"),
             f7Button(inputId="btn_ingred_entry_ingredSheet1",
-                     label="Add more ingredients"),
+                     label="Add more ingredients")
           ),
           br(),
           #right-aligns text
@@ -162,6 +162,50 @@ ui<-f7Page(
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
       )
+    ),
+    
+    ##### Generate Shopping List====================================================================
+    
+    
+    
+    
+    
+    ##### Upload Files to Database==================================================================
+    f7Tab(title="Upload Recipes",
+          tabName="upload_recipes",
+          hidden=TRUE,
+      div(
+        strong(h2("Batch insert recipes and their ingredients to database by file")),
+        br(),
+        h3("1) Download a copy of the template"),
+        f7DownloadButton(outputId="btn_template_download_upload",
+                         label="Download Template"),
+        tags$p("Notes:",
+          tags$li("recipe: name of recipe"),
+          tags$li("appliance: one or more of 'stove', 'oven', 'grill', 'broiler', 'slow cooker'; mtags$litiple
+             appliances separated by a ', '"),
+          tags$li("protein: one or more of 'Chicken', 'Beef', 'Steak', 'Pork', 'Fish', or 'Vegetarian'"),
+          tags$li("name: name of ingredient"),
+          tags$li("size: size of ingredient"),
+          tags$li("n: number of that partictags$liar ingredient needed in recipe")
+        ),
+        br(),
+        h3("2) Replace example in file with your recipes and ingredients"),
+        br(),
+        h3("3) Save file"),
+        br(),
+        h3("4) Upload file to database"),
+        f7File(
+          inputId="file_upload_recipe_upload",
+          label="",
+          accept=c(".csv",".xls",".xlsx"),
+          buttonLabel="Upload file"
+        ),
+        linebreaks(3),
+        f7Button(inputId="btn_return_main_upload",
+                 label="Return to main menu"),
+        style="margin-left:100px; margin-right: 100px"
+      )
     )
   )
 )
@@ -208,17 +252,16 @@ ui<-f7Page(
 
 
 
-
-
 # DONE
 
 
 
 
+
 # LAST COMMIT
-# got pre-loaded data button to load (and thus replace existing data)
-# added dialog for pre-loaded data
-# re-organized server script so that code is associated in the right place based on UI
-# added functional reset button
+# created upload file tab with buttons to navigate and to and from tab
+# added functional download button for user to get a copy of the template
+# added upload button & made it functional
+# added margins to upload tab
 
 

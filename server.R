@@ -43,6 +43,12 @@ server<-function(input,output,session){
   })
   
   
+  ## Move to upload tab
+  observeEvent(input$btn_upload_recipe_main,{
+    updateF7Tabs(id="main_tabset", selected="upload_recipes")
+  })
+  
+  
   
   #### Server=======================================================================================
   ### Initialize tmp reactiveValues
@@ -390,12 +396,39 @@ server<-function(input,output,session){
     )
     
   })
-  
-  
-
 
   
   
+  ##### Generate Ingredient List ####################################################################
+  #### UI===========================================================================================  
+  
+  
+  ##### Upload Recipes Tab #########################################################################
+  #### UI===========================================================================================
+  ### Return to main menu
+  observeEvent(input$btn_return_main_upload,{
+    updateF7Tabs(id="main_tabset",selected="main_tab")
+  })
+  
+  
+  
+  #### Back-end=====================================================================================
+  ### Create template by code
+  templateDF<-tibble(
+    demo_recipeDF %>% 
+      left_join(demo_ingredDF) %>% 
+      filter(row_number() %in% 1:3)
+  )
+  
+  ### 
+  output$btn_template_download_upload <- downloadHandler(
+    filename="grocery-assistant-template.csv",
+    content=function(file){
+      write_csv(templateDF,file)
+    }
+  )
+  # btn_template_download_upload
+
 }
 
 
