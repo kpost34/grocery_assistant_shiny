@@ -2,7 +2,7 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,vroom)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools)
 
 #source in functions and objects
 source(here("obj_fns","grocery_assistant_obj_01.R"))
@@ -180,15 +180,15 @@ ui<-f7Page(
         h3("1) Download a copy of the template"),
         f7DownloadButton(outputId="btn_template_download_upload",
                          label="Download Template"),
-        tags$p("Notes:",
-          tags$li("recipe: name of recipe"),
-          tags$li("appliance: one or more of 'stove', 'oven', 'grill', 'broiler', 'slow cooker'; mtags$litiple
+        br(),
+        "File should contain six columns:",
+          tags$li(strong("recipe:"), "name of recipe"),
+          tags$li(strong("appliance:"), "one or more of 'stove', 'oven', 'grill', 'broiler', 'slow cooker'; multiple
              appliances separated by a ', '"),
-          tags$li("protein: one or more of 'Chicken', 'Beef', 'Steak', 'Pork', 'Fish', or 'Vegetarian'"),
-          tags$li("name: name of ingredient"),
-          tags$li("size: size of ingredient"),
-          tags$li("n: number of that partictags$liar ingredient needed in recipe")
-        ),
+          tags$li(strong("protein:"), "one or more of 'chicken', 'beef', 'steak', 'pork', 'fish', or 'vegetarian'"),
+          tags$li(strong("name:"), "name of ingredient"),
+          tags$li(strong("size:"), "size of ingredient"),
+          tags$li(strong("n:"), "number of that particular ingredient needed in recipe"),
         br(),
         h3("2) Replace example in file with your recipes and ingredients"),
         br(),
@@ -204,6 +204,8 @@ ui<-f7Page(
         linebreaks(3),
         f7Button(inputId="btn_return_main_upload",
                  label="Return to main menu"),
+        br(),
+        tableOutput("file_upload_table"),
         style="margin-left:100px; margin-right: 100px"
       )
     )
@@ -241,6 +243,9 @@ ui<-f7Page(
 #add checkboxes to customize what to display in datatable (i.e., user chooses columns)
 #see if any observeEvents can be combined
 # tinker with main menu buttons--size, color, spacing, etc.
+#develop custom functions to limit server code
+#limit width of download button
+#error message if uploaded data have erros
 
 
 
@@ -249,6 +254,11 @@ ui<-f7Page(
 # 2) generate shopping list
 # 3) view/edit button generates cards (which also has delete option)
 # 4) ability to save status with login
+
+# use function/code to split uploaded data into db and recipe code
+# leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
+  #include a double-confirm?
+
 
 
 
@@ -259,9 +269,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-# created upload file tab with buttons to navigate and to and from tab
-# added functional download button for user to get a copy of the template
-# added upload button & made it functional
-# added margins to upload tab
+# developed code to read in uploaded file & (temporarily) write to a table
+# added toast notification for successful upload
+# split uploaded data (from file) to recipe and ingredient components
+# developed code for uploaded data to be added to db
 
 

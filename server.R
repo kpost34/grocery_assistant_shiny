@@ -413,21 +413,87 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
-  ### Create template by code
+  ### File download template
+  ## Create template by code
   templateDF<-tibble(
     demo_recipeDF %>% 
       left_join(demo_ingredDF) %>% 
       filter(row_number() %in% 1:3)
   )
   
-  ### 
+  
+  ## Download template
   output$btn_template_download_upload <- downloadHandler(
     filename="grocery-assistant-template.csv",
     content=function(file){
       write_csv(templateDF,file)
     }
   )
-  # btn_template_download_upload
+  
+  
+  ### File upload
+  ## Display toast notification that file uploaded
+  observeEvent(input$file_upload_recipe_upload,{
+    if(tools::file_ext(input$file_upload_recipe_upload$name) %in% c("csv","xls","xlsx")){
+      f7Toast(
+        text=paste(input$file_upload_recipe_upload$name,"uploaded to database"),
+        position="center",
+        closeButton=FALSE,
+        closeTimeout=3500
+      )
+    }
+  })
+  
+  
+  ## Read in uploaded file 
+  uploaded_file<-reactive({
+    req(input$file_upload_recipe_upload)
+    
+    ext<-tools::file_ext(input$file_upload_recipe_upload$name)
+    switch(ext,
+      csv = read_csv(input$file_upload_recipe_upload$datapath,show_col_types=FALSE),
+      xls = read_xls(input$file_upload_recipe_upload$datapath),
+      xlsx = read_xlsx(input$file_upload_recipe_upload$datapath)
+    ) %>%
+      mutate(across(!n,str_to_lower))
+  })
+
+  # Split uploaded file into recipe and ingredient DFs
+  recipe_upload<-reactive({
+    uploaded_file() %>%
+      select(recipe:protein) %>%
+      distinct()
+  })
+  
+  ingred_upload<-reactive({
+    uploaded_file() %>%
+      select(recipe,name:n)
+  })
+  
+  
+  ## Add uploaded files to database
+  observeEvent(input$file_upload_recipe_upload,{
+    #delay is to allow time for  uploaded_file() to split into recipe_upload() and ingred_upload()
+    delay(1000,{
+      recipe$db<-bind_rows(recipe$db,recipe_upload())
+      ingred$db<-bind_rows(ingred$db,ingred_upload())
+    })
+  })
+
+  
+  
+  # TEMP CODE: show tibble of uploaded file
+  output$file_upload_table<-renderTable({
+    uploaded_file()
+  })
+  
+
+
+  
+  
+
+  
+  
 
 }
 
