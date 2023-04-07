@@ -21,6 +21,12 @@ server<-function(input,output,session){
   })
   
   
+  ## Move to shopping list tab
+  observeEvent(input$btn_gen_list_main,{
+    updateF7Tabs(id="main_tabset",selected="list_tab")
+  })
+  
+  
   ## Display dialog for pre-loaded data
   observeEvent(input$btn_preload_data_main,{
     f7Dialog(
@@ -299,7 +305,13 @@ server<-function(input,output,session){
     updateF7Tabs(id="main_tabset",selected="main_tab")
   })
   
-  ### Display modal/dialog
+  
+  ### Display card after hitting View/edit button
+  # observeEvent(input$view_button,{
+  #   updateF7Card(id="test_card")
+  # })
+  
+  ### Display modal/dialog after hitting Delete button
   #both submit buttons in {} for observeEvent to listen to them
   observeEvent(eventExpr={
     input$delete_button #|
@@ -313,6 +325,9 @@ server<-function(input,output,session){
     )
   },
   ignoreInit=TRUE)
+  
+  
+  
   
   
 
@@ -332,23 +347,22 @@ server<-function(input,output,session){
         mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
         group_by(recipe,appliance,protein) %>%
         summarize(ingredients=toString(ingredient)) %>%
-        ungroup() %>%
+        ungroup() #%>%
         #add actionButtons to Actions column
-        mutate(Actions=paste(
-          shinyInput(actionButton,
-                     nrow(.),
-                     id="edit_",
-                     label="View/edit",
-                     icon=shiny::icon("trash"),
-                     class="btn-danger",
-                     onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
-          shinyInput(actionButton,
-                     nrow(.),
-                     id="delete_",
-                     label="Delete",
-                     icon=shiny::icon("trash"),
-                     class="btn-danger",
-                     onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))")))
+        # mutate(Actions=paste(
+        #   shinyInput(actionButton,
+        #              nrow(.),
+        #              id="edit_",
+        #              label="View/edit",
+        #              class="btn-danger",
+        #              onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
+        #   shinyInput(actionButton,
+        #              nrow(.),
+        #              id="delete_",
+        #              label="Delete",
+        #              icon=shiny::icon("trash"),
+        #              class="btn-danger",
+        #              onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))")))
     }
   })
   
@@ -356,7 +370,21 @@ server<-function(input,output,session){
   
   ## Display database as table
   output$recipe_db_recipe<-renderDT(
-    dt_df(),
+    dt_df() %>%
+      mutate(Actions=paste(
+        shinyInput(actionButton,
+                   nrow(.),
+                   id="edit_",
+                   label="View/edit",
+                   class="btn-danger",
+                   onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
+        shinyInput(actionButton,
+                   nrow(.),
+                   id="delete_",
+                   label="Delete",
+                   icon=shiny::icon("trash"),
+                   class="btn-danger",
+                   onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))"))),
     server=FALSE,
     selection="none",
     rownames=FALSE,
@@ -401,6 +429,34 @@ server<-function(input,output,session){
   
   ##### Generate Ingredient List ####################################################################
   #### UI===========================================================================================  
+  ### Return to main menu
+  observeEvent(input$btn_return_main_list,{
+    updateF7Tabs(id="main_tabset",selected="main_tab")
+  })
+  
+  
+  #### Back-end=====================================================================================
+  ## Display database as table
+  output$recipe_db_list<-renderDT(
+    dt_df() %>%
+      mutate(Actions=paste(
+        shinyInput(actionButton,
+                   nrow(.),
+                   id="add_",
+                   label="Add to list",
+                   onclick="Shiny.setInputValue(\"add_button\",  this.id.concat(\"_\", Math.random()))"))),
+    server=FALSE,
+    selection="none",
+    rownames=FALSE,
+    escape=FALSE,
+    options=list(
+      dom="frtip",
+      pageLength=10
+    )
+  )
+  
+  
+  
   
   
   ##### Upload Recipes Tab #########################################################################

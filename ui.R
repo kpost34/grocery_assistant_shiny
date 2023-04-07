@@ -150,7 +150,7 @@ ui<-f7Page(
       )
     ),
     
-    ##### Search/Browse Recipes=====================================================================
+    ##### Search/Browse/View/Edit/Delete Recipes====================================================
     f7Tab(title="Recipes",
           tabName="recipe_tab",
           hidden=TRUE,
@@ -162,10 +162,23 @@ ui<-f7Page(
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
       )
+      #view recipe cards
+      # f7Card(id="test_card",
+      #        title=demo_recipeDF[1,1])
     ),
     
     ##### Generate Shopping List====================================================================
-    
+    f7Tab(title="List",
+          tabName="list_tab",
+          hidden=TRUE,
+      div(
+        strong(h2("Generate shopping list")),
+        DTOutput("recipe_db_list"),
+        f7Button(inputId="btn_return_main_list",
+                 label="Return to main menu"),
+        style="margin-left:100px; margin-right: 100px"
+      )
+    ),
     
     
     
@@ -217,12 +230,6 @@ ui<-f7Page(
 
 
 
-
-
-
-
-
-
 #---------------------------------------
 # LATER
 #shopping list will round counts up (e.g., ceiling)
@@ -231,7 +238,6 @@ ui<-f7Page(
 #figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
   #two sheets will actually manifest
 #add condition--if no ingredients selected then can't submit (same with recipe)
-#password protection
 #auto-complete
 #change styling of buttons
 #fix delay/poor responsiveness with previous ingredient actionButton
@@ -245,21 +251,17 @@ ui<-f7Page(
 # tinker with main menu buttons--size, color, spacing, etc.
 #develop custom functions to limit server code
 #limit width of download button
-#error message if uploaded data have erros
+#error message if uploaded data have errors
+# leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
+  #include a double-confirm?
+#add toast notification for pre-loaded data??
 
 
 
 # NEXT
-# 1) batch add capability
+# 1) view/edit button generates cards (which also has delete option)
 # 2) generate shopping list
-# 3) view/edit button generates cards (which also has delete option)
-# 4) ability to save status with login
-
-# use function/code to split uploaded data into db and recipe code
-# leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
-  #include a double-confirm?
-
-
+# 3) ability to save status with login
 
 
 # DONE
@@ -268,10 +270,9 @@ ui<-f7Page(
 
 
 
+
 # LAST COMMIT
-# developed code to read in uploaded file & (temporarily) write to a table
-# added toast notification for successful upload
-# split uploaded data (from file) to recipe and ingredient components
-# developed code for uploaded data to be added to db
+# removed trash can icon from View/edit button
+# created generate shopping list tab & functional button to return to main menu
 
 
