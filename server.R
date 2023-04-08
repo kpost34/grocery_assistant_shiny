@@ -440,8 +440,14 @@ server<-function(input,output,session){
 
   
   
-  ##### Generate Ingredient List ####################################################################
+  ##### Generate Ingredient List Tab ###############################################################
   #### UI===========================================================================================  
+  ### See meal plan
+  observeEvent(input$btn_view_plan_list,{
+    updateF7Tabs(id="main_tabset",selected="plan_tab")
+  })
+  
+  
   ### Return to main menu
   observeEvent(input$btn_return_main_list,{
     updateF7Tabs(id="main_tabset",selected="main_tab")
@@ -486,10 +492,29 @@ server<-function(input,output,session){
   })
   
   
+  ##### Meal Plan Tab ##############################################################################
+  #### UI===========================================================================================
+  ### Return to meal planner tab
+  observeEvent(input$btn_return_list_plan,{
+    updateF7Tabs(id="main_tabset",
+                 selected="list_tab")
+  })
   
-  ## Temporarily display shopping list
-  output$shopping_list<-renderTable(ingred$list)
-  output$recipe_list<-renderText(recipe$list)
+  ### Return to main menu
+  observeEvent(input$btn_return_main_plan,{
+    updateF7Tabs(id="main_tabset",
+                 selected="main_tab")
+  })
+
+
+  
+  #### Back-end=====================================================================================
+  ## Display meal plan and shopping list
+  output$recipe_list_plan<-renderText(recipe$list)
+  output$shopping_list_plan<-renderDT(ingred$list)
+  
+
+
  
   
   

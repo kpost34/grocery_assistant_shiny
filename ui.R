@@ -172,17 +172,37 @@ ui<-f7Page(
           tabName="list_tab",
           hidden=TRUE,
       div(
-        strong(h2("Generate shopping list")),
+        splitLayout(cellWidths=c("75%","25%"),
+          strong(h2("Generate shopping list")),
+          f7Button(inputId="btn_view_plan_list",
+                   label="View meal plan")
+        ),
         h3("Select the recipes to add to your meal planner"),
         DTOutput("recipe_db_list"),
         f7Button(inputId="btn_return_main_list",
                  label="Return to main menu"),
+        style="margin-left:100px; margin-right: 100px"
+      )
+    ),
+    
+    
+    
+    ##### Meal Plan=================================================================================
+    f7Tab(title="Meal Plan",
+          tabName="plan_tab",
+          hidden=TRUE,
+      div(
+        strong(h2("Meal plan")),
+        h3("Upcoming meals"),
+        textOutput("recipe_list_plan"),
+        linebreaks(2),
+        h3("Shopping list"),
+        DTOutput("shopping_list_plan"),
+        f7Button(inputId="btn_return_list_plan",
+                 label="Return to meal planner"),
         br(),
-        "Recipe list",
-        textOutput("recipe_list"),
-        br(),
-        "Shopping list",
-        tableOutput("shopping_list"),
+        f7Button(inputId="btn_return_main_plan",
+                 label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
       )
     ),
@@ -278,8 +298,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-# created functional add buttons on generate list tab
-# added ingred$list to reset app & pre-loaded data buttons observeEvents
-# added code to separate recipe from ingredients and compile and output
+# created meal plan tab
+# moved recipe and shopping list outputs to new tab
+# added buttons to get to and from meal planner and meal plan tabs
 
 
