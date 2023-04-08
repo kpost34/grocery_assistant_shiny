@@ -38,8 +38,8 @@ ui<-f7Page(
           f7Button(inputId="btn_manage_recipe_main",
                    label="View/edit/delete recipes"),
           br(),
-          f7Button(inputId="btn_gen_list_main",
-                   label="Generate shopping list"),
+          f7Button(inputId="btn_meal_plan_main",
+                   label="Meal planner"),
           br(),
           f7Button(inputId="btn_upload_recipe_main",
                     label="Upload recipes from file (computer recommended)"),
@@ -168,18 +168,18 @@ ui<-f7Page(
     ),
     
     ##### Generate Shopping List====================================================================
-    f7Tab(title="List",
-          tabName="list_tab",
+    f7Tab(title="Meal Planner",
+          tabName="planner_tab",
           hidden=TRUE,
       div(
         splitLayout(cellWidths=c("75%","25%"),
-          strong(h2("Generate shopping list")),
-          f7Button(inputId="btn_view_plan_list",
-                   label="View meal plan")
+          strong(h2("Meal planner")),
+          f7Button(inputId="btn_view_plan_planner",
+                   label="View meal plan/shopping list")
         ),
-        h3("Select the recipes to add to your meal planner"),
-        DTOutput("recipe_db_list"),
-        f7Button(inputId="btn_return_main_list",
+        h3("Select the recipes to add to your meal plan"),
+        DTOutput("recipe_db_planner"),
+        f7Button(inputId="btn_return_main_planner",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
       )
@@ -187,21 +187,21 @@ ui<-f7Page(
     
     
     
-    ##### Meal Plan=================================================================================
-    f7Tab(title="Meal Plan",
-          tabName="plan_tab",
+    ##### Shopping List=============================================================================
+    f7Tab(title="Shopping List",
+          tabName="list_tab",
           hidden=TRUE,
       div(
         strong(h2("Meal plan")),
         h3("Upcoming meals"),
-        textOutput("recipe_list_plan"),
+        tableOutput("recipe_list_list"),
         linebreaks(2),
         h3("Shopping list"),
-        DTOutput("shopping_list_plan"),
-        f7Button(inputId="btn_return_list_plan",
+        DTOutput("shopping_list_list"),
+        f7Button(inputId="btn_return_planner_list",
                  label="Return to meal planner"),
-        br(),
-        f7Button(inputId="btn_return_main_plan",
+        linebreaks(2),
+        f7Button(inputId="btn_return_main_list",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
       )
@@ -258,48 +258,58 @@ ui<-f7Page(
 
 
 #---------------------------------------
-# LATER
-#shopping list will round counts up (e.g., ceiling)
+# LATER-------------------------
+# Styling
+# tinker with main menu buttons--size, color, spacing, etc.
+#change styling of buttons
+# slideshow of images (recipe) on main app page
+#limit width of download button
+
+
+# UI
+#use segment to bunch buttons
+#auto-complete
+#add checkboxes to customize what to display in datatable (i.e., user chooses columns)
+#fix delay/poor responsiveness with previous ingredient actionButton
+#add condition--if no ingredients selected then can't submit (same with recipe)
 #figure out a way to always display sheet 3 in the background so that submit button is always
   #visible
 #figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
   #two sheets will actually manifest
-#add condition--if no ingredients selected then can't submit (same with recipe)
-#auto-complete
-#change styling of buttons
-#fix delay/poor responsiveness with previous ingredient actionButton
-#use segment to bunch buttons
-#slideshow of images (recipe) on main app page
-#display recipe 'cards' (which have pictures of dishes--manual upload or auto-internet search)
-#add nuance to observeEvent that generates dt--that adding recipe, loading saved db, loading
-  #demo, or batch loading can be the event
-#add checkboxes to customize what to display in datatable (i.e., user chooses columns)
-#see if any observeEvents can be combined
-# tinker with main menu buttons--size, color, spacing, etc.
-#develop custom functions to limit server code
-#limit width of download button
 #error message if uploaded data have errors
 # leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
   #include a double-confirm?
 
 
+# Back-end
+#develop custom functions to limit server code
+#see if any observeEvents can be combined
 
-# NEXT
+
+
+
+# NEXT-------------------------
 # 1) view/edit button generates cards (which also has delete option)
 # 2) generate shopping list
 # 3) ability to save status with login
 
-
-# DONE
-
-
-
-
+# Shopping List
+#add ability to adjust quantities & remove items from recipe and shopping lists
+#make shopping list a caption-title
+#add reset button
 
 
-# LAST COMMIT
-# created meal plan tab
-# moved recipe and shopping list outputs to new tab
-# added buttons to get to and from meal planner and meal plan tabs
+# DONE--------------------------
+
+
+
+
+
+
+# LAST COMMIT-------------------
+# renamed 'generate shopping list' and 'shopping list' tabs (and their inputs and outputs) to make 
+  #more logical sense
+# changed upcoming meals from a string to a table
+# added toast notification when recipe added to meal plan
 
 

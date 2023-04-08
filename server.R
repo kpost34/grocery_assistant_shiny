@@ -21,9 +21,9 @@ server<-function(input,output,session){
   })
   
   
-  ## Move to shopping list tab
-  observeEvent(input$btn_gen_list_main,{
-    updateF7Tabs(id="main_tabset",selected="list_tab")
+  ## Move to meal planner tab
+  observeEvent(input$btn_meal_plan_main,{
+    updateF7Tabs(id="main_tabset",selected="planner_tab")
   })
   
   
@@ -66,7 +66,7 @@ server<-function(input,output,session){
   
   
   ## Set recipe$list to an empty tibble
-  recipe<-reactiveValues(list=vector(mode="character"))
+  recipe<-reactiveValues(list=tibble())
   
   ## Set ingred$list to an empty tibble
   ingred<-reactiveValues(list=tibble())
@@ -86,7 +86,7 @@ server<-function(input,output,session){
     req(input$dialog_confirm_preload_data)
     recipe$db<-demo_recipeDF
     ingred$db<-demo_ingredDF
-    recipe$list<-vector(mode="character")
+    recipe$list<-tibble()
     ingred$list<-tibble()
   })
   
@@ -97,7 +97,7 @@ server<-function(input,output,session){
     req(input$dialog_confirm_reset_db_data)
     recipe$db<-tibble()
     ingred$db<-tibble()
-    recipe$list<-vector(mode="character")
+    recipe$list<-tibble()
     ingred$list<-tibble()
   })
   
@@ -440,29 +440,29 @@ server<-function(input,output,session){
 
   
   
-  ##### Generate Ingredient List Tab ###############################################################
+  ##### Generate Ingredient List/Meal Planner Tab ##################################################
   #### UI===========================================================================================  
   ### See meal plan
-  observeEvent(input$btn_view_plan_list,{
-    updateF7Tabs(id="main_tabset",selected="plan_tab")
+  observeEvent(input$btn_view_plan_planner,{
+    updateF7Tabs(id="main_tabset",selected="list_tab")
   })
   
   
   ### Return to main menu
-  observeEvent(input$btn_return_main_list,{
+  observeEvent(input$btn_return_main_planner,{
     updateF7Tabs(id="main_tabset",selected="main_tab")
   })
   
   
   #### Back-end=====================================================================================
   ## Display database as table
-  output$recipe_db_list<-renderDT(
+  output$recipe_db_planner<-renderDT(
     dt_df() %>%
       mutate(Actions=paste(
         shinyInput(actionButton,
                    nrow(.),
                    id="add_",
-                   label="Add to list",
+                   label="Add to plan",
                    onclick="Shiny.setInputValue(\"add_button\",  this.id.concat(\"_\", Math.random()))"))),
     server=FALSE,
     selection="none",
@@ -477,31 +477,44 @@ server<-function(input,output,session){
   )
   
   
-  ## Add item to 'shopping cart'--updates recipes and ingredients
+  ## Add item to meal plan--updates recipes and ingredients--and display toast notification
   observeEvent(input$add_button,{
+    #recipe & ingreds added to meal plan
     added_row<-as.numeric(strsplit(input$add_button,"_")[[1]][2])
+    #new recipe name
     recipe_nm<-dt_df()[[added_row,"recipe"]]
+    #new ingredients that will be added to list
     ingreds<-ingred$db %>% 
       filter(recipe==recipe_nm) %>%
       select(-recipe) 
+    #add ingredients to list
     ingred$list<-bind_rows(ingred$list,ingreds) %>%
       group_by(name,size) %>%
       summarize(n=sum(n) %>% ceiling)
-    recipe$list<-paste(recipe$list,recipe_nm,sep=", ") %>%
-      str_remove(.,"^, ")
+    #new recipe added to list
+    recipe_new<-as_tibble_col(recipe_nm,column_name="recipe")
+    recipe$list<-bind_rows(recipe$list,recipe_new)
+    
+    #toast notification
+    f7Toast(
+      text=paste(recipe_nm,"added to meal plan"),
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=3000
+    )
   })
   
   
-  ##### Meal Plan Tab ##############################################################################
+  ##### Meal Plan/Shopping List Tab ################################################################
   #### UI===========================================================================================
   ### Return to meal planner tab
-  observeEvent(input$btn_return_list_plan,{
+  observeEvent(input$btn_return_planner_list,{
     updateF7Tabs(id="main_tabset",
-                 selected="list_tab")
+                 selected="planner_tab")
   })
   
   ### Return to main menu
-  observeEvent(input$btn_return_main_plan,{
+  observeEvent(input$btn_return_main_list,{
     updateF7Tabs(id="main_tabset",
                  selected="main_tab")
   })
@@ -510,8 +523,8 @@ server<-function(input,output,session){
   
   #### Back-end=====================================================================================
   ## Display meal plan and shopping list
-  output$recipe_list_plan<-renderText(recipe$list)
-  output$shopping_list_plan<-renderDT(ingred$list)
+  output$recipe_list_list<-renderTable(recipe$list)
+  output$shopping_list_list<-renderDT(ingred$list)
   
 
 
