@@ -65,6 +65,13 @@ server<-function(input,output,session){
   ingred<-reactiveValues(tmp=tibble())
   
   
+  ## Set recipe$list to an empty tibble
+  recipe<-reactiveValues(list=vector(mode="character"))
+  
+  ## Set ingred$list to an empty tibble
+  ingred<-reactiveValues(list=tibble())
+  
+  
   ### Initialize database reactiveValues
   ## Set recipe$db to an empty tibble
   recipe<-reactiveValues(db=tibble())
@@ -79,6 +86,8 @@ server<-function(input,output,session){
     req(input$dialog_confirm_preload_data)
     recipe$db<-demo_recipeDF
     ingred$db<-demo_ingredDF
+    recipe$list<-vector(mode="character")
+    ingred$list<-tibble()
   })
   
   
@@ -88,6 +97,8 @@ server<-function(input,output,session){
     req(input$dialog_confirm_reset_db_data)
     recipe$db<-tibble()
     ingred$db<-tibble()
+    recipe$list<-vector(mode="character")
+    ingred$list<-tibble()
   })
   
   
@@ -397,14 +408,16 @@ server<-function(input,output,session){
         list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
         list(extend="print",title="Grocery Assistant Database")
       )
-    )
+    ),
+    caption = htmltools::tags$caption(style = "caption-side: top; text-align: center; color:black;  
+                                      font-size:200% ;","Recipe Database")
   )
 
   ## If no data then message is returned
-  output$blank_dt_df_recipe<-renderText({
-    req(nrow(recipe$db)==0 & nrow(ingred$db)==0)
-    "No data in database."
-  })
+  # output$blank_dt_df_recipe<-renderText({
+  #   req(nrow(recipe$db)==0 & nrow(ingred$db)==0)
+  #   "No data in database."
+  # })
   
   
   
@@ -452,10 +465,32 @@ server<-function(input,output,session){
     options=list(
       dom="frtip",
       pageLength=10
-    )
+    ),
+    caption = htmltools::tags$caption(style = "caption-side: top; text-align: center; color:black;  
+                                      font-size:200% ;","Recipe Database")
   )
   
   
+  ## Add item to 'shopping cart'--updates recipes and ingredients
+  observeEvent(input$add_button,{
+    added_row<-as.numeric(strsplit(input$add_button,"_")[[1]][2])
+    recipe_nm<-dt_df()[[added_row,"recipe"]]
+    ingreds<-ingred$db %>% 
+      filter(recipe==recipe_nm) %>%
+      select(-recipe) 
+    ingred$list<-bind_rows(ingred$list,ingreds) %>%
+      group_by(name,size) %>%
+      summarize(n=sum(n) %>% ceiling)
+    recipe$list<-paste(recipe$list,recipe_nm,sep=", ") %>%
+      str_remove(.,"^, ")
+  })
+  
+  
+  
+  ## Temporarily display shopping list
+  output$shopping_list<-renderTable(ingred$list)
+  output$recipe_list<-renderText(recipe$list)
+ 
   
   
   

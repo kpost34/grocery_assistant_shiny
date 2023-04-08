@@ -157,7 +157,7 @@ ui<-f7Page(
       div(
         strong(h2("Feel free to browse, search, edit, and delete recipes")),
         DTOutput("recipe_db_recipe"),
-        strong(h3(textOutput("blank_dt_df_recipe"))),
+        # strong(h3(textOutput("blank_dt_df_recipe"))),
         f7Button(inputId="btn_return_main_recipe",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
@@ -173,9 +173,16 @@ ui<-f7Page(
           hidden=TRUE,
       div(
         strong(h2("Generate shopping list")),
+        h3("Select the recipes to add to your meal planner"),
         DTOutput("recipe_db_list"),
         f7Button(inputId="btn_return_main_list",
                  label="Return to main menu"),
+        br(),
+        "Recipe list",
+        textOutput("recipe_list"),
+        br(),
+        "Shopping list",
+        tableOutput("shopping_list"),
         style="margin-left:100px; margin-right: 100px"
       )
     ),
@@ -254,7 +261,6 @@ ui<-f7Page(
 #error message if uploaded data have errors
 # leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
   #include a double-confirm?
-#add toast notification for pre-loaded data??
 
 
 
@@ -272,7 +278,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT
-# removed trash can icon from View/edit button
-# created generate shopping list tab & functional button to return to main menu
+# created functional add buttons on generate list tab
+# added ingred$list to reset app & pre-loaded data buttons observeEvents
+# added code to separate recipe from ingredients and compile and output
 
 
