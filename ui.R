@@ -179,6 +179,12 @@ ui<-f7Page(
         ),
         h3("Select the recipes to add to your meal plan"),
         DTOutput("recipe_db_planner"),
+        splitLayout(cellWidths=c("75%","25%"),
+          br(),
+          f7Button(inputId="btn_reset_planList_planner",
+                   label="Reset plan/list")
+        ),
+        linebreaks(2),
         f7Button(inputId="btn_return_main_planner",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
@@ -192,14 +198,19 @@ ui<-f7Page(
           tabName="list_tab",
           hidden=TRUE,
       div(
-        strong(h2("Meal plan")),
-        h3("Upcoming meals"),
-        tableOutput("recipe_list_list"),
+        splitLayout(cellWidths=c("75%","25%"),
+          strong(h2("Meal plan & shopping list")),
+          f7Button(inputId="btn_return_planner_list",
+                 label="Return to meal planner")
+        ),
+        DTOutput("recipe_list_list"),
         linebreaks(2),
-        h3("Shopping list"),
         DTOutput("shopping_list_list"),
-        f7Button(inputId="btn_return_planner_list",
-                 label="Return to meal planner"),
+        splitLayout(cellWidths=c("75%","25%"),
+          br(),
+          f7Button(inputId="btn_reset_planList_list",
+                   label="Reset plan/list")
+        ),
         linebreaks(2),
         f7Button(inputId="btn_return_main_list",
                  label="Return to main menu"),
@@ -279,6 +290,7 @@ ui<-f7Page(
 #error message if uploaded data have errors
 # leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
   #include a double-confirm?
+# make button for meal planner visible only when recipes are in the database
 
 
 # Back-end
@@ -295,7 +307,6 @@ ui<-f7Page(
 
 # Shopping List
 #add ability to adjust quantities & remove items from recipe and shopping lists
-#make shopping list a caption-title
 #add reset button
 
 
@@ -304,12 +315,10 @@ ui<-f7Page(
 
 
 
-
-
 # LAST COMMIT-------------------
-# renamed 'generate shopping list' and 'shopping list' tabs (and their inputs and outputs) to make 
-  #more logical sense
-# changed upcoming meals from a string to a table
-# added toast notification when recipe added to meal plan
+# added titles to meal and shopping lists
+# moved return to meal planner button to top-right corner
+# added reset buttons & functionality to display dialogs on planner and list tabs
+# made dialogs functional so that they erase 
 
 

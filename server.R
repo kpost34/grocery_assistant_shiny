@@ -454,6 +454,17 @@ server<-function(input,output,session){
   })
   
   
+  ### Display dialog for resetting plan/list
+  observeEvent(input$btn_reset_planList_planner,{
+    f7Dialog(
+      id="dialog_confirm_reset_planList_planner",
+      title="Confirm plan reset",
+      type="confirm",
+      text="Click OK to erase meal plan and shopping list."
+    )
+  })
+  
+  
   #### Back-end=====================================================================================
   ## Display database as table
   output$recipe_db_planner<-renderDT(
@@ -500,8 +511,16 @@ server<-function(input,output,session){
       text=paste(recipe_nm,"added to meal plan"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=3000
+      closeTimeout=2000
     )
+  })
+  
+  
+  ## Reset plan and list
+  observeEvent(input$dialog_confirm_reset_planList_planner,{
+    req(input$dialog_confirm_reset_planList_planner)
+    recipe$list<-tibble()
+    ingred$list<-tibble()
   })
   
   
@@ -518,17 +537,54 @@ server<-function(input,output,session){
     updateF7Tabs(id="main_tabset",
                  selected="main_tab")
   })
+  
+  
+  ## Display dialog for resetting plan/list
+  observeEvent(input$btn_reset_planList_list,{
+    f7Dialog(
+      id="dialog_confirm_reset_planList_list",
+      title="Confirm plan reset",
+      type="confirm",
+      text="Click OK to erase meal plan and shopping list."
+    )
+  })
 
 
   
   #### Back-end=====================================================================================
   ## Display meal plan and shopping list
-  output$recipe_list_list<-renderTable(recipe$list)
-  output$shopping_list_list<-renderDT(ingred$list)
+  # Meal plan
+  output$recipe_list_list<-renderDT(
+    recipe$list,
+    rownames=FALSE,
+    options=list(
+      dom="ft"
+    ),
+    caption = htmltools::tags$caption(style = "caption-side: top; text-align: left; color:black;  
+                                      font-size:150% ;","Meals")
+  )
+                                    
+  # Shopping list
+  output$shopping_list_list<-renderDT(
+    ingred$list,
+    rownames=FALSE,
+    options=list(
+      dom="Blft"
+    ),
+    caption = htmltools::tags$caption(style = "caption-side: top; text-align: center; color:black;  
+                                      font-size:150% ;","Shopping List")
+  )
+  
+  
+  ## Reset plan and list
+  observeEvent(input$dialog_confirm_reset_planList_list,{
+    req(input$dialog_confirm_reset_planList_list)
+    recipe$list<-tibble()
+    ingred$list<-tibble()
+  })
+  
   
 
-
- 
   
   
   
