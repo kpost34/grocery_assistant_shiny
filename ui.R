@@ -2,7 +2,7 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,shinyscreenshot)
 
 #source in functions and objects
 source(here("obj_fns","grocery_assistant_obj_01.R"))
@@ -203,15 +203,34 @@ ui<-f7Page(
           f7Button(inputId="btn_return_planner_list",
                  label="Return to meal planner")
         ),
-        DTOutput("recipe_list_list"),
-        linebreaks(2),
-        DTOutput("shopping_list_list"),
+        #create div() for screenshot() in server function
+        div(id="plan-list-screenshot",
+          DTOutput("recipe_list_list"),
+          linebreaks(2),
+          DTOutput("shopping_list_list")
+        ),
+        #take a screenshot
+        splitLayout(cellWidths=c("75%","25%"),
+          br(),
+          f7Button(inputId="btn_planList_screenshot_list",
+                   label="Screenshot plan & list")
+        ),
+        br(),
+        #export to pdf
+        splitLayout(cellWidths=c("75%","25%"),            
+          br(),
+          f7DownloadButton(outputId="btn_list_export_list",
+                           label="Export plan & list to pdf")
+        ),
+        br(),
+        #reset
         splitLayout(cellWidths=c("75%","25%"),
           br(),
           f7Button(inputId="btn_reset_planList_list",
                    label="Reset plan/list")
         ),
         linebreaks(2),
+        #return to main menu
         f7Button(inputId="btn_return_main_list",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
@@ -290,7 +309,8 @@ ui<-f7Page(
 #error message if uploaded data have errors
 # leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
   #include a double-confirm?
-# make button for meal planner visible only when recipes are in the database
+# make button for meal planner (on main menu) visible only when recipes are in the database
+#add ability to adjust quantities & remove items from recipe and shopping lists
 
 
 # Back-end
@@ -306,8 +326,8 @@ ui<-f7Page(
 # 3) ability to save status with login
 
 # Shopping List
-#add ability to adjust quantities & remove items from recipe and shopping lists
-#add reset button
+# email page
+
 
 
 # DONE--------------------------
@@ -316,9 +336,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# added titles to meal and shopping lists
-# moved return to meal planner button to top-right corner
-# added reset buttons & functionality to display dialogs on planner and list tabs
-# made dialogs functional so that they erase 
+# added download button to export meal plan/shopping list
+# left-aligned Shopping List title
+# added ability to export meal plan and shopping list to a pdf
+# added ability to screenshot tables
 
 

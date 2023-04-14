@@ -1,0 +1,30 @@
+---
+title: "Meal Plan & Shopping List"
+output: pdf_document
+params:
+  table1: NA
+  table2: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(kableExtra)
+```
+
+*Meal Plan*
+```{r}
+kable(params[["table1"]],format="latex") %>%
+  row_spec(0,bold=TRUE)
+```
+
+\
+\
+\
+
+
+*Shopping List*
+```{r}
+kable(params[["table2"]],format="latex") %>%
+  row_spec(0,bold=TRUE)
+```

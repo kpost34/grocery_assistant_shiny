@@ -561,7 +561,7 @@ server<-function(input,output,session){
       dom="ft"
     ),
     caption = htmltools::tags$caption(style = "caption-side: top; text-align: left; color:black;  
-                                      font-size:150% ;","Meals")
+                                      font-size:150% ;","Meal Plan")
   )
                                     
   # Shopping list
@@ -569,11 +569,40 @@ server<-function(input,output,session){
     ingred$list,
     rownames=FALSE,
     options=list(
-      dom="Blft"
+      dom="ft"
     ),
-    caption = htmltools::tags$caption(style = "caption-side: top; text-align: center; color:black;  
+    caption = htmltools::tags$caption(style = "caption-side: top; text-align: left; color:black;  
                                       font-size:150% ;","Shopping List")
   )
+  
+  
+  ## Download meal plan and shopping list
+  output$btn_list_export_list<-downloadHandler(
+    filename="meal-plan-and-shopping-list.pdf",
+    content=function(file){
+      tempReport<-file.path(tempdir(),"plan-and-list-template.Rmd")
+      file.copy("plan-and-list-template.Rmd",tempReport,overwrite=TRUE)
+
+      params<-list(table1=recipe$list,
+                   table2=ingred$list
+      )
+
+      rmarkdown::render(input=tempReport,
+                        output_file=file,
+                        params=params,
+                        envir=new.env(parent=globalenv()))
+    }
+  )
+  
+  
+  ## Take screenshot of meal plan and shopping list
+  observeEvent(input$btn_planList_screenshot_list,{
+    screenshot(
+      id="tables",
+      scale=0.8,
+      filename="plan-and-list-screenshot.png"
+    )
+  })
   
   
   ## Reset plan and list
