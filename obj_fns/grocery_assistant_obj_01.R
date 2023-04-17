@@ -56,3 +56,14 @@ demo_ingredDF <- tibble(
     1,6,1,1
   )
 )
+
+
+
+
+#### Meal Plan & Shopping List======================================================================
+### Send email copy
+## String for detecting legitimate emails
+email_str_detect<-"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+
+
+

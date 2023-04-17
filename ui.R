@@ -2,11 +2,15 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,shinyscreenshot)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,shinyscreenshot,
+               mailR,htmlTable)
+
+
 
 #source in functions and objects
 source(here("obj_fns","grocery_assistant_obj_01.R"))
 source(here("obj_fns","grocery_assistant_fn_01.R"))
+source(here("config.R"))
 
 
 #--------------------------------------------------------------------------------------------------#
@@ -209,6 +213,21 @@ ui<-f7Page(
           linebreaks(2),
           DTOutput("shopping_list_list")
         ),
+        br(),
+        #email it
+        splitLayout(cellWidths=c("75%","25%"),
+          br(),
+          f7Block(
+            f7BlockTitle(title="Email plan & list",size="medium"),
+            f7Text(inputId="text_email_address_list",
+                   label="Recipient"),
+            shinyFeedback::useShinyFeedback(),
+            textOutput("warn_no_email_address_list"),
+            f7Button(inputId="btn_planList_email_list",
+                     label="Send email")
+          )
+        ),
+        br(),
         #take a screenshot
         splitLayout(cellWidths=c("75%","25%"),
           br(),
@@ -219,7 +238,7 @@ ui<-f7Page(
         #export to pdf
         splitLayout(cellWidths=c("75%","25%"),            
           br(),
-          f7DownloadButton(outputId="btn_list_export_list",
+          f7DownloadButton(outputId="btn_planList_export_list",
                            label="Export plan & list to pdf")
         ),
         br(),
@@ -311,6 +330,8 @@ ui<-f7Page(
   #include a double-confirm?
 # make button for meal planner (on main menu) visible only when recipes are in the database
 #add ability to adjust quantities & remove items from recipe and shopping lists
+#turn any repeated functions into custom functions (e.g., use of splitLayout?)
+#add camera icon (and other icons) to buttons
 
 
 # Back-end
@@ -321,12 +342,14 @@ ui<-f7Page(
 
 
 # NEXT-------------------------
+#Broad action items
 # 1) view/edit button generates cards (which also has delete option)
 # 2) generate shopping list
 # 3) ability to save status with login
 
-# Shopping List
-# email page
+#Next
+# 1) set up code so that app doesn't simply fail if recipient box is empty and email is attempted
+
 
 
 
@@ -335,10 +358,12 @@ ui<-f7Page(
 
 
 
+
 # LAST COMMIT-------------------
-# added download button to export meal plan/shopping list
-# left-aligned Shopping List title
-# added ability to export meal plan and shopping list to a pdf
-# added ability to screenshot tables
+# added email button, associated server code, and set-up gmail account so that list is emailed
+# configured body of email so that it sends htmlTable() objects
+# toast notification appears when email is sent
+# update .gitignore and created a configuration file (not pushed to GitHub)
+# str_detect added to ID real emails and warning given if not legitimate
 
 

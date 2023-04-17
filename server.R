@@ -552,8 +552,9 @@ server<-function(input,output,session){
 
   
   #### Back-end=====================================================================================
-  ## Display meal plan and shopping list
-  # Meal plan
+  ### Display meal plan and shopping list
+  ## Meal plan
+  # datatable
   output$recipe_list_list<-renderDT(
     recipe$list,
     rownames=FALSE,
@@ -563,8 +564,14 @@ server<-function(input,output,session){
     caption = htmltools::tags$caption(style = "caption-side: top; text-align: left; color:black;  
                                       font-size:150% ;","Meal Plan")
   )
+  
+  #htmlTable
+  meal_email_table<-reactive({
+    htmlTable(recipe$list,rnames=FALSE)
+  })
                                     
-  # Shopping list
+  ## Shopping list
+  #datatable
   output$shopping_list_list<-renderDT(
     ingred$list,
     rownames=FALSE,
@@ -575,9 +582,75 @@ server<-function(input,output,session){
                                       font-size:150% ;","Shopping List")
   )
   
+  #htmlTable
+  ingredient_email_table<-reactive({
+    htmlTable(ingred$list,rnames=FALSE)
+  })
   
-  ## Download meal plan and shopping list
-  output$btn_list_export_list<-downloadHandler(
+  
+  ### Get a copy of plan and list
+  ## By email
+  # Reactive object for issuing warning if no email address provided
+  
+  
+  observeEvent(input$btn_planList_email_list,{
+    
+    #logical object for minimal req for an email address entered
+    address_entered<-nchar(input$text_email_address_list)>0 & 
+      str_detect(input$text_email_address_list,"@")
+    
+    address_entered<-str_detect(input$text_email_address_list,email_str_detect)
+    
+    #warning returned if not entered
+    shinyFeedback::feedbackWarning("text_email_address_list",
+                                   !address_entered,
+                                   "Please enter a valid email address")
+
+    #prevents app from failing if blank email entered
+    req(address_entered,cancelOutput=TRUE)
+    
+    #create body of email
+    email_body<-paste0("<p> Meal plan </p>",
+                       meal_email_table(),
+                       "<br>",
+                       "<br>",
+                       "<p> Shopping list </p>",
+                       ingredient_email_table()
+                       )
+    
+    #send email
+    send.mail(from="grocery.asst.app@gmail.com",
+              to=paste0("<",input$text_email_address_list,">"),
+              subject="meal plan & grocery list",
+              body=email_body,
+              smtp = list(host.name = "smtp.gmail.com", port = 587, 
+                          user.name = x1, passwd = x2, ssl = TRUE),
+              authenticate = TRUE,
+              html=TRUE,
+              send = TRUE)
+    
+    #create toast notification
+    f7Toast(
+        text=paste("Meal plan and shopping list sent to",input$text_email_address_list),
+        position="center",
+        closeButton=FALSE,
+        closeTimeout=3000
+      )
+  })
+  
+  
+  ## By screenshot
+  observeEvent(input$btn_planList_screenshot_list,{
+    screenshot(
+      id="plan-list-screenshot",
+      scale=0.8,
+      filename="plan-and-list-screenshot.png"
+    )
+  })
+  
+  
+  ## Download as pdf
+  output$btn_planList_export_list<-downloadHandler(
     filename="meal-plan-and-shopping-list.pdf",
     content=function(file){
       tempReport<-file.path(tempdir(),"plan-and-list-template.Rmd")
@@ -593,19 +666,10 @@ server<-function(input,output,session){
                         envir=new.env(parent=globalenv()))
     }
   )
+
   
   
-  ## Take screenshot of meal plan and shopping list
-  observeEvent(input$btn_planList_screenshot_list,{
-    screenshot(
-      id="tables",
-      scale=0.8,
-      filename="plan-and-list-screenshot.png"
-    )
-  })
-  
-  
-  ## Reset plan and list
+  ### Reset plan and list
   observeEvent(input$dialog_confirm_reset_planList_list,{
     req(input$dialog_confirm_reset_planList_list)
     recipe$list<-tibble()
