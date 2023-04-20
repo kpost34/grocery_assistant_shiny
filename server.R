@@ -339,13 +339,11 @@ server<-function(input,output,session){
   
   
   
-  
-  
 
   #### Back-end=====================================================================================
   ### Joined DF of recipes and ingredients
-  ## Create reactive of recipe df joined with ingredient df
-  dt_df<-reactive({
+  ## Simple reactive df of the two dbs joined
+  db_df<-reactive({
     #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
     if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
       tibble()
@@ -353,29 +351,46 @@ server<-function(input,output,session){
     #but if there are data in each, then a combined table is made
     else if(nrow(recipe$db)>0 & nrow(ingred$db)>0){
       recipe$db %>%
+        left_join(ingred$db)
+    }
+  })
+  
+  
+  ## Builds off db_df() and displays info in a psuedo-wide format with ingredient list as one string
+  dt_df<-reactive({
+    if(nrow(db_df())==0){
+      tibble()
+    }
+    
+    else{
+      recipe$db %>%
         left_join(ingred$db) %>%
         unite(col="ingredient",n,size,name,sep=" ") %>%
         mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
         group_by(recipe,appliance,protein) %>%
         summarize(ingredients=toString(ingredient)) %>%
-        ungroup() #%>%
-        #add actionButtons to Actions column
-        # mutate(Actions=paste(
-        #   shinyInput(actionButton,
-        #              nrow(.),
-        #              id="edit_",
-        #              label="View/edit",
-        #              class="btn-danger",
-        #              onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
-        #   shinyInput(actionButton,
-        #              nrow(.),
-        #              id="delete_",
-        #              label="Delete",
-        #              icon=shiny::icon("trash"),
-        #              class="btn-danger",
-        #              onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))")))
+        ungroup() 
     }
   })
+  
+  
+  # ## Create reactive of recipe df joined with ingredient df
+  # dt_df<-reactive({
+  #   #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
+  #   if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
+  #     tibble()
+  #   }
+  #   #but if there are data in each, then a combined table is made
+  #   else if(nrow(recipe$db)>0 & nrow(ingred$db)>0){
+  #     recipe$db %>%
+  #       left_join(ingred$db) %>%
+  #       unite(col="ingredient",n,size,name,sep=" ") %>%
+  #       mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
+  #       group_by(recipe,appliance,protein) %>%
+  #       summarize(ingredients=toString(ingredient)) %>%
+  #       ungroup() 
+  #   }
+  # })
   
   
   
@@ -405,7 +420,7 @@ server<-function(input,output,session){
       dom="Bfrtip",
       pageLength=10,
       buttons=list(
-        list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
+        # list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
         list(extend="print",title="Grocery Assistant Database")
       )
     ),
@@ -413,13 +428,6 @@ server<-function(input,output,session){
                                       font-size:200% ;","Recipe Database")
   )
 
-  ## If no data then message is returned
-  # output$blank_dt_df_recipe<-renderText({
-  #   req(nrow(recipe$db)==0 & nrow(ingred$db)==0)
-  #   "No data in database."
-  # })
-  
-  
   
   ### Display toast notification and remove values after confirming deletion
   observeEvent(input$dialog_confirm_delete,{
@@ -435,8 +443,18 @@ server<-function(input,output,session){
       closeButton=FALSE,
       closeTimeout=3500
     )
-    
   })
+  
+  
+  
+  
+  ## Download copy of database
+  output$btn_download_db_recipe <- downloadHandler(
+    filename="grocery-assistant-db.csv",
+    content=function(file){
+      write_csv(db_df(),file)
+    }
+  )
 
   
   
@@ -591,8 +609,6 @@ server<-function(input,output,session){
   ### Get a copy of plan and list
   ## By email
   # Reactive object for issuing warning if no email address provided
-  
-  
   observeEvent(input$btn_planList_email_list,{
     
     #logical object for minimal req for an email address entered
@@ -764,8 +780,6 @@ server<-function(input,output,session){
   output$file_upload_table<-renderTable({
     uploaded_file()
   })
-  
-
 
   
   

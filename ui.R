@@ -3,7 +3,7 @@
 
 #load packages
 pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,shinyscreenshot,
-               mailR,htmlTable)
+               mailR,htmlTable,readxl,gargle,googlesheets4)
 
 
 
@@ -16,7 +16,7 @@ source(here("config.R"))
 #--------------------------------------------------------------------------------------------------#
 ###### Define UI====================================================================================
 #--------------------------------------------------------------------------------------------------#
-ui<-f7Page(
+ui<-function(request) {f7Page(
   useShinyjs(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
 #   #spaceholder for theme
@@ -48,6 +48,9 @@ ui<-f7Page(
           f7Button(inputId="btn_upload_recipe_main",
                     label="Upload recipes from file (computer recommended)"),
           br(),
+          f7Button(inputId="btn_load_db_main",
+                  label="Load database from file (computer recommended)"),
+          br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
           br(),
@@ -55,6 +58,7 @@ ui<-f7Page(
                    label="Reset app")
         ),
         br(),
+        #temporary tables to see server function
         h4("recent recipe"),
         tableOutput("recipe_tab"),
         br(),
@@ -161,11 +165,18 @@ ui<-f7Page(
       div(
         strong(h2("Feel free to browse, search, edit, and delete recipes")),
         DTOutput("recipe_db_recipe"),
-        # strong(h3(textOutput("blank_dt_df_recipe"))),
+        br(),
+        splitLayout(cellWidths=c("75%","25%"),
+                    br(),
+                    f7DownloadButton(outputId="btn_download_db_recipe",
+                                     label="Download a Copy")
+        ),
+        br(),
         f7Button(inputId="btn_return_main_recipe",
                  label="Return to main menu"),
         style="margin-left:100px; margin-right: 100px"
-      )
+      ),
+      br(),
       #view recipe cards
       # f7Card(id="test_card",
       #        title=demo_recipeDF[1,1])
@@ -300,6 +311,7 @@ ui<-f7Page(
     )
   )
 )
+}
 
 
 
@@ -343,13 +355,8 @@ ui<-f7Page(
 
 # NEXT-------------------------
 #Broad action items
-# 1) view/edit button generates cards (which also has delete option)
-# 2) generate shopping list
-# 3) ability to save status with login
-
-#Next
-# 1) set up code so that app doesn't simply fail if recipient box is empty and email is attempted
-
+# 1) ability to load data (from file--different than batch adding?)
+# 2) view/edit button generates cards (which also has delete option)
 
 
 
@@ -360,10 +367,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# added email button, associated server code, and set-up gmail account so that list is emailed
-# configured body of email so that it sends htmlTable() objects
-# toast notification appears when email is sent
-# update .gitignore and created a configuration file (not pushed to GitHub)
-# str_detect added to ID real emails and warning given if not legitimate
+# removed "Excel" button associated with datatable of database
+# added download button and made it functional so that it downloads db in one DF/file in long format, similar
+  #to adding recipes
+# created load database on main page (want to try googlesheets before making it functional)
 
 
