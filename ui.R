@@ -16,7 +16,7 @@ source(here("config.R"))
 #--------------------------------------------------------------------------------------------------#
 ###### Define UI====================================================================================
 #--------------------------------------------------------------------------------------------------#
-ui<-function(request) {f7Page(
+ui<-f7Page(
   useShinyjs(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
 #   #spaceholder for theme
@@ -49,7 +49,7 @@ ui<-function(request) {f7Page(
                     label="Upload recipes from file (computer recommended)"),
           br(),
           f7Button(inputId="btn_load_db_main",
-                  label="Load database from file (computer recommended)"),
+                   label="Load database (from file or googlesheets)"),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
@@ -167,9 +167,25 @@ ui<-function(request) {f7Page(
         DTOutput("recipe_db_recipe"),
         br(),
         splitLayout(cellWidths=c("75%","25%"),
-                    br(),
-                    f7DownloadButton(outputId="btn_download_db_recipe",
-                                     label="Download a Copy")
+          br(),
+          f7DownloadButton(outputId="btn_download_db_recipe",
+                           label="Download a Copy")
+        ),
+        splitLayout(cellWidths=c("60%","40%"),
+          br(),
+          f7Block(
+            f7BlockTitle(title="Save a copy to app",size="medium"),
+            f7Text(inputId="txt_sheet_nm_recipe",
+                   #html used to get multiline label
+                   label=HTML("Enter your name
+                              <br />
+                              (use <em>firstinitial_lastname</em>, e.g., k_post)"),
+            ),
+            shinyFeedback::useShinyFeedback(),
+            # textOutput("warn_bad_sheet_nm_recipe"),
+            f7Button(inputId="btn_save_db_recipe",
+                     label="Save database to app")
+          )
         ),
         br(),
         f7Button(inputId="btn_return_main_recipe",
@@ -230,10 +246,10 @@ ui<-function(request) {f7Page(
           br(),
           f7Block(
             f7BlockTitle(title="Email plan & list",size="medium"),
-            f7Text(inputId="text_email_address_list",
+            f7Text(inputId="txt_email_address_list",
                    label="Recipient"),
             shinyFeedback::useShinyFeedback(),
-            textOutput("warn_no_email_address_list"),
+            # textOutput("warn_no_email_address_list"),
             f7Button(inputId="btn_planList_email_list",
                      label="Send email")
           )
@@ -308,10 +324,18 @@ ui<-function(request) {f7Page(
         tableOutput("file_upload_table"),
         style="margin-left:100px; margin-right: 100px"
       )
-    )
+    ),
+    
+    
+    ##### Load Databse==============================================================================
+    f7Tab(title="Load Database",
+          tabName="load_database",
+          hidden=TRUE,
+      div(
+        strong(h2("Load database"))
+      ))
   )
 )
-}
 
 
 
@@ -367,9 +391,8 @@ ui<-function(request) {f7Page(
 
 
 # LAST COMMIT-------------------
-# removed "Excel" button associated with datatable of database
-# added download button and made it functional so that it downloads db in one DF/file in long format, similar
-  #to adding recipes
-# created load database on main page (want to try googlesheets before making it functional)
+# created UI for saving a copy of db to app (google sheet)
+# developed matching server code so that app checks whether sheet exists, if not then it creates it,
+  #and then it (over)writes it & after a confirmation dialog
 
 

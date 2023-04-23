@@ -338,6 +338,28 @@ server<-function(input,output,session){
   ignoreInit=TRUE)
   
   
+  ### Display modal/dialog after hitting button to Save db to app
+  observeEvent(input$btn_save_db_recipe, {
+    #logical object representing whether text matches name formula
+    name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
+    
+    #warning returned if not entered
+    shinyFeedback::feedbackWarning("txt_sheet_nm_recipe",
+                                   !name_entered,
+                                   "Please enter [firstinitial_lastname]")
+
+    #prevents app from failing if blank/incorrectly formatted name entered
+    req(name_entered,cancelOutput=TRUE)
+    
+    #if passes 'name test' then display dialog to confirm
+    f7Dialog(
+      id="dialog_confirm_save",
+      title="Confirm save",
+      type="confirm",
+      text="Click OK to save a copy of your recipe database to the app. Note: this will ovewrite any previously 
+      saved data")
+  },
+  ignoreInit=TRUE)
   
 
   #### Back-end=====================================================================================
@@ -455,6 +477,39 @@ server<-function(input,output,session){
       write_csv(db_df(),file)
     }
   )
+  
+  
+  ## Save a copy of database to app (google sheet)
+  observeEvent(input$dialog_confirm_save,{
+    req(input$dialog_confirm_save)
+    
+    # #logical object representing whether text matches name formula
+    # name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
+    # 
+    # #warning returned if not entered
+    # shinyFeedback::feedbackWarning("txt_sheet_nm_recipe",
+    #                                !name_entered,
+    #                                "Please enter [firstinitial_lastname]")
+    # 
+    # #prevents app from failing if blank/incorrectly formatted name entered
+    # req(name_entered,cancelOutput=TRUE)
+    
+    #if sheet does not exist create it
+    if(!input$txt_sheet_nm_recipe %in% sheet_names(sheet_id)){
+      googlesheets4::sheet_add(ss=sheet_id, sheet=input$txt_sheet_nm_recipe)
+    }
+    
+    #(over)write sheet
+    googlesheets4::write_sheet(data=db_df(),ss=sheet_id,sheet = input$txt_sheet_nm_recipe)
+    
+    #create toast notification
+    f7Toast(
+        text=paste("Copy of database saved to app"),
+        position="center",
+        closeButton=FALSE,
+        closeTimeout=3000
+      )
+  })
 
   
   
@@ -612,13 +667,13 @@ server<-function(input,output,session){
   observeEvent(input$btn_planList_email_list,{
     
     #logical object for minimal req for an email address entered
-    address_entered<-nchar(input$text_email_address_list)>0 & 
-      str_detect(input$text_email_address_list,"@")
+    # address_entered<-nchar(input$txt_email_address_list)>0 & 
+    #   str_detect(input$txt_email_address_list,"@")
     
-    address_entered<-str_detect(input$text_email_address_list,email_str_detect)
+    address_entered<-str_detect(input$txt_email_address_list,email_str_detect)
     
     #warning returned if not entered
-    shinyFeedback::feedbackWarning("text_email_address_list",
+    shinyFeedback::feedbackWarning("txt_email_address_list",
                                    !address_entered,
                                    "Please enter a valid email address")
 
@@ -636,7 +691,7 @@ server<-function(input,output,session){
     
     #send email
     send.mail(from="grocery.asst.app@gmail.com",
-              to=paste0("<",input$text_email_address_list,">"),
+              to=paste0("<",input$txt_email_address_list,">"),
               subject="meal plan & grocery list",
               body=email_body,
               smtp = list(host.name = "smtp.gmail.com", port = 587, 
@@ -647,7 +702,7 @@ server<-function(input,output,session){
     
     #create toast notification
     f7Toast(
-        text=paste("Meal plan and shopping list sent to",input$text_email_address_list),
+        text=paste("Meal plan and shopping list sent to",input$txt_email_address_list),
         position="center",
         closeButton=FALSE,
         closeTimeout=3000
@@ -782,8 +837,14 @@ server<-function(input,output,session){
   })
 
   
-  
 
+  ##### Load Database Tab #########################################################################
+  #### UI===========================================================================================
+  
+  
+  
+  #### Back-end=======================================================================================
+  
   
   
 
