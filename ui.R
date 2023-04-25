@@ -3,7 +3,7 @@
 
 #load packages
 pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,shinyscreenshot,
-               mailR,htmlTable,readxl,gargle,googlesheets4)
+               mailR,htmlTable,readxl,googledrive,gargle,googlesheets4)
 
 
 
@@ -11,6 +11,17 @@ pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdo
 source(here("obj_fns","grocery_assistant_obj_01.R"))
 source(here("obj_fns","grocery_assistant_fn_01.R"))
 source(here("config.R"))
+
+
+#run options
+#run at start to connect to gmail account
+options(
+  # whenever there is one account token found, use the cached token
+  gargle_oauth_email = TRUE,
+  # specify auth tokens should be stored in a hidden directory ".secrets"
+  gargle_oauth_cache = ".secrets"
+)
+
 
 
 #--------------------------------------------------------------------------------------------------#
@@ -40,7 +51,7 @@ ui<-f7Page(
                    label="Manually add recipe"),
           br(),
           f7Button(inputId="btn_manage_recipe_main",
-                   label="View/edit/delete recipes"),
+                   label="View/edit/delete/save recipes"),
           br(),
           f7Button(inputId="btn_meal_plan_main",
                    label="Meal planner"),
@@ -158,7 +169,7 @@ ui<-f7Page(
       )
     ),
     
-    ##### Search/Browse/View/Edit/Delete Recipes====================================================
+    ##### View/Edit/Delete/Save Recipes=============================================================
     f7Tab(title="Recipes",
           tabName="recipe_tab",
           hidden=TRUE,
@@ -327,15 +338,38 @@ ui<-f7Page(
     ),
     
     
-    ##### Load Databse==============================================================================
+    
+    ##### Load Database=============================================================================
     f7Tab(title="Load Database",
           tabName="load_database",
           hidden=TRUE,
       div(
-        strong(h2("Load database"))
-      ))
+        strong(h2("Load database from file or app")),
+        br(),
+        f7Row(
+          f7Col(
+            f7File(inputId="file_load_file_load",
+                   label="Load database from file",
+                   buttonLabel="Browse for file")
+          ),
+          f7Col(
+            f7Text(inputId="txt_sheet_nm_load",
+                   label=HTML("Enter your name
+                              <br />
+                              (use <em>firstinitial_lastname</em>, e.g., k_post)")),
+            f7Button(inputId="btn_load_sheet_load",
+                     label="Load database from app")
+          )
+        ),
+        br(),
+        f7Button(inputId="btn_return_main_load",
+                 label="Return to main menu"),
+        style="margin-left:100px; margin-right: 100px"
+      )
+    )
   )
 )
+    
 
 
 
@@ -368,11 +402,13 @@ ui<-f7Page(
 #add ability to adjust quantities & remove items from recipe and shopping lists
 #turn any repeated functions into custom functions (e.g., use of splitLayout?)
 #add camera icon (and other icons) to buttons
+#change order of main menu buttons (and thus UI)?
 
 
 # Back-end
 #develop custom functions to limit server code
 #see if any observeEvents can be combined
+#if change order of buttons and UI, then change order of server code
 
 
 
@@ -380,9 +416,12 @@ ui<-f7Page(
 # NEXT-------------------------
 #Broad action items
 # 1) ability to load data (from file--different than batch adding?)
+    #plan = do this using actionSheet and have multiple buttons (or another tab with a splitLayout)
+      #1) load from app: prompted to enter name first
+      #2) load from file: prompted to click file to upload
 # 2) view/edit button generates cards (which also has delete option)
 
-
+#currently working on: 1) load db tab: loading db from file after confirm--add toast notification
 
 # DONE--------------------------
 
@@ -391,8 +430,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# created UI for saving a copy of db to app (google sheet)
-# developed matching server code so that app checks whether sheet exists, if not then it creates it,
-  #and then it (over)writes it & after a confirmation dialog
+# created load db tab and code to get there from landing page
+# added buttons to load db from file or app
+# added dialogs after file/app load buttons pressed
+# added functionality if app load confirmation pressed
 
 

@@ -27,6 +27,19 @@ server<-function(input,output,session){
   })
   
   
+  
+  ## Move to upload tab
+  observeEvent(input$btn_upload_recipe_main,{
+    updateF7Tabs(id="main_tabset", selected="upload_recipes")
+  })
+  
+  
+  ## Move to load database tab
+  observeEvent(input$btn_load_db_main,{
+    updateF7Tabs(id="main_tabset", selected="load_database")
+  })
+  
+  
   ## Display dialog for pre-loaded data
   observeEvent(input$btn_preload_data_main,{
     f7Dialog(
@@ -36,6 +49,7 @@ server<-function(input,output,session){
       text="Click OK to use pre-loaded data. Note that this will remove all unsaved data."
     )
   })
+  
   
   
   ## Display dialog for resetting data
@@ -48,11 +62,6 @@ server<-function(input,output,session){
     )
   })
   
-  
-  ## Move to upload tab
-  observeEvent(input$btn_upload_recipe_main,{
-    updateF7Tabs(id="main_tabset", selected="upload_recipes")
-  })
   
   
   
@@ -309,7 +318,7 @@ server<-function(input,output,session){
 
 
 
-  ##### Search/Browse Recipes Tab###################################################################
+  ##### View/Edit/Delete/Save Recipes Tab###########################################################
   #### UI===========================================================================================
   ### Return to main menu
   observeEvent(input$btn_return_main_recipe,{
@@ -482,6 +491,8 @@ server<-function(input,output,session){
   ## Save a copy of database to app (google sheet)
   observeEvent(input$dialog_confirm_save,{
     req(input$dialog_confirm_save)
+    #pull id of Google sheet "main"
+    sheet_id<-drive_get("main")$id
     
     # #logical object representing whether text matches name formula
     # name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
@@ -840,12 +851,64 @@ server<-function(input,output,session){
 
   ##### Load Database Tab #########################################################################
   #### UI===========================================================================================
+  ### Load from file
+  ## Display dialog 
+  observeEvent(input$file_load_file_load,{
+    if(tools::file_ext(input$file_load_file_load$name) %in% c("csv","xls","xlsx")){
+      f7Dialog(
+        id="dialog_confirm_file_load_db",
+        title="Confirm load file",
+        type="confirm",
+        text="Click OK to load database from file. Note that any unsaved information will be lost."
+      )
+    }
+  })
   
+  
+  ### Load from app (google sheets)
+  ## Display dialog
+  observeEvent(input$btn_load_sheet_load,{
+    f7Dialog(
+      id="dialog_confirm_sheet_load_db",
+      title="Confirm load app",
+      type="confirm",
+      text="Click OK to load database from app. Note that any unsaved information will be lost."
+    )
+  })
+  
+  
+  ### Return to main menu
+  observeEvent(input$btn_return_main_load,{
+    updateF7Tabs(id="main_tabset",selected="main_tab")
+  })
   
   
   #### Back-end=======================================================================================
+  ### Load from file
+  ## Confirm dialog & load file
+  observeEvent(input$dialog_confirm_file_load_db,{
+    req(input$dialog_confirm_file_load_db)
+    
+  })
   
   
+  ### Load from app
+  ## Confirm dialog & load from app
+  observeEvent(input$dialog_confirm_sheet_load_db,{
+    req(input$dialog_confirm_sheet_load_db)
+    #pull id of Google sheet "main"
+    sheet_id<-drive_get("main")$id
+    #save db as a temporary DF
+    tmpDF<-read_sheet(ss=sheet_id,
+               sheet=input$txt_sheet_nm_load)
+    #split into two reactiveValues
+    recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
+      distinct()
+    ingred$db<-tmpDF %>% select(recipe,name,size,n)
+    #assign RVs of list as NULL DFs
+    recipe$list<-tibble()
+    ingred$list<-tibble()
+  })
   
 
 }
