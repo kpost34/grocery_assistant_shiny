@@ -29,6 +29,7 @@ options(
 #--------------------------------------------------------------------------------------------------#
 ui<-f7Page(
   useShinyjs(),
+  shinyFeedback::useShinyFeedback(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
 #   #spaceholder for theme
 #   ##### Create structure as f7Tabs (similar to tabsetPanel)
@@ -57,10 +58,10 @@ ui<-f7Page(
                    label="Meal planner"),
           br(),
           f7Button(inputId="btn_upload_recipe_main",
-                    label="Upload recipes from file (computer recommended)"),
+                    label="Add one or more recipes from file (computer recommended)"),
           br(),
           f7Button(inputId="btn_load_db_main",
-                   label="Load database (from file or googlesheets)"),
+                   label="Load database (from file or app)"),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
@@ -192,8 +193,6 @@ ui<-f7Page(
                               <br />
                               (use <em>firstinitial_lastname</em>, e.g., k_post)"),
             ),
-            shinyFeedback::useShinyFeedback(),
-            # textOutput("warn_bad_sheet_nm_recipe"),
             f7Button(inputId="btn_save_db_recipe",
                      label="Save database to app")
           )
@@ -414,25 +413,20 @@ ui<-f7Page(
 
 
 # NEXT-------------------------
+# have specific text requirement for loading
 #Broad action items
-# 1) ability to load data (from file--different than batch adding?)
-    #plan = do this using actionSheet and have multiple buttons (or another tab with a splitLayout)
-      #1) load from app: prompted to enter name first
-      #2) load from file: prompted to click file to upload
-# 2) view/edit button generates cards (which also has delete option)
+# 1) view/edit button generates cards (which also has delete option)
 
-#currently working on: 1) load db tab: loading db from file after confirm--add toast notification
+
 
 # DONE--------------------------
 
 
 
 
-
 # LAST COMMIT-------------------
-# created load db tab and code to get there from landing page
-# added buttons to load db from file or app
-# added dialogs after file/app load buttons pressed
-# added functionality if app load confirmation pressed
+# load db from file is now fully functional
+# added toast notifications for loading data from file & app
+# added shiny feedback warnings if text to save or load db from app not in correct format
 
 

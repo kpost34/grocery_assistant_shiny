@@ -494,16 +494,16 @@ server<-function(input,output,session){
     #pull id of Google sheet "main"
     sheet_id<-drive_get("main")$id
     
-    # #logical object representing whether text matches name formula
-    # name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
-    # 
-    # #warning returned if not entered
-    # shinyFeedback::feedbackWarning("txt_sheet_nm_recipe",
-    #                                !name_entered,
-    #                                "Please enter [firstinitial_lastname]")
-    # 
-    # #prevents app from failing if blank/incorrectly formatted name entered
-    # req(name_entered,cancelOutput=TRUE)
+    #logical object representing whether text matches name formula
+    name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
+
+    #warning returned if not entered
+    shinyFeedback::feedbackWarning("txt_sheet_nm_recipe",
+                                   !name_entered,
+                                   "Please enter [firstinitial_lastname]")
+
+    #prevents app from failing if blank/incorrectly formatted name entered
+    req(name_entered,cancelOutput=TRUE)
     
     #if sheet does not exist create it
     if(!input$txt_sheet_nm_recipe %in% sheet_names(sheet_id)){
@@ -676,11 +676,8 @@ server<-function(input,output,session){
   ## By email
   # Reactive object for issuing warning if no email address provided
   observeEvent(input$btn_planList_email_list,{
-    
-    #logical object for minimal req for an email address entered
-    # address_entered<-nchar(input$txt_email_address_list)>0 & 
-    #   str_detect(input$txt_email_address_list,"@")
-    
+
+    #logical object that assesses whether input txt is an email address    
     address_entered<-str_detect(input$txt_email_address_list,email_str_detect)
     
     #warning returned if not entered
@@ -866,8 +863,20 @@ server<-function(input,output,session){
   
   
   ### Load from app (google sheets)
-  ## Display dialog
+  ## Display dialog 
   observeEvent(input$btn_load_sheet_load,{
+    #logical object representing whether text matches name formula
+    name_entered<-str_detect(input$txt_sheet_nm_load,"^[:lower:]{1}_[:lower:]{1,}$")
+
+    #warning returned if not entered
+    shinyFeedback::feedbackWarning("txt_sheet_nm_load",
+                                   !name_entered,
+                                   "Please enter [firstinitial_lastname]")
+
+    #prevents app from failing if blank/incorrectly formatted name entered
+    req(name_entered,cancelOutput=TRUE)
+    
+    #display dialog
     f7Dialog(
       id="dialog_confirm_sheet_load_db",
       title="Confirm load app",
@@ -885,15 +894,35 @@ server<-function(input,output,session){
   
   #### Back-end=======================================================================================
   ### Load from file
-  ## Confirm dialog & load file
+  ## Confirm dialog, load file, & display toast notification
   observeEvent(input$dialog_confirm_file_load_db,{
     req(input$dialog_confirm_file_load_db)
-    
+    #save db as temporary DF
+    ext<-tools::file_ext(input$file_load_file_load$name)
+    tmpDF<-switch(ext,
+      csv = read_csv(input$file_load_file_load$datapath,show_col_types=FALSE),
+      xls = read_xls(input$file_load_file_load$datapath),
+      xlsx = read_xlsx(input$file_load_file_load$datapath)
+    ) 
+    #split into two reactiveValues
+    recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
+      distinct()
+    ingred$db<-tmpDF %>% select(recipe,name,size,n)
+    #assign RVs of list as NULL DFs
+    recipe$list<-tibble()
+    ingred$list<-tibble()
+    #display toast notification
+    f7Toast(
+      text="Database loaded from file",
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=2000
+    )
   })
   
   
   ### Load from app
-  ## Confirm dialog & load from app
+  ## Confirm dialog, load from app, & display toast notification
   observeEvent(input$dialog_confirm_sheet_load_db,{
     req(input$dialog_confirm_sheet_load_db)
     #pull id of Google sheet "main"
@@ -908,6 +937,13 @@ server<-function(input,output,session){
     #assign RVs of list as NULL DFs
     recipe$list<-tibble()
     ingred$list<-tibble()
+    #display toast notification
+    f7Toast(
+      text="Database loaded from app",
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=2000
+    )
   })
   
 
