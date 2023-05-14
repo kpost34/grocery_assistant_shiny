@@ -49,7 +49,7 @@ ui<-f7Page(
         #add block of buttons
         f7Block(
           f7Button(inputId="btn_add1_recipe_main",
-                   label="Manually add recipe"),
+                   label=div(f7Icon("plus"),"Manually add recipe")),
           br(),
           f7Button(inputId="btn_manage_recipe_main",
                    label="View/edit/delete/save recipes"),
@@ -58,16 +58,17 @@ ui<-f7Page(
                    label="Meal planner"),
           br(),
           f7Button(inputId="btn_upload_recipe_main",
-                    label="Add one or more recipes from file (computer recommended)"),
+                    label=div(f7Icon("plus"),f7Icon("plus"),"Add recipes from file (computer recommended)")),
           br(),
           f7Button(inputId="btn_load_db_main",
-                   label="Load database (from file or app)"),
+                   label="Load saved database (from file or app)"),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
           br(),
           f7Button(inputId="btn_reset_db_main",
-                   label="Reset app")
+                   label=div(f7Icon("arrow_counterclockwise_circle"),"Reset app"),
+                   color="red")
         ),
         br(),
         #temporary tables to see server function
@@ -125,7 +126,8 @@ ui<-f7Page(
         hiddenItems=tagList( 
           splitLayout(
             f7Button(inputId="btn_return_recipe_ingredSheet1",
-                     label="Return to recipe info"),
+                     label="Return to recipe info",
+                     color="purple"),
             f7Button(inputId="btn_ingred_entry_ingredSheet1",
                      label="Add more ingredients")
           ),
@@ -136,7 +138,8 @@ ui<-f7Page(
           add_ingredients(n=4),
           linebreaks(2),
           f7Button(inputId="btn_submit_recipe_ingred_ingredSheet1",
-                   label="Submit recipe info & ingredients")
+                   label="Submit recipe info & ingredients",
+                   color="green")
         )
       ),
       
@@ -157,7 +160,8 @@ ui<-f7Page(
           br(),
           splitLayout(
             f7Button(inputId="btn_return_recipe_ingredSheet2",
-                     label="Return to recipe info"),
+                     label="Return to recipe info",
+                     color="purple"),
             br()
           ),
           #right-aligns text
@@ -165,7 +169,8 @@ ui<-f7Page(
           h2(strong(textOutput("txt_out_recipe_ingredSheet2"))),
           add_ingredients(n_prev=4,n=4),
           f7Button(inputId="btn_submit_recipe_ingred_ingredSheet2",
-                   label="Submit recipe info & ingredients")
+                   label="Submit recipe info & ingredients",
+                   color="green")
         )
       )
     ),
@@ -194,12 +199,14 @@ ui<-f7Page(
                               (use <em>firstinitial_lastname</em>, e.g., k_post)"),
             ),
             f7Button(inputId="btn_save_db_recipe",
-                     label="Save database to app")
+                     label=div(f7Icon("floppy_disk"),"Save database to app"),
+                     color="green")
           )
         ),
         br(),
         f7Button(inputId="btn_return_main_recipe",
-                 label="Return to main menu"),
+                 label=div(f7Icon("return"),"Return to main menu"),
+                 color="purple"),
         style="margin-left:100px; margin-right: 100px"
       ),
       br(),
@@ -223,11 +230,13 @@ ui<-f7Page(
         splitLayout(cellWidths=c("75%","25%"),
           br(),
           f7Button(inputId="btn_reset_planList_planner",
-                   label="Reset plan/list")
+                   label=div(f7Icon("arrow_counterclockwise_circle"),"Reset plan/list"),
+                   color="red")
         ),
         linebreaks(2),
         f7Button(inputId="btn_return_main_planner",
-                 label="Return to main menu"),
+                 label=div(f7Icon("return"),"Return to main menu"),
+                 color="purple"),
         style="margin-left:100px; margin-right: 100px"
       )
     ),
@@ -242,7 +251,8 @@ ui<-f7Page(
         splitLayout(cellWidths=c("75%","25%"),
           strong(h2("Meal plan & shopping list")),
           f7Button(inputId="btn_return_planner_list",
-                 label="Return to meal planner")
+                 label="Return to meal planner",
+                 color="purple")
         ),
         #create div() for screenshot() in server function
         div(id="plan-list-screenshot",
@@ -261,7 +271,7 @@ ui<-f7Page(
             shinyFeedback::useShinyFeedback(),
             # textOutput("warn_no_email_address_list"),
             f7Button(inputId="btn_planList_email_list",
-                     label="Send email")
+                     label=div(f7Icon("envelope"),"Send email"))
           )
         ),
         br(),
@@ -269,7 +279,7 @@ ui<-f7Page(
         splitLayout(cellWidths=c("75%","25%"),
           br(),
           f7Button(inputId="btn_planList_screenshot_list",
-                   label="Screenshot plan & list")
+                   label=div(f7Icon("camera"),"Screenshot plan & list"))
         ),
         br(),
         #export to pdf
@@ -283,12 +293,14 @@ ui<-f7Page(
         splitLayout(cellWidths=c("75%","25%"),
           br(),
           f7Button(inputId="btn_reset_planList_list",
-                   label="Reset plan/list")
+                   label=div(f7Icon("arrow_counterclockwise_circle"),"Reset plan/list"),
+                   color="red")
         ),
         linebreaks(2),
         #return to main menu
         f7Button(inputId="btn_return_main_list",
-                 label="Return to main menu"),
+                 label=div(f7Icon("return"),"Return to main menu"),
+                 color="purple"),
         style="margin-left:100px; margin-right: 100px"
       )
     ),
@@ -304,8 +316,11 @@ ui<-f7Page(
         strong(h2("Batch insert recipes and their ingredients to database by file")),
         br(),
         h3("1) Download a copy of the template"),
-        f7DownloadButton(outputId="btn_template_download_upload",
-                         label="Download Template"),
+        splitLayout(cellWidths=c("25%","75%"),
+          f7DownloadButton(outputId="btn_template_download_upload",
+                           label="Download Template"),
+          br()
+        ),
         br(),
         "File should contain six columns:",
           tags$li(strong("recipe:"), "name of recipe"),
@@ -325,11 +340,13 @@ ui<-f7Page(
           inputId="file_upload_recipe_upload",
           label="",
           accept=c(".csv",".xls",".xlsx"),
-          buttonLabel="Upload file"
+          width="25%",
+          buttonLabel=div(f7Icon("cloud_upload"), "Upload file")
         ),
         linebreaks(3),
         f7Button(inputId="btn_return_main_upload",
-                 label="Return to main menu"),
+                 label=div(f7Icon("return"),"Return to main menu"),
+                 color="purple"),
         br(),
         tableOutput("file_upload_table"),
         style="margin-left:100px; margin-right: 100px"
@@ -349,7 +366,7 @@ ui<-f7Page(
           f7Col(
             f7File(inputId="file_load_file_load",
                    label="Load database from file",
-                   buttonLabel="Browse for file")
+                   buttonLabel= div(f7Icon("folder"),"Browse for file"))
           ),
           f7Col(
             f7Text(inputId="txt_sheet_nm_load",
@@ -362,7 +379,8 @@ ui<-f7Page(
         ),
         br(),
         f7Button(inputId="btn_return_main_load",
-                 label="Return to main menu"),
+                 label=div(f7Icon("return"),"Return to main menu"),
+                 color="purple"),
         style="margin-left:100px; margin-right: 100px"
       )
     )
@@ -378,44 +396,31 @@ ui<-f7Page(
 #---------------------------------------
 # LATER-------------------------
 # Styling
-# tinker with main menu buttons--size, color, spacing, etc.
-#change styling of buttons
 # slideshow of images (recipe) on main app page
-#limit width of download button
 
 
 # UI
-#use segment to bunch buttons
-#auto-complete
-#add checkboxes to customize what to display in datatable (i.e., user chooses columns)
-#fix delay/poor responsiveness with previous ingredient actionButton
-#add condition--if no ingredients selected then can't submit (same with recipe)
-#figure out a way to always display sheet 3 in the background so that submit button is always
-  #visible
-#figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
+# fix delay/poor responsiveness with previous ingredient actionButton
+# add condition--if no ingredients selected then can't submit (same with recipe)
+# figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
   #two sheets will actually manifest
-#error message if uploaded data have errors
+# error message if uploaded data have errors
 # leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
   #include a double-confirm?
-# make button for meal planner (on main menu) visible only when recipes are in the database
-#add ability to adjust quantities & remove items from recipe and shopping lists
-#turn any repeated functions into custom functions (e.g., use of splitLayout?)
-#add camera icon (and other icons) to buttons
-#change order of main menu buttons (and thus UI)?
+# add ability to adjust quantities & remove items from shopping lists [add -/+ buttons next to n]
+# turn any repeated functions into custom functions (e.g., use of splitLayout?)
 
 
 # Back-end
-#develop custom functions to limit server code
-#see if any observeEvents can be combined
-#if change order of buttons and UI, then change order of server code
+# develop custom functions to limit server code
+# see if any observeEvents can be combined
 
 
 
 
 # NEXT-------------------------
-# have specific text requirement for loading
-#Broad action items
-# 1) view/edit button generates cards (which also has delete option)
+# view/edit button generates cards (which also has delete option)
+# items listed in LATER above
 
 
 
@@ -425,8 +430,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# load db from file is now fully functional
-# added toast notifications for loading data from file & app
-# added shiny feedback warnings if text to save or load db from app not in correct format
+# made download template button shorter and same length as upload button
+# added icons to many buttons
+# changed colors of more buttons
 
 
