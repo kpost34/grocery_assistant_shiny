@@ -49,25 +49,39 @@ ui<-f7Page(
         #add block of buttons
         f7Block(
           f7Button(inputId="btn_add1_recipe_main",
-                   label=div(f7Icon("plus"),"Manually add recipe")),
+                   label=div(f7Icon("plus"),
+                             "Manually add recipe")),
           br(),
           f7Button(inputId="btn_manage_recipe_main",
-                   label="View/edit/delete/save recipes"),
+                   label=div(f7Icon("eye"),
+                             "View ",
+                             f7Icon("pencil"),
+                             "Edit ",
+                             f7Icon("trash"),
+                             "Delete ",
+                             f7Icon("floppy_disk"),
+                             "Save Recipes")
+                   ),
           br(),
           f7Button(inputId="btn_meal_plan_main",
-                   label="Meal planner"),
+                   label=div(f7Icon("square_split_2x1"),
+                             "Meal planner")),
           br(),
           f7Button(inputId="btn_upload_recipe_main",
-                    label=div(f7Icon("plus"),f7Icon("plus"),"Add recipes from file (computer recommended)")),
+                    label=div(f7Icon("plus"),
+                              f7Icon("plus"),
+                              "Add recipes from file (computer recommended)")),
           br(),
           f7Button(inputId="btn_load_db_main",
-                   label="Load saved database (from file or app)"),
+                   label=div(f7Icon("arrow_up_square"),
+                             "Load saved database (from file or app)")),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
           br(),
           f7Button(inputId="btn_reset_db_main",
-                   label=div(f7Icon("arrow_counterclockwise_circle"),"Reset app"),
+                   label=div(f7Icon("arrow_counterclockwise_circle"),
+                             "Reset app"),
                    color="red")
         ),
         br(),
@@ -223,7 +237,8 @@ ui<-f7Page(
         splitLayout(cellWidths=c("75%","25%"),
           strong(h2("Meal planner")),
           f7Button(inputId="btn_view_plan_planner",
-                   label="View meal plan/shopping list")
+                   label=div(f7Icon("eye"),
+                             "View meal plan/shopping list"))
         ),
         h3("Select the recipes to add to your meal plan"),
         DTOutput("recipe_db_planner"),
@@ -313,8 +328,9 @@ ui<-f7Page(
           tabName="upload_recipes",
           hidden=TRUE,
       div(
-        strong(h2("Batch insert recipes and their ingredients to database by file")),
+        strong(h2("Batch add recipes and their ingredients to database by file")),
         br(),
+        #step 1: download copy of tempalte
         h3("1) Download a copy of the template"),
         splitLayout(cellWidths=c("25%","75%"),
           f7DownloadButton(outputId="btn_template_download_upload",
@@ -331,10 +347,13 @@ ui<-f7Page(
           tags$li(strong("size:"), "size of ingredient"),
           tags$li(strong("n:"), "number of that particular ingredient needed in recipe"),
         br(),
+        #2: input your info
         h3("2) Replace example in file with your recipes and ingredients"),
         br(),
+        #3; save file
         h3("3) Save file"),
         br(),
+        #4: upload file to db
         h3("4) Upload file to database"),
         f7File(
           inputId="file_upload_recipe_upload",
@@ -343,12 +362,21 @@ ui<-f7Page(
           width="25%",
           buttonLabel=div(f7Icon("cloud_upload"), "Upload file")
         ),
-        linebreaks(3),
-        f7Button(inputId="btn_return_main_upload",
-                 label=div(f7Icon("return"),"Return to main menu"),
-                 color="purple"),
         br(),
-        tableOutput("file_upload_table"),
+        #5: preview uploaded data
+        htmlOutput("ui_txt_preview_upload_upload"),
+        # h3("5) Preview upload"),
+        DTOutput("file_upload_table"),
+        br(),
+        #6: confirm upload
+        htmlOutput("ui_txt_confirm_upload_upload"),
+        uiOutput("ui_btn_confirm_upload_upload"),
+        linebreaks(3),
+        #button to return to main menu
+        f7Button(inputId="btn_return_main_upload",
+                 label=div(f7Icon("return"),
+                           "Return to main menu"),
+                 color="purple"),
         style="margin-left:100px; margin-right: 100px"
       )
     ),
@@ -366,7 +394,8 @@ ui<-f7Page(
           f7Col(
             f7File(inputId="file_load_file_load",
                    label="Load database from file",
-                   buttonLabel= div(f7Icon("folder"),"Browse for file"))
+                   buttonLabel= div(f7Icon("folder"),
+                                    "Browse for file"))
           ),
           f7Col(
             f7Text(inputId="txt_sheet_nm_load",
@@ -374,7 +403,8 @@ ui<-f7Page(
                               <br />
                               (use <em>firstinitial_lastname</em>, e.g., k_post)")),
             f7Button(inputId="btn_load_sheet_load",
-                     label="Load database from app")
+                     label=div(f7Icon("arrow_up_square"),
+                               "Load database from app"))
           )
         ),
         br(),
@@ -400,13 +430,16 @@ ui<-f7Page(
 
 
 # UI
-# fix delay/poor responsiveness with previous ingredient actionButton
-# add condition--if no ingredients selected then can't submit (same with recipe)
-# figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
-  #two sheets will actually manifest
-# error message if uploaded data have errors
 # leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
   #include a double-confirm?
+# error message if uploaded data have errors
+
+# add condition--if no ingredients selected then can't submit (same with recipe)
+# fix delay/poor responsiveness with previous ingredient actionButton
+
+# figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
+  #two sheets will actually manifest
+
 # add ability to adjust quantities & remove items from shopping lists [add -/+ buttons next to n]
 # turn any repeated functions into custom functions (e.g., use of splitLayout?)
 
@@ -419,6 +452,8 @@ ui<-f7Page(
 
 
 # NEXT-------------------------
+# improve batch add page
+#3) add logic to hold uploaded file temporarily and to add to db once confirm is pressed
 # view/edit button generates cards (which also has delete option)
 # items listed in LATER above
 
@@ -430,8 +465,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# made download template button shorter and same length as upload button
-# added icons to many buttons
-# changed colors of more buttons
+# added icons to more buttons, including the view/edit/delete/save button in the main menu
+# on batch add page, added preview upload section, turned table into DT and moved it up, added dynamic
+# confirm button & text
 
 

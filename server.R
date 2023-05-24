@@ -762,6 +762,27 @@ server<-function(input,output,session){
   
   ##### Upload Recipes Tab #########################################################################
   #### UI===========================================================================================
+  ### Display text and button programmatically
+  observeEvent(input$file_upload_recipe_upload, {
+    #preview upload text
+    output$ui_txt_preview_upload_upload<-renderUI({
+      HTML("<H3>5) Preview upload</H3>")
+    })
+    #confirm upload text
+    output$ui_txt_confirm_upload_upload<-renderUI({
+      HTML("<H3>6) Confirm upload</H3>
+           <H4>If dissatisfied, edit file, save, and re-upload</H4>")
+    })
+    #confirm upload button
+    output$ui_btn_confirm_upload_upload<-renderUI({
+      f7Button(inputId="btn_confirm_upload_upload",
+                label=div(f7Icon("checkmark"),
+                          "Confirm"),
+              color="green")
+    })
+  })
+
+  
   ### Return to main menu
   observeEvent(input$btn_return_main_upload,{
     updateF7Tabs(id="main_tabset",selected="main_tab")
@@ -814,6 +835,14 @@ server<-function(input,output,session){
     ) %>%
       mutate(across(!n,str_to_lower))
   })
+  
+  
+  ## Show table of uploaded file
+  output$file_upload_table<-renderDT(
+    uploaded_file(),
+    options=list(dom="t")
+  )
+  
 
   # Split uploaded file into recipe and ingredient DFs
   recipe_upload<-reactive({
@@ -839,10 +868,7 @@ server<-function(input,output,session){
 
   
   
-  # TEMP CODE: show tibble of uploaded file
-  output$file_upload_table<-renderTable({
-    uploaded_file()
-  })
+  
 
   
 
