@@ -93,7 +93,7 @@ server<-function(input,output,session){
   ## Populate recipe$db with pre-loaded recipes
   observeEvent(input$dialog_confirm_preload_data,{
     req(input$dialog_confirm_preload_data)
-    recipe$db<-demo_recipeDF
+    recipe$db<-demo_recipeDF %>% select(-id)
     ingred$db<-demo_ingredDF
     recipe$list<-tibble()
     ingred$list<-tibble()
@@ -768,6 +768,9 @@ server<-function(input,output,session){
     output$ui_txt_preview_upload_upload<-renderUI({
       HTML("<H3>5) Preview upload</H3>")
     })
+    
+    req(uploaded_file())
+    #reactive DF uploaded_file() must exist for #6 text and confirmation button to appear
     #confirm upload text
     output$ui_txt_confirm_upload_upload<-renderUI({
       HTML("<H3>6) Confirm upload</H3>
@@ -780,6 +783,30 @@ server<-function(input,output,session){
                           "Confirm"),
               color="green")
     })
+  })
+  
+  
+  ### Display toast notification and step 7 text after hitting confirm
+  observeEvent(input$btn_confirm_upload_upload, {
+    #toast notification
+    # if(tools::file_ext(input$file_upload_recipe_upload$name) %in% c("csv","xls","xlsx")){
+    delay(500,
+      f7Toast(
+        text=paste(input$file_upload_recipe_upload$name,"uploaded to database"),
+        position="center",
+        closeButton=FALSE,
+        closeTimeout=2000
+      )
+    )
+    
+    #text for another upload
+    delay(1000,
+      output$ui_txt_another_upload_upload<-renderUI({
+        HTML("<H3>7) Another upload?</H3>
+            <H4>Want to batch upload more recipes? Edit the template (or last file uploaded), 
+            save, and click 'Upload File'.")
+      })
+    )
   })
 
   
@@ -796,7 +823,7 @@ server<-function(input,output,session){
   templateDF<-tibble(
     demo_recipeDF %>% 
       left_join(demo_ingredDF) %>% 
-      filter(row_number() %in% 1:3)
+      filter(row_number() %in% 1:7)
   )
   
   
@@ -810,19 +837,6 @@ server<-function(input,output,session){
   
   
   ### File upload
-  ## Display toast notification that file uploaded
-  observeEvent(input$file_upload_recipe_upload,{
-    if(tools::file_ext(input$file_upload_recipe_upload$name) %in% c("csv","xls","xlsx")){
-      f7Toast(
-        text=paste(input$file_upload_recipe_upload$name,"uploaded to database"),
-        position="center",
-        closeButton=FALSE,
-        closeTimeout=3500
-      )
-    }
-  })
-  
-  
   ## Read in uploaded file 
   uploaded_file<-reactive({
     req(input$file_upload_recipe_upload)
@@ -833,32 +847,75 @@ server<-function(input,output,session){
       xls = read_xls(input$file_upload_recipe_upload$datapath),
       xlsx = read_xlsx(input$file_upload_recipe_upload$datapath)
     ) %>%
-      mutate(across(!n,str_to_lower))
+      mutate(across(!n,str_to_lower),
+             n=as.numeric(n)) -> data_upload
+    
+    # Checks of uploaded file
+    #check names vector
+    names_check<-setequal(names(data_upload),names(templateDF))
+
+    req(names_check,cancelOutput=TRUE)
+
+    #check if recipe and app & protein #s are appropriate
+    if(!names_check){second_check<-TRUE} else{
+
+    n_recipe<-max(data_upload$id)==n_distinct(data_upload$recipe)
+    data_upload %>%
+      group_by(recipe) %>%
+      summarize(n_app=n_distinct(appliance),
+                n_protein=n_distinct(protein)) %>%
+      ungroup() %>%
+      distinct(n_app,n_protein) %>%
+      .[1,] %>%
+      as.numeric() %>%
+      sum()==2 -> n_app_protein
+
+    second_check<-sum(n_recipe,n_app_protein)==2
+    }
+
+    #prevents app from failing if incorrectly formatted file
+    req(second_check,cancelOutput=TRUE)
+    
+    data_upload
   })
   
   
   ## Show table of uploaded file
   output$file_upload_table<-renderDT(
     uploaded_file(),
-    options=list(dom="t")
+      rownames=FALSE,
+      options=list(dom="t")
   )
   
+  
+  ## Show message if file not formatted correctly
+  output$txt_warning_upload<-renderText({
+    req(input$file_upload_recipe_upload)
+    # delay(1000,
+      if(!exists(deparse(substitute(uploaded_file())))) {
+        shiny::validate("File is not formatted properly")
+      }
+    # )
+  })
+  
 
-  # Split uploaded file into recipe and ingredient DFs
-  recipe_upload<-reactive({
+  ### Move uploaded file to database (following confirmation)
+  ## Split uploaded file into recipe and ingredient DFs
+  recipe_upload<-eventReactive(input$btn_confirm_upload_upload, {
     uploaded_file() %>%
       select(recipe:protein) %>%
       distinct()
   })
   
-  ingred_upload<-reactive({
+  ingred_upload<-eventReactive(input$btn_confirm_upload_upload, {
     uploaded_file() %>%
       select(recipe,name:n)
   })
   
   
   ## Add uploaded files to database
-  observeEvent(input$file_upload_recipe_upload,{
+  observeEvent(input$btn_confirm_upload_upload,{
+  # observeEvent(input$file_upload_recipe_upload,{
     #delay is to allow time for  uploaded_file() to split into recipe_upload() and ingred_upload()
     delay(1000,{
       recipe$db<-bind_rows(recipe$db,recipe_upload())

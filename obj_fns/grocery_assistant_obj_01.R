@@ -28,6 +28,7 @@ protein_choices_sheet1<-c(
 #### App Test=======================================================================================
 ### Generate recipe & ingredient data
 demo_recipeDF <- tibble(
+  id=1:3,
   recipe=c("chicken alfredo","chicken tacos","pot roast"),
   appliance=c("stove, slow cooker","slow cooker","slow cooker"),
   protein=c("chicken","chicken","beef")

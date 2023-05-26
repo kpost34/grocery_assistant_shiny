@@ -86,13 +86,13 @@ ui<-f7Page(
         ),
         br(),
         #temporary tables to see server function
-        h4("recent recipe"),
+        h4("recent recipe (manual upload)"),
         tableOutput("recipe_tab"),
         br(),
         h4("recipe database"),
         tableOutput("recipe_database"),
         br(),
-        h4("recent ingredient"),
+        h4("recent ingredient (manual upload)"),
         tableOutput("ingred_tab"),
         br(),
         h4("ingred database"),
@@ -339,6 +339,7 @@ ui<-f7Page(
         ),
         br(),
         "File should contain six columns:",
+          tags$li(strong("id:"),"identifer: assign recipes numerically starting with 1"),
           tags$li(strong("recipe:"), "name of recipe"),
           tags$li(strong("appliance:"), "one or more of 'stove', 'oven', 'grill', 'broiler', 'slow cooker'; multiple
              appliances separated by a ', '"),
@@ -367,11 +368,14 @@ ui<-f7Page(
         htmlOutput("ui_txt_preview_upload_upload"),
         # h3("5) Preview upload"),
         DTOutput("file_upload_table"),
-        br(),
+        textOutput("txt_warning_upload"),
         #6: confirm upload
         htmlOutput("ui_txt_confirm_upload_upload"),
         uiOutput("ui_btn_confirm_upload_upload"),
-        linebreaks(3),
+        br(),
+        #7: another upload
+        htmlOutput("ui_txt_another_upload_upload"),
+        br(),
         #button to return to main menu
         f7Button(inputId="btn_return_main_upload",
                  label=div(f7Icon("return"),
@@ -430,8 +434,6 @@ ui<-f7Page(
 
 
 # UI
-# leave uploaded data table (but make nicer) as user feedback to see if it looks correct--perhaps
-  #include a double-confirm?
 # error message if uploaded data have errors
 
 # add condition--if no ingredients selected then can't submit (same with recipe)
@@ -452,10 +454,9 @@ ui<-f7Page(
 
 
 # NEXT-------------------------
-# improve batch add page
-#3) add logic to hold uploaded file temporarily and to add to db once confirm is pressed
 # view/edit button generates cards (which also has delete option)
 # items listed in LATER above
+# figure out how to make action button and DT disappear after confirm button clicked
 
 
 
@@ -465,8 +466,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# added icons to more buttons, including the view/edit/delete/save button in the main menu
-# on batch add page, added preview upload section, turned table into DT and moved it up, added dynamic
-# confirm button & text
-
+#added logic to include batch uploaded file in database
+#moved toast notification to after confirmation button hit
+#added id field to upload template to improve checks on file
+#added logic to display validate message when uploaded file is incorrectly formatted
 
