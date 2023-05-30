@@ -68,25 +68,44 @@ server<-function(input,output,session){
   #### Server=======================================================================================
   ### Initialize tmp reactiveValues
   ## Set recipe$tmp to an empty tibble
-  recipe<-reactiveValues(tmp=tibble())
+  # recipe<-reactiveValues(tmp=tibble())
+  # 
+  # ## Set ingred$tmp to an empty tibble
+  # ingred<-reactiveValues(tmp=tibble())
+  # 
+  # 
+  # ## Set recipe$list to an empty tibble
+  # recipe<-reactiveValues(list=tibble())
+  # 
+  # ## Set ingred$list to an empty tibble
+  # ingred<-reactiveValues(list=tibble())
+  # 
+  # 
+  # ### Initialize database reactiveValues
+  # ## Set recipe$db to an empty tibble
+  # recipe<-reactiveValues(db=tibble())
+  # 
+  # ## Set ingred$db to an empty tibble
+  # ingred<-reactiveValues(db=tibble())
+  # 
+  # 
+  # ### Initialize uploaded reactiveValues
+  # ## Set recipe$upload to an empty tibble
+  # recipe<-reactiveValues(upload=tibble())
+  # 
+  # ## Set ingred$upload to an empty tibble
+  # ingred<-reactiveValues(upload=tibble())
   
-  ## Set ingred$tmp to an empty tibble
-  ingred<-reactiveValues(tmp=tibble())
+  recipe<-reactiveValues(tmp=tibble(),
+                         list=tibble(),
+                         db=tibble(),
+                         upload=tibble())
   
+  ingred<-reactiveValues(tmp=tibble(),
+                         list=tibble(),
+                         db=tibble(),
+                         upload=tibble())
   
-  ## Set recipe$list to an empty tibble
-  recipe<-reactiveValues(list=tibble())
-  
-  ## Set ingred$list to an empty tibble
-  ingred<-reactiveValues(list=tibble())
-  
-  
-  ### Initialize database reactiveValues
-  ## Set recipe$db to an empty tibble
-  recipe<-reactiveValues(db=tibble())
-  
-  ## Set ingred$db to an empty tibble
-  ingred<-reactiveValues(db=tibble())
   
   
   ### Pre-loaded data
@@ -768,29 +787,28 @@ server<-function(input,output,session){
     output$ui_txt_preview_upload_upload<-renderUI({
       HTML("<H3>5) Preview upload</H3>")
     })
-    
-    req(uploaded_file())
-    #reactive DF uploaded_file() must exist for #6 text and confirmation button to appear
-    #confirm upload text
-    output$ui_txt_confirm_upload_upload<-renderUI({
-      HTML("<H3>6) Confirm upload</H3>
-           <H4>If dissatisfied, edit file, save, and re-upload</H4>")
-    })
-    #confirm upload button
-    output$ui_btn_confirm_upload_upload<-renderUI({
-      f7Button(inputId="btn_confirm_upload_upload",
-                label=div(f7Icon("checkmark"),
-                          "Confirm"),
-              color="green")
+    #add delay to allow time for uploaded_file() to take on data if file is formatted correctly
+    delay(100,if(nrow(uploaded_file())>0) {
+      #display confirm upload text
+      output$ui_txt_confirm_upload_upload<-renderUI({
+        HTML("<H3>6) Confirm upload</H3>
+             <H4>If dissatisfied, edit file, save, and re-upload</H4>")
+      })
+      #display confirm upload button
+      output$ui_btn_confirm_upload_upload<-renderUI({
+        f7Button(inputId="btn_confirm_upload_upload",
+                  label=div(f7Icon("checkmark"),
+                            "Confirm"),
+                color="green")
+      })
     })
   })
   
   
-  ### Display toast notification and step 7 text after hitting confirm
+  ### Display toast notification and step 7 & remove button text after hitting confirm
   observeEvent(input$btn_confirm_upload_upload, {
     #toast notification
-    # if(tools::file_ext(input$file_upload_recipe_upload$name) %in% c("csv","xls","xlsx")){
-    delay(500,
+    delay(100,
       f7Toast(
         text=paste(input$file_upload_recipe_upload$name,"uploaded to database"),
         position="center",
@@ -800,14 +818,30 @@ server<-function(input,output,session){
     )
     
     #text for another upload
-    delay(1000,
+    delay(200,
       output$ui_txt_another_upload_upload<-renderUI({
         HTML("<H3>7) Another upload?</H3>
             <H4>Want to batch upload more recipes? Edit the template (or last file uploaded), 
             save, and click 'Upload File'.")
       })
     )
+    #condition = if uploaded_file() is empty
+    delay(200,if(nrow(uploaded_file())==0){
+    
+    #remove confirm button
+    removeUI(selector="#btn_confirm_upload_upload")
+    })
+    #update #6 text
+    output$ui_txt_confirm_upload_upload<-renderUI({
+        HTML("<H3>6) Confirm upload</H3>
+             <H4>Completed</H4>")
+      })
+    #removes validate() message because table is empty
+    delay(250,
+      removeUI(selector="#txt_warning_upload")
+    )
   })
+  
 
   
   ### Return to main menu
@@ -837,8 +871,11 @@ server<-function(input,output,session){
   
   
   ### File upload
+  ## Initialize reactiveVal
+  uploaded_file<-reactiveVal(tibble())
+  
   ## Read in uploaded file 
-  uploaded_file<-reactive({
+  observeEvent(input$file_upload_recipe_upload,{
     req(input$file_upload_recipe_upload)
     
     ext<-tools::file_ext(input$file_upload_recipe_upload$name)
@@ -876,7 +913,7 @@ server<-function(input,output,session){
     #prevents app from failing if incorrectly formatted file
     req(second_check,cancelOutput=TRUE)
     
-    data_upload
+    uploaded_file(data_upload)
   })
   
   
@@ -891,36 +928,26 @@ server<-function(input,output,session){
   ## Show message if file not formatted correctly
   output$txt_warning_upload<-renderText({
     req(input$file_upload_recipe_upload)
-    # delay(1000,
-      if(!exists(deparse(substitute(uploaded_file())))) {
-        shiny::validate("File is not formatted properly")
-      }
-    # )
-  })
-  
-
-  ### Move uploaded file to database (following confirmation)
-  ## Split uploaded file into recipe and ingredient DFs
-  recipe_upload<-eventReactive(input$btn_confirm_upload_upload, {
-    uploaded_file() %>%
-      select(recipe:protein) %>%
-      distinct()
-  })
-  
-  ingred_upload<-eventReactive(input$btn_confirm_upload_upload, {
-    uploaded_file() %>%
-      select(recipe,name:n)
+    if(nrow(uploaded_file())==0) {
+      shiny::validate("File is not formatted properly")
+    }
   })
   
   
-  ## Add uploaded files to database
+  ### Add uploaded files to database & clear uploaded_file()
   observeEvent(input$btn_confirm_upload_upload,{
-  # observeEvent(input$file_upload_recipe_upload,{
-    #delay is to allow time for  uploaded_file() to split into recipe_upload() and ingred_upload()
-    delay(1000,{
-      recipe$db<-bind_rows(recipe$db,recipe_upload())
-      ingred$db<-bind_rows(ingred$db,ingred_upload())
-    })
+    #adding to db
+    recipe$db<-uploaded_file() %>%
+      select(recipe:protein) %>%
+      distinct() %>%
+      bind_rows(recipe$db)
+    ingred$db<-uploaded_file() %>%
+      select(recipe,name:n) %>%
+      bind_rows(ingred$db)
+    #clearing DF
+    delay(100,
+      uploaded_file(tibble())
+    )
   })
 
   

@@ -445,6 +445,8 @@ ui<-f7Page(
 # add ability to adjust quantities & remove items from shopping lists [add -/+ buttons next to n]
 # turn any repeated functions into custom functions (e.g., use of splitLayout?)
 
+# potentially reduce delay() durations
+
 
 # Back-end
 # develop custom functions to limit server code
@@ -456,7 +458,9 @@ ui<-f7Page(
 # NEXT-------------------------
 # view/edit button generates cards (which also has delete option)
 # items listed in LATER above
-# figure out how to make action button and DT disappear after confirm button clicked
+# figure out how to make action button and DT disappear after confirm button clicked --> change
+  #uploaded_file from reactive() to reactiveValues() & change it to empty DF after confirm btn
+  #clicked so that button does not re-appear
 
 
 
@@ -466,8 +470,6 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-#added logic to include batch uploaded file in database
-#moved toast notification to after confirmation button hit
-#added id field to upload template to improve checks on file
-#added logic to display validate message when uploaded file is incorrectly formatted
+# re-tooled uploaded_file() so that it's a reactiveVal and not a reactive
+# fixed logic such that a confirmed upload adds recipes & ingreds to db
 
