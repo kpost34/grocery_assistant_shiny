@@ -282,7 +282,7 @@ ui<-f7Page(
           f7Block(
             f7BlockTitle(title="Email plan & list",size="medium"),
             f7Text(inputId="txt_email_address_list",
-                   label="Recipient"),
+                   label="Recipient email address"),
             shinyFeedback::useShinyFeedback(),
             # textOutput("warn_no_email_address_list"),
             f7Button(inputId="btn_planList_email_list",
@@ -434,17 +434,14 @@ ui<-f7Page(
 
 
 # UI
-# error message if uploaded data have errors
-
 # add condition--if no ingredients selected then can't submit (same with recipe)
 # fix delay/poor responsiveness with previous ingredient actionButton
 
 # figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
   #two sheets will actually manifest
 
-# add ability to adjust quantities & remove items from shopping lists [add -/+ buttons next to n]
-# turn any repeated functions into custom functions (e.g., use of splitLayout?)
 
+# turn any repeated functions into custom functions (e.g., use of splitLayout?)
 # potentially reduce delay() durations
 
 
@@ -457,11 +454,6 @@ ui<-f7Page(
 
 # NEXT-------------------------
 # view/edit button generates cards (which also has delete option)
-# items listed in LATER above
-# figure out how to make action button and DT disappear after confirm button clicked --> change
-  #uploaded_file from reactive() to reactiveValues() & change it to empty DF after confirm btn
-  #clicked so that button does not re-appear
-
 
 
 # DONE--------------------------
@@ -470,6 +462,6 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# re-tooled uploaded_file() so that it's a reactiveVal and not a reactive
-# fixed logic such that a confirmed upload adds recipes & ingreds to db
+# added action buttons for +/-/delete to shopping list
+# added logic to make them work, including a modal and toast notification
 

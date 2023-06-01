@@ -452,14 +452,14 @@ server<-function(input,output,session){
                    nrow(.),
                    id="edit_",
                    label="View/edit",
-                   class="btn-danger",
+                   class="btn-primary",
                    onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
         shinyInput(actionButton,
                    nrow(.),
                    id="delete_",
                    label="Delete",
                    icon=shiny::icon("trash"),
-                   class="btn-danger",
+                   class="btn-primary",
                    onclick="Shiny.setInputValue(\"delete_button\",  this.id.concat(\"_\", Math.random()))"))),
     server=FALSE,
     selection="none",
@@ -635,11 +635,27 @@ server<-function(input,output,session){
                  selected="planner_tab")
   })
   
+  
   ### Return to main menu
   observeEvent(input$btn_return_main_list,{
     updateF7Tabs(id="main_tabset",
                  selected="main_tab")
   })
+  
+  
+  ### Display modal/dialog after hitting Delete button
+  observeEvent(eventExpr={
+    input$trash_button #|
+    #PLACEHOLDER FOR DELETE BUTTON ON CARDS
+    }, {
+    f7Dialog(
+      id="dialog_confirm_trash",
+      title="Confirm delete",
+      type="confirm",
+      text="Click OK to remove ingredient from shopping list."
+    )
+  },
+  ignoreInit=TRUE)
   
   
   ## Display dialog for resetting plan/list
@@ -670,18 +686,45 @@ server<-function(input,output,session){
   
   #htmlTable
   meal_email_table<-reactive({
-    htmlTable(recipe$list,rnames=FALSE)
+    htmlTable(recipe$list,rnames=FALSE) 
   })
                                     
   ## Shopping list
   #datatable
   output$shopping_list_list<-renderDT(
-    ingred$list,
+    ingred$list %>%
+      ungroup() %>%
+      mutate(Actions=paste(
+        shinyInput(actionButton,
+          nrow(.),
+          id="plus_",
+          label="",
+          icon=shiny::icon("plus"),
+          class="btn-primary",
+          onclick="Shiny.setInputValue(\"plus_button\",  this.id.concat(\"_\", Math.random()))"),
+      shinyInput(actionButton,
+        nrow(.),
+        id="minus_",
+        label="",
+        icon=shiny::icon("minus"),
+        class="btn-primary",
+        onclick="Shiny.setInputValue(\"minus_button\",  this.id.concat(\"_\", Math.random()))"),
+      shinyInput(actionButton,
+        nrow(.),
+        id="trash_",
+        label="",
+        icon=shiny::icon("trash"),
+        class="btn-primary",
+        onclick="Shiny.setInputValue(\"trash_button\",  this.id.concat(\"_\", Math.random()))"))),
+    server=FALSE,
+    selection="none",
     rownames=FALSE,
+    escape=FALSE,
     options=list(
-      dom="ft"
+      dom="ft",
+      pageLength=10
     ),
-    caption = htmltools::tags$caption(style = "caption-side: top; text-align: left; color:black;  
+    caption = htmltools::tags$caption(style = "caption-side: top; text-align: left; color:black;
                                       font-size:150% ;","Shopping List")
   )
   
@@ -689,6 +732,42 @@ server<-function(input,output,session){
   ingredient_email_table<-reactive({
     htmlTable(ingred$list,rnames=FALSE)
   })
+  
+  
+  ### Action buttons
+  ## Remove item from shopping list after hitting trash button & display toast notification
+  observeEvent(input$dialog_confirm_trash,{
+    deleted_row<-as.numeric(strsplit(input$trash_button,"_")[[1]][2])
+    nm<-ingred$list[[deleted_row,"name"]]
+    ingred$list<-ingred$list %>% filter(name!=nm)
+    
+    f7Toast(
+      text=paste(nm,"removed from shopping list"),
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=2000
+    )
+  })
+  
+  ## Adjust quantities after pressing buttons
+  observeEvent(input$plus_button,{
+    plus_row<-as.numeric(strsplit(input$plus_button,"_")[[1]][2])
+    nm_plus<-ingred$list[[plus_row,"name"]]
+    ingred$list<-ingred$list %>%
+      mutate(n=ifelse(name==nm_plus,
+                      n+1,
+                      n))
+  })
+  
+  observeEvent(input$minus_button,{
+    minus_row<-as.numeric(strsplit(input$minus_button,"_")[[1]][2])
+    nm_minus<-ingred$list[[minus_row,"name"]]
+    ingred$list<-ingred$list %>%
+      mutate(n=ifelse(n>=2,
+                      n-1,
+                      n))
+  })
+  
   
   
   ### Get a copy of plan and list
