@@ -193,12 +193,74 @@ server<-function(input,output,session){
   })
   
   ## Confirm submission of manual addition of recipe/ingredient info
-  # Display modal/dialog
+  # Display alert modal/dialog if recipe info is absent present
+  observeEvent(eventExpr={
+    input$btn_submit_recipe_ingred_ingredSheet1|
+    input$btn_submit_recipe_ingred_ingredSheet2
+    }, {
+    #condition: recipe info must all be present; otherwise alert given
+    if(sum(map(
+      c(input$txt_recipe_recipeSheet,
+        input$chkGrp_app_recipeSheet,
+        input$chkGrp_protein_recipeSheet),
+      nchar)>0)<3){
+      f7Dialog(
+        id="dialog_alert_manual_recipe_add",
+        title="Invalid entry",
+        type="alert",
+        text="Please enter all recipe information before submitting to database.")
+      }
+  },
+  ignoreInit=TRUE)
+  
+  
+  # Display alert modal/dialog if ingredient info is missing
+  observeEvent(eventExpr={
+    input$btn_submit_recipe_ingred_ingredSheet1|
+    input$btn_submit_recipe_ingred_ingredSheet2
+    }, {
+    #recipe check necessary (so that only one dialog displayed)
+    req(sum(map(
+      c(input$txt_recipe_recipeSheet,
+        input$chkGrp_app_recipeSheet,
+        input$chkGrp_protein_recipeSheet),
+      nchar)>0)==3)
+    #condition needed
+    if(1:8 %>%
+      map_lgl(function(x){
+        #populates tibble rows if ingredient name & size have 1+ chr
+        nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
+        nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0
+      }) %>%
+        sum(.)==0)
+          f7Dialog(
+            id="dialog_alert_manual_ingred_add",
+            title="Invalid entry",
+            type="alert",
+            text="Please enter all information for at least one ingredient before submitting to database.")
+    },
+  ignoreInit=TRUE)
+  
+  
+  
+  # Display confirm modal/dialog
   #both submit buttons in {} for observeEvent to listen to them
   observeEvent(eventExpr={
     input$btn_submit_recipe_ingred_ingredSheet1|
     input$btn_submit_recipe_ingred_ingredSheet2
     }, {
+    req(sum(map(
+      c(input$txt_recipe_recipeSheet,
+        input$chkGrp_app_recipeSheet,
+        input$chkGrp_protein_recipeSheet),
+      nchar)>0)==3)
+    req(1:8 %>%
+      map_lgl(function(x){
+        #populates tibble rows if ingredient name & size have 1+ chr
+        nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
+        nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0
+      }) %>%
+        sum(.)>0)
     f7Dialog(
       id="dialog_confirm_manual_add",
       title="Confirm submission",
@@ -309,6 +371,7 @@ server<-function(input,output,session){
     1:8 %>%
       map_df(function(x){
         #populates tibble rows if ingredient name & size have 1+ chr
+        #(still necessary with check above b/c don't want incomplete ingred info)
         if(nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
            nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0) {
         tibble(
@@ -321,6 +384,10 @@ server<-function(input,output,session){
         }) -> ingred$tmp
     }
   )
+  
+  
+  
+  
   
   
   

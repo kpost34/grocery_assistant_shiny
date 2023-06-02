@@ -429,12 +429,8 @@ ui<-f7Page(
 
 #---------------------------------------
 # LATER-------------------------
-# Styling
-# slideshow of images (recipe) on main app page
-
-
 # UI
-# add condition--if no ingredients selected then can't submit (same with recipe)
+
 # fix delay/poor responsiveness with previous ingredient actionButton
 
 # figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
@@ -445,9 +441,13 @@ ui<-f7Page(
 # potentially reduce delay() durations
 
 
-# Back-end
+# BACK-END
 # develop custom functions to limit server code
 # see if any observeEvents can be combined
+
+
+# STYLING
+# slideshow of images (recipe) on main app page
 
 
 
@@ -456,12 +456,12 @@ ui<-f7Page(
 # view/edit button generates cards (which also has delete option)
 
 
+
 # DONE--------------------------
 
 
 
 
 # LAST COMMIT-------------------
-# added action buttons for +/-/delete to shopping list
-# added logic to make them work, including a modal and toast notification
+# added dialog alerts if recipe info missing or if any info for at least one ingredient absent
 
