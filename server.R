@@ -184,6 +184,7 @@ server<-function(input,output,session){
   ## Return to recipe sheet
   observeEvent(input$btn_return_recipe_ingredSheet1, {
     updateF7Sheet("man_input_recipeSheet")
+    updateF7Sheet("man_input_ingredSheet1")
   })
   
   
@@ -331,6 +332,7 @@ server<-function(input,output,session){
   ## Return to first ingredient sheet
   observeEvent(input$btn_previous_ingred_ingredSheet2, {
     updateF7Sheet("man_input_ingredSheet1")
+    updateF7Sheet("man_input_ingredSheet2")
   })
   
   

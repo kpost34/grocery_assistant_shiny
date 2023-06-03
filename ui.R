@@ -242,6 +242,7 @@ ui<-f7Page(
         ),
         h3("Select the recipes to add to your meal plan"),
         DTOutput("recipe_db_planner"),
+        br(),
         splitLayout(cellWidths=c("75%","25%"),
           br(),
           f7Button(inputId="btn_reset_planList_planner",
@@ -430,13 +431,6 @@ ui<-f7Page(
 #---------------------------------------
 # LATER-------------------------
 # UI
-
-# fix delay/poor responsiveness with previous ingredient actionButton
-
-# figure out how to get clicking a button on same item 2x in a row or going back and forth b/t
-  #two sheets will actually manifest
-
-
 # turn any repeated functions into custom functions (e.g., use of splitLayout?)
 # potentially reduce delay() durations
 
@@ -463,5 +457,5 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# added dialog alerts if recipe info missing or if any info for at least one ingredient absent
+# resolved delays and lack of responsiveness to buttons when manually entering dishes
 
