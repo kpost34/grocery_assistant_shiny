@@ -389,10 +389,6 @@ server<-function(input,output,session){
   
   
   
-  
-  
-  
-  
   ### Ingredient database info
   ## Add ingredients from new recipe to database
   observeEvent(input$dialog_confirm_manual_add,{
@@ -405,7 +401,6 @@ server<-function(input,output,session){
   
 
 
-
   ##### View/Edit/Delete/Save Recipes Tab###########################################################
   #### UI===========================================================================================
   ### Return to main menu
@@ -414,10 +409,70 @@ server<-function(input,output,session){
   })
   
   
-  ### Display card after hitting View/edit button
-  # observeEvent(input$view_button,{
-  #   updateF7Card(id="test_card")
-  # })
+  ### Display popover after hitting view button (NEED TO REVISIT)
+  observeEvent(input$view_button,{
+    addF7Popover(
+      id="test_popover",
+      options=list(
+        content="testing popover text"
+      )
+    )
+  })
+  
+  
+  ### Display sheets after hitting edit button (NEED TO UPDATE OR DELETE)
+  observeEvent(input$edit_button,{
+    edited_row<-as.numeric(strsplit(input$edit_button,"_")[[1]][2])
+    #grab recipe name
+    nm_edit<-dt_df()[[edited_row,"recipe"]]
+    
+    #grab appliance(s)
+    appliance_edit<-recipe$db %>%
+      filter(recipe==nm_edit) %>%
+      separate_longer_delim(appliance,delim=", ") %>%
+      mutate(appliance=str_to_sentence(appliance)) %>%
+      pull(appliance)
+    
+    #grab protein(s)
+    protein_edit<-recipe$db %>%
+      filter(recipe==nm_edit) %>%
+      separate_longer_delim(protein,delim=", ") %>%
+      mutate(protein=toTitleCase(protein)) %>%
+      pull(protein)
+    
+    
+    f7Popup(
+      id="edit_info_popup",
+      title=nm_edit,
+      edit_recipe_info(root_id="recipe_popup",
+                       app_edit=appliance_edit,
+                       prot_edit=protein_edit)
+    )
+  })
+    
+    
+    
+    # edited_row<-as.numeric(strsplit(input$edit_button,"_")[[1]][2])
+    # #grab recipe name
+    # nm_edit<-dt_df()[[edited_row,"recipe"]]
+    # 
+    # #grab appliance(s)
+    # appliance_edit<-recipe$db %>%
+    #   filter(recipe==nm_edit) %>%
+    #   separate_longer_delim(appliance,delim=", ") %>%
+    #   mutate(appliance=str_to_sentence(appliance)) %>%
+    #   pull(appliance)
+    # 
+    # #grab protein(s)
+    # protein_edit<-recipe$db %>%
+    #   filter(recipe==nm_edit) %>%
+    #   separate_longer_delim(protein,delim=", ") %>%
+    #   mutate(protein=toTitleCase(protein)) %>%
+    #   pull(protein)
+    # 
+    # ingred_edit<-ingred$db %>% filter(recipe==nm_edit)
+
+
   
   ### Display modal/dialog after hitting Delete button
   #both submit buttons in {} for observeEvent to listen to them
@@ -493,7 +548,7 @@ server<-function(input,output,session){
   })
   
   
-  # ## Create reactive of recipe df joined with ingredient df
+  # ## Create reactive of recipe df joined with ingredient df (DELETE?)
   # dt_df<-reactive({
   #   #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
   #   if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
@@ -519,10 +574,16 @@ server<-function(input,output,session){
       mutate(Actions=paste(
         shinyInput(actionButton,
                    nrow(.),
-                   id="edit_",
-                   label="View/edit",
+                   id="view_",
+                   label="View",
                    class="btn-primary",
                    onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
+        shinyInput(actionButton,
+                   nrow(.),
+                   id="edit_",
+                   label="Edit",
+                   class="btn-primary",
+                   onclick="Shiny.setInputValue(\"edit_button\",  this.id.concat(\"_\", Math.random()))"),
         shinyInput(actionButton,
                    nrow(.),
                    id="delete_",

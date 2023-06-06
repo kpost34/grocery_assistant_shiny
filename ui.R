@@ -32,7 +32,7 @@ ui<-f7Page(
   shinyFeedback::useShinyFeedback(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
 #   #spaceholder for theme
-#   ##### Create structure as f7Tabs (similar to tabsetPanel)
+  ##### Create structure as f7Tabs (similar to tabsetPanel)
   f7Tabs(id="main_tabset",
                  
     ##### Main Menu=================================================================================
@@ -129,6 +129,7 @@ ui<-f7Page(
         )
       ),
       
+      
       ## Ingredient entry sheet 1
       f7Sheet(
         id="man_input_ingredSheet1",
@@ -190,6 +191,7 @@ ui<-f7Page(
     ),
     
     ##### View/Edit/Delete/Save Recipes=============================================================
+    ### Page associatted with recipe browser
     f7Tab(title="Recipes",
           tabName="recipe_tab",
           hidden=TRUE,
@@ -222,11 +224,7 @@ ui<-f7Page(
                  label=div(f7Icon("return"),"Return to main menu"),
                  color="purple"),
         style="margin-left:100px; margin-right: 100px"
-      ),
-      br(),
-      #view recipe cards
-      # f7Card(id="test_card",
-      #        title=demo_recipeDF[1,1])
+      )
     ),
     
     ##### Generate Shopping List====================================================================
@@ -441,13 +439,14 @@ ui<-f7Page(
 
 
 # STYLING
-# slideshow of images (recipe) on main app page
+# slideshow of images (recipe) on main app page [ideally it could fetch this on its own from internet]
 
 
 
 
 # NEXT-------------------------
-# view/edit button generates cards (which also has delete option)
+# view button that displays popovers(?) containing a google image of dish
+# edit button (need to create separately) that displays dish & ingred info for user to edit
 
 
 
@@ -457,5 +456,6 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# resolved delays and lack of responsiveness to buttons when manually entering dishes
+# began developing UI and logic code to display selected recipe, appliance(s), and protein(s) 
+  #that a user is editing from their database
 

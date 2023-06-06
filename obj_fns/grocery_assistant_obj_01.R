@@ -19,7 +19,7 @@ protein_choices_sheet1<-c(
   "Steak",
   "Pork",
   "Fish",
-  "Vegetarian (e.g, beans)"
+  "Vegetarian"
 )
 
 
