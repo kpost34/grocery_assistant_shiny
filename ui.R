@@ -437,6 +437,9 @@ ui<-f7Page(
 # develop custom functions to limit server code
 # see if any observeEvents can be combined
 
+# go through code and delete anything that's extraneous & commented out
+# go through code and replace splitLayout() + two f7Button() with f7Segment()
+
 
 # STYLING
 # slideshow of images (recipe) on main app page [ideally it could fetch this on its own from internet]
@@ -454,8 +457,9 @@ ui<-f7Page(
 
 
 
-
 # LAST COMMIT-------------------
-# began developing UI and logic code to display selected recipe, appliance(s), and protein(s) 
-  #that a user is editing from their database
+# added second edit button (specifically for ingredients)
+# developed function edit_recipe_info() that builds out that popup for editing dishes in db
+# added update & cancel buttons to each popup
+# updated popups such that they display the submit buttons in place of their titles
 

@@ -420,9 +420,10 @@ server<-function(input,output,session){
   })
   
   
-  ### Display sheets after hitting edit button (NEED TO UPDATE OR DELETE)
-  observeEvent(input$edit_button,{
-    edited_row<-as.numeric(strsplit(input$edit_button,"_")[[1]][2])
+  ### Display popups--------------------------------------------------------------------------------
+  ## Recipe--after hitting edit1 button 
+  observeEvent(input$edit1_button,{
+    edited_row<-as.numeric(strsplit(input$edit1_button,"_")[[1]][2])
     #grab recipe name
     nm_edit<-dt_df()[[edited_row,"recipe"]]
     
@@ -442,39 +443,72 @@ server<-function(input,output,session){
     
     
     f7Popup(
-      id="edit_info_popup",
-      title=nm_edit,
+      id="edit_recipe_popup",
+      title=splitLayout(
+        f7Button(inputId="btn_update_recipe_popup",
+                 label="Update recipe",
+                 color="green",
+                 size="small"),
+        br()
+      ),
+      h3(nm_edit),
       edit_recipe_info(root_id="recipe_popup",
                        app_edit=appliance_edit,
                        prot_edit=protein_edit)
     )
   })
+  
+  
+  ## Ingredients--after hitting edit2 button
+  observeEvent(input$edit2_button, {
+    edited_row<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
+    #grab recipe name
+    nm_edit<-dt_df()[[edited_row,"recipe"]]
+  
+    #grab ingred info
+    ingred_edit<-ingred$db %>% filter(recipe==nm_edit)
     
     
+    f7Popup(
+      id="edit_ingred_popup",
+      title=splitLayout(
+        f7Button(inputId="btn_update_ingred_popup",
+                label="Update ingredients",
+                color="green",
+                size="small"),
+        br()
+      ),
+      h3(nm_edit),
+      edit_ingred_info(root_id="ingred_popup",
+                       df=ingred_edit)
+    )
+  })
     
-    # edited_row<-as.numeric(strsplit(input$edit_button,"_")[[1]][2])
-    # #grab recipe name
-    # nm_edit<-dt_df()[[edited_row,"recipe"]]
-    # 
-    # #grab appliance(s)
-    # appliance_edit<-recipe$db %>%
-    #   filter(recipe==nm_edit) %>%
-    #   separate_longer_delim(appliance,delim=", ") %>%
-    #   mutate(appliance=str_to_sentence(appliance)) %>%
-    #   pull(appliance)
-    # 
-    # #grab protein(s)
-    # protein_edit<-recipe$db %>%
-    #   filter(recipe==nm_edit) %>%
-    #   separate_longer_delim(protein,delim=", ") %>%
-    #   mutate(protein=toTitleCase(protein)) %>%
-    #   pull(protein)
-    # 
-    # ingred_edit<-ingred$db %>% filter(recipe==nm_edit)
 
+  ### Display dialogs for recipe/ingredient updates
+  ## Recipe
+  observeEvent(input$btn_update_recipe_popup,{
+    f7Dialog(
+      id="dialog_confirm_update_recipe_recipe",
+      title="Confirm recipe update",
+      type="confirm",
+      text="Click OK to update recipe information."
+    )
+  })
+  
+  
+  ## Ingredients
+  observeEvent(input$btn_update_ingred_popup,{
+    f7Dialog(
+      id="dialog_confirm_update_ingred_recipe",
+      title="Confirm ingredients update",
+      type="confirm",
+      text="Click OK to update ingredient information."
+    )
+  })
 
   
-  ### Display modal/dialog after hitting Delete button
+  ### Display modal/dialog after hitting Delete button----------------------------------------------
   #both submit buttons in {} for observeEvent to listen to them
   observeEvent(eventExpr={
     input$delete_button #|
@@ -572,6 +606,7 @@ server<-function(input,output,session){
   output$recipe_db_recipe<-renderDT(
     dt_df() %>%
       mutate(Actions=paste(
+        #add buttons: view, edit recipe & ingred info, delete
         shinyInput(actionButton,
                    nrow(.),
                    id="view_",
@@ -580,10 +615,16 @@ server<-function(input,output,session){
                    onclick="Shiny.setInputValue(\"view_button\",  this.id.concat(\"_\", Math.random()))"),
         shinyInput(actionButton,
                    nrow(.),
-                   id="edit_",
-                   label="Edit",
+                   id="edit1_",
+                   label="Edit recipe",
                    class="btn-primary",
-                   onclick="Shiny.setInputValue(\"edit_button\",  this.id.concat(\"_\", Math.random()))"),
+                   onclick="Shiny.setInputValue(\"edit1_button\",  this.id.concat(\"_\", Math.random()))"),
+        shinyInput(actionButton,
+                   nrow(.),
+                   id="edit2_",
+                   label="Edit ingredients",
+                   class="btn-primary",
+                   onclick="Shiny.setInputValue(\"edit2_button\",  this.id.concat(\"_\", Math.random()))"),
         shinyInput(actionButton,
                    nrow(.),
                    id="delete_",
@@ -608,6 +649,36 @@ server<-function(input,output,session){
                                       font-size:200% ;","Recipe Database")
   )
 
+  
+  ### Display toast notification and update values after confirming dialog update
+  ## Recipe info
+  # observeEvent(input$dialog_confirm_update_recipe_recipe,{
+  #   req(input$dialog_confirm_update_recipe_recipe)
+  #   
+  #   
+  #   
+  #   f7Toast(
+  #     text=paste(nm,"removed from database"),
+  #     position="center",
+  #     closeButton=FALSE,
+  #     closeTimeout=3500
+  #   )
+  # }
+  
+  
+  
+  ## Ingredient info
+  # observeEvent(input$dialog_confirm_update_ingred_recipe,{
+  #   req(input$dialog_confirm_update_ingred_recipe)
+  #   
+  #   f7Toast(
+  #     text=paste(nm,"removed from database"),
+  #     position="center",
+  #     closeButton=FALSE,
+  #     closeTimeout=3500
+  #   )
+  # })
+  
   
   ### Display toast notification and remove values after confirming deletion
   observeEvent(input$dialog_confirm_delete,{
@@ -774,10 +845,7 @@ server<-function(input,output,session){
   
   
   ### Display modal/dialog after hitting Delete button
-  observeEvent(eventExpr={
-    input$trash_button #|
-    #PLACEHOLDER FOR DELETE BUTTON ON CARDS
-    }, {
+  observeEvent(input$trash_button, {
     f7Dialog(
       id="dialog_confirm_trash",
       title="Confirm delete",
