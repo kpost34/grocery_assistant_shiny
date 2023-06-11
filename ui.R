@@ -432,6 +432,9 @@ ui<-f7Page(
 # turn any repeated functions into custom functions (e.g., use of splitLayout?)
 # potentially reduce delay() durations
 
+# view button that displays popovers(?) containing a google image of dish (and option to add manually)
+# update buttons in DTs from actionbuttons to f7buttons?
+
 
 # BACK-END
 # develop custom functions to limit server code
@@ -448,8 +451,14 @@ ui<-f7Page(
 
 
 # NEXT-------------------------
-# view button that displays popovers(?) containing a google image of dish
-# edit button (need to create separately) that displays dish & ingred info for user to edit
+# get popup to close after submitting update
+# updating multiple recipes (or the same one twice) is non-functional --> need to update
+# figure out way to close popup after confirming dialog (even better, with a cancel button)
+
+
+# for manual entry, combine alert/confirm dialogs into single observeEvent (like the updates)
+# for manual entry, add better logic for alert/confirm (based off of edit info)
+# capitalization of updated items (recipe & ingreds)
 
 
 
@@ -458,8 +467,7 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# added second edit button (specifically for ingredients)
-# developed function edit_recipe_info() that builds out that popup for editing dishes in db
-# added update & cancel buttons to each popup
-# updated popups such that they display the submit buttons in place of their titles
+# developed back-end code to update recipe info in db & display toast notification
+# created warning dialogs if new info is incomplete
+# successfully added logic to display alert/confirm dialog and to add edited ingreds to db
 

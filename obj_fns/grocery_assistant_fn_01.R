@@ -44,7 +44,7 @@ add_ingredients<-function(n_prev=0,n) {
 
 
 ### Create appliance and protein checkboxes with pre-selected values
-edit_recipe_info<-function(root_id,app_edit=NA,prot_edit=NA){
+edit_recipe_info<-function(app_edit=NA,prot_edit=NA){
   # Create objects
   # add_recipe_sheet<-function(type="entry",root_id,app_edit=NA,prot_edit=NA){
   # if(type=="entry"){
@@ -59,7 +59,7 @@ edit_recipe_info<-function(root_id,app_edit=NA,prot_edit=NA){
   #create appliance checkboxes
   app_list<-purrr::map2(.x=1:5,.y=app_value,
     function(num,log){
-      p(f7Checkbox(inputId=paste0("chkGrp_app_",tolower(app_choices_sheet1[num]),root_id),
+      p(f7Checkbox(inputId=paste("chk_app",num,"recipe_popup",sep="_"),
          label=app_choices_sheet1[num],
          value=log))
         # style="font-size: 16px")
@@ -69,7 +69,7 @@ edit_recipe_info<-function(root_id,app_edit=NA,prot_edit=NA){
   #create protein checkboxes
   protein_list<-purrr::map2(.x=1:6,.y=protein_value,
     function(num2,log2){
-      p(f7Checkbox(inputId=paste0("chkGrp_protein_",tolower(protein_choices_sheet1[num2]),root_id),
+      p(f7Checkbox(inputId=paste("chk_protein",num2,"recipe_popup",sep="_"),
          label=protein_choices_sheet1[num2],
          value=log2))
         # style="font-size: 16px")
@@ -91,7 +91,7 @@ edit_recipe_info<-function(root_id,app_edit=NA,prot_edit=NA){
 
 
 ### Create ingredient inputs with pre-selected values
-edit_ingred_info<-function(root_id,df){
+edit_ingred_info<-function(df){
 # Create objects
   #recipe, nrows (with values), nblanks (to balance out all ingred slots), 
     #num (track ingred #), nm, size, and ns (ingred data)
@@ -112,15 +112,15 @@ edit_ingred_info<-function(root_id,df){
   pmap(ingred_list,function(w,x,y,z) {
     #all info in one row
     splitLayout(cellWidths=c("40%","35%","25%"),
-      f7Text(inputId=paste0("txt_ingred",w,"_nm",root_id),
+      f7Text(inputId=paste("txt_ingred",w,"nm","ingred_popup",sep="_"),
              label="Name",
              value=x),
-      f7Text(inputId=paste0("txt_ingred",w,"_size",root_id),
+      f7Text(inputId=paste("txt_ingred",w,"size","ingred_popup",sep="_"),
              label="Size",
              value=y),
       #aligns stepper with text boxes
       div(class="label-left",
-        f7Stepper(inputId=paste0("stp_ingred",w,"_n",root_id),
+        f7Stepper(inputId=paste("stp_ingred",w,"n","ingred_popup",sep="_"),
                   label="",
                   min=0.5,
                   max=20,

@@ -233,7 +233,7 @@ server<-function(input,output,session){
         nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
         nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0
       }) %>%
-        sum(.)==0)
+      sum(.)==0)
           f7Dialog(
             id="dialog_alert_manual_ingred_add",
             title="Invalid entry",
@@ -452,8 +452,7 @@ server<-function(input,output,session){
         br()
       ),
       h3(nm_edit),
-      edit_recipe_info(root_id="recipe_popup",
-                       app_edit=appliance_edit,
+      edit_recipe_info(app_edit=appliance_edit,
                        prot_edit=protein_edit)
     )
   })
@@ -479,33 +478,87 @@ server<-function(input,output,session){
         br()
       ),
       h3(nm_edit),
-      edit_ingred_info(root_id="ingred_popup",
-                       df=ingred_edit)
+      edit_ingred_info(df=ingred_edit)
     )
   })
     
 
-  ### Display dialogs for recipe/ingredient updates
-  ## Recipe
-  observeEvent(input$btn_update_recipe_popup,{
-    f7Dialog(
-      id="dialog_confirm_update_recipe_recipe",
-      title="Confirm recipe update",
-      type="confirm",
-      text="Click OK to update recipe information."
-    )
-  })
+  ### Display dialogs for recipe/ingredient updates-------------------------------------------------
+  ## Recipe info
+  observeEvent(input$btn_update_recipe_popup, {
+    #create true/false objects related to appliance & protein entries
+    new_app_pres<-1:5 %>% 
+      map_lgl(function(app){
+        input[[paste("chk_app",app,"recipe_popup",sep="_")]]
+      }) %>%
+      sum() > 0
+    
+    new_prot_pres<-1:6 %>% 
+      map_lgl(function(prot){
+        input[[paste("chk_protein",prot,"recipe_popup",sep="_")]]
+      }) %>%
+      sum() > 0
+    
+    
+    #condition: recipe info present -> confirm dialog
+    if(sum(new_app_pres,new_prot_pres)>=2) {
+      f7Dialog(
+        id="dialog_confirm_update_recipe_recipe",
+        title="Confirm recipe update",
+        type="confirm",
+        text="Click OK to update recipe information.")
+    }
+    #if any info absent, then alert dialog
+    else if(sum(new_app_pres,new_prot_pres)<2) {
+      f7Dialog(
+        id="dialog_alert_update_recipe_recipe",
+        title="Invalid entry",
+        type="alert",
+        text="Please enter all recipe information before submitting updates.")
+    }
+  },
+  ignoreInit=TRUE)
   
   
-  ## Ingredients
+  ## Ingredient info
   observeEvent(input$btn_update_ingred_popup,{
-    f7Dialog(
-      id="dialog_confirm_update_ingred_recipe",
-      title="Confirm ingredients update",
-      type="confirm",
-      text="Click OK to update ingredient information."
-    )
+    #condition needed
+    new_ingreds<-1:8 %>%
+      map_df(function(x){
+        tibble(
+          #populates tibble rows if ingredient name & size have 1+ chr
+          nm_pres=nchar(input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]])>0,
+          size_pres=nchar(input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]])>0,
+          none_pres=sum(nm_pres,size_pres)==0,
+          one_pres=sum(nm_pres,size_pres)==1,
+          both_pres=sum(nm_pres,size_pres)==2
+        )
+      }) 
+    
+    #condition: if all info missing or if any info missing for one ingred -> alert dialog
+    if(any(new_ingreds$one_pres)|all(!new_ingreds$both_pres)) {
+      f7Dialog(
+        id="dialog_alert_update_ingred_recipe",
+        title="Invalid entry",
+        type="alert",
+        text="Please enter all ingredient information before submitting updates.")
+    }
+  
+    #condition: all ingred info present -> confirm dialog
+    else if(all(!new_ingreds$one_pres) & any(new_ingreds$both_pres)) {
+      f7Dialog(
+        id="dialog_confirm_update_ingred_recipe",
+        title="Confirm ingredients update",
+        type="confirm",
+        text="Click OK to update ingredient information."
+      )
+    }
   })
+  
+
+  
+  
+
 
   
   ### Display modal/dialog after hitting Delete button----------------------------------------------
@@ -650,34 +703,92 @@ server<-function(input,output,session){
   )
 
   
-  ### Display toast notification and update values after confirming dialog update
+  
+  ### Display toast notification and update values after confirming dialog update-------------------
   ## Recipe info
-  # observeEvent(input$dialog_confirm_update_recipe_recipe,{
-  #   req(input$dialog_confirm_update_recipe_recipe)
-  #   
-  #   
-  #   
-  #   f7Toast(
-  #     text=paste(nm,"removed from database"),
-  #     position="center",
-  #     closeButton=FALSE,
-  #     closeTimeout=3500
-  #   )
-  # }
+  observeEvent(input$dialog_confirm_update_recipe_recipe,{
+    req(input$dialog_confirm_update_recipe_recipe)
+
+    #identify row (from DT) being updated
+    updated_row<-as.numeric(strsplit(input$edit1_button,"_")[[1]][2])
+    
+    #grab recipe name
+    nm_update<-dt_df()[[updated_row,"recipe"]]
+
+    #identify which appliances selected (T/F)
+    new_app_log<-1:5 %>% 
+      map_lgl(function(app){
+        input[[paste("chk_app",app,"recipe_popup",sep="_")]]
+      })
+    
+    #convert to appliance names
+    new_app<-app_choices_sheet1[new_app_log]
+    
+    
+    #identify which proteins selected (T/F)
+    new_prot_log<-1:6 %>% 
+      map_lgl(function(prot){
+        input[[paste("chk_protein",prot,"recipe_popup",sep="_")]]
+      })
+    
+    #convert to appliance names
+    new_protein<-protein_choices_sheet1[new_prot_log]
+    
+    #replace recipe info by removing current info & replacing it with new info
+    recipe$db<-recipe$db %>%
+      filter(recipe!=nm_update) %>%
+      add_row(
+        recipe=nm_update,
+        appliance=paste(new_app,collapse=", "),
+        protein=paste(new_protein,collapse=", ")
+      )
+
+    f7Toast(
+      text=paste("Recipe info for",nm_update,"updated in database"),
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=3500
+    )
+  })
   
   
   
   ## Ingredient info
-  # observeEvent(input$dialog_confirm_update_ingred_recipe,{
-  #   req(input$dialog_confirm_update_ingred_recipe)
-  #   
-  #   f7Toast(
-  #     text=paste(nm,"removed from database"),
-  #     position="center",
-  #     closeButton=FALSE,
-  #     closeTimeout=3500
-  #   )
-  # })
+  observeEvent(input$dialog_confirm_update_ingred_recipe,{
+    req(input$dialog_confirm_update_ingred_recipe)
+    
+    #identify row (from DT) being updated
+    updated_row<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
+    
+    #grab recipe name
+    nm_update<-dt_df()[[updated_row,"recipe"]]
+
+    #identify updated ingredients
+    new_ingred<-1:8 %>% 
+      map_df(function(x){
+        if(nchar(input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]])>0 &
+           nchar(input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]])>0) {
+        tibble(
+          recipe=nm_update,
+          name=input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]],
+          size=input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]],
+          n=input[[paste("stp_ingred",x,"n","ingred_popup",sep="_")]]
+        )
+        } else{NULL}
+      })
+    
+    #replace ingred info by removing current info & replacing it with new info
+    ingred$db<-ingred$db %>%
+      filter(recipe!=nm_update) %>%
+      bind_rows(new_ingred)
+    
+    f7Toast(
+      text=paste("Ingredient info for",nm_update,"updated to database"),
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=3500
+    )
+  })
   
   
   ### Display toast notification and remove values after confirming deletion
