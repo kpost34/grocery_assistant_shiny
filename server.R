@@ -66,36 +66,7 @@ server<-function(input,output,session){
   
   
   #### Server=======================================================================================
-  ### Initialize tmp reactiveValues
-  ## Set recipe$tmp to an empty tibble
-  # recipe<-reactiveValues(tmp=tibble())
-  # 
-  # ## Set ingred$tmp to an empty tibble
-  # ingred<-reactiveValues(tmp=tibble())
-  # 
-  # 
-  # ## Set recipe$list to an empty tibble
-  # recipe<-reactiveValues(list=tibble())
-  # 
-  # ## Set ingred$list to an empty tibble
-  # ingred<-reactiveValues(list=tibble())
-  # 
-  # 
-  # ### Initialize database reactiveValues
-  # ## Set recipe$db to an empty tibble
-  # recipe<-reactiveValues(db=tibble())
-  # 
-  # ## Set ingred$db to an empty tibble
-  # ingred<-reactiveValues(db=tibble())
-  # 
-  # 
-  # ### Initialize uploaded reactiveValues
-  # ## Set recipe$upload to an empty tibble
-  # recipe<-reactiveValues(upload=tibble())
-  # 
-  # ## Set ingred$upload to an empty tibble
-  # ingred<-reactiveValues(upload=tibble())
-  
+  ### Initialize reactiveValues as empty tibbles
   recipe<-reactiveValues(tmp=tibble(),
                          list=tibble(),
                          db=tibble(),
@@ -194,7 +165,7 @@ server<-function(input,output,session){
   })
   
   ## Confirm submission of manual addition of recipe/ingredient info
-  # Display alert modal/dialog if recipe info is absent present
+  # Display alert modal/dialog if recipe info is absent 
   observeEvent(eventExpr={
     input$btn_submit_recipe_ingred_ingredSheet1|
     input$btn_submit_recipe_ingred_ingredSheet2
@@ -278,7 +249,7 @@ server<-function(input,output,session){
       text=paste(input$txt_recipe_recipeSheet,"added to database"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=3500
+      closeTimeout=2500
     )
     # Recipe sheet
     #delay used because dialog confirm triggers eventReactive (moves data to db) and observeEvent
@@ -421,63 +392,73 @@ server<-function(input,output,session){
   
   
   ### Display popups--------------------------------------------------------------------------------
+  ## Create reactiveVals (for naming inputs uniquely)
+  rand_recipe<-reactiveVal()
+  rand_ingred<-reactiveVal()
+  
   ## Recipe--after hitting edit1 button 
   observeEvent(input$edit1_button,{
-    edited_row<-as.numeric(strsplit(input$edit1_button,"_")[[1]][2])
+    #grab row number
+    edited_row_recipe<-as.numeric(strsplit(input$edit1_button,"_")[[1]][2])
     #grab recipe name
-    nm_edit<-dt_df()[[edited_row,"recipe"]]
+    nm_edit_recipe<-dt_df()[[edited_row_recipe,"recipe"]]
     
     #grab appliance(s)
     appliance_edit<-recipe$db %>%
-      filter(recipe==nm_edit) %>%
+      filter(recipe==nm_edit_recipe) %>%
       separate_longer_delim(appliance,delim=", ") %>%
       mutate(appliance=str_to_sentence(appliance)) %>%
       pull(appliance)
     
     #grab protein(s)
     protein_edit<-recipe$db %>%
-      filter(recipe==nm_edit) %>%
+      filter(recipe==nm_edit_recipe) %>%
       separate_longer_delim(protein,delim=", ") %>%
       mutate(protein=toTitleCase(protein)) %>%
       pull(protein)
     
+    #assigns rand_recipe() unique value
+    rand_recipe(rnorm(1))
     
     f7Popup(
       id="edit_recipe_popup",
       title=splitLayout(
-        f7Button(inputId="btn_update_recipe_popup",
+        #button has unique id
+        f7Button(inputId=paste0("btn_update_recipe_popup_",rand_recipe()),
                  label="Update recipe",
                  color="green",
                  size="small"),
         br()
       ),
-      h3(nm_edit),
+      h3(nm_edit_recipe),
+      #populates inputs with pre-selected values
       edit_recipe_info(app_edit=appliance_edit,
-                       prot_edit=protein_edit)
+                       prot_edit=protein_edit,
+                       id=rand_recipe())
     )
   })
   
   
   ## Ingredients--after hitting edit2 button
   observeEvent(input$edit2_button, {
-    edited_row<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
+    edited_row_ingred<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
     #grab recipe name
-    nm_edit<-dt_df()[[edited_row,"recipe"]]
+    nm_edit_ingred<-dt_df()[[edited_row_ingred,"recipe"]]
   
     #grab ingred info
-    ingred_edit<-ingred$db %>% filter(recipe==nm_edit)
+    ingred_edit<-ingred$db %>% filter(recipe==nm_edit_ingred)
     
     
     f7Popup(
       id="edit_ingred_popup",
       title=splitLayout(
         f7Button(inputId="btn_update_ingred_popup",
-                label="Update ingredients",
-                color="green",
-                size="small"),
+                 label="Update ingredients",
+                 color="green",
+                 size="small"),
         br()
       ),
-      h3(nm_edit),
+      h3(nm_edit_ingred),
       edit_ingred_info(df=ingred_edit)
     )
   })
@@ -485,21 +466,23 @@ server<-function(input,output,session){
 
   ### Display dialogs for recipe/ingredient updates-------------------------------------------------
   ## Recipe info
-  observeEvent(input$btn_update_recipe_popup, {
+  # observeEvent(input$btn_update_recipe_popup,{
+  observeEvent(input[[paste0("btn_update_recipe_popup_", rand_recipe())]], {
+    req(input$edit_recipe_popup)
+
     #create true/false objects related to appliance & protein entries
-    new_app_pres<-1:5 %>% 
+    new_app_pres<-1:5 %>%
       map_lgl(function(app){
-        input[[paste("chk_app",app,"recipe_popup",sep="_")]]
+        input[[paste("chk_app",app,rand_recipe(),"recipe_popup",sep="_")]]
       }) %>%
       sum() > 0
     
     new_prot_pres<-1:6 %>% 
       map_lgl(function(prot){
-        input[[paste("chk_protein",prot,"recipe_popup",sep="_")]]
+        input[[paste("chk_protein",prot,rand_recipe(),"recipe_popup",sep="_")]]
       }) %>%
       sum() > 0
-    
-    
+        
     #condition: recipe info present -> confirm dialog
     if(sum(new_app_pres,new_prot_pres)>=2) {
       f7Dialog(
@@ -516,8 +499,7 @@ server<-function(input,output,session){
         type="alert",
         text="Please enter all recipe information before submitting updates.")
     }
-  },
-  ignoreInit=TRUE)
+  })
   
   
   ## Ingredient info
@@ -556,17 +538,8 @@ server<-function(input,output,session){
   })
   
 
-  
-  
-
-
-  
   ### Display modal/dialog after hitting Delete button----------------------------------------------
-  #both submit buttons in {} for observeEvent to listen to them
-  observeEvent(eventExpr={
-    input$delete_button #|
-    #PLACEHOLDER FOR DELETE BUTTON ON CARDS
-    }, {
+  observeEvent(input$delete_button,{
     f7Dialog(
       id="dialog_confirm_delete",
       title="Confirm delete",
@@ -577,7 +550,7 @@ server<-function(input,output,session){
   ignoreInit=TRUE)
   
   
-  ### Display modal/dialog after hitting button to Save db to app
+  ### Display modal/dialog after hitting button to Save db to app-----------------------------------
   observeEvent(input$btn_save_db_recipe, {
     #logical object representing whether text matches name formula
     name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
@@ -659,7 +632,8 @@ server<-function(input,output,session){
   output$recipe_db_recipe<-renderDT(
     dt_df() %>%
       mutate(Actions=paste(
-        #add buttons: view, edit recipe & ingred info, delete
+        #add buttons: view, edit recipe & ingred info, delete; random # associated with button so that it
+          #can re-fire
         shinyInput(actionButton,
                    nrow(.),
                    id="view_",
@@ -708,17 +682,20 @@ server<-function(input,output,session){
   ## Recipe info
   observeEvent(input$dialog_confirm_update_recipe_recipe,{
     req(input$dialog_confirm_update_recipe_recipe)
+    
+    #require that popup is open for dialogs to be triggered
+    req(input$edit_recipe_popup)
 
     #identify row (from DT) being updated
-    updated_row<-as.numeric(strsplit(input$edit1_button,"_")[[1]][2])
+    updated_row_recipe<-as.numeric(strsplit(input$edit1_button,"_")[[1]][2])
     
     #grab recipe name
-    nm_update<-dt_df()[[updated_row,"recipe"]]
+    nm_update_recipe<-dt_df()[[updated_row_recipe,"recipe"]]
 
     #identify which appliances selected (T/F)
     new_app_log<-1:5 %>% 
       map_lgl(function(app){
-        input[[paste("chk_app",app,"recipe_popup",sep="_")]]
+        input[[paste("chk_app",app,rand_recipe(),"recipe_popup",sep="_")]]
       })
     
     #convert to appliance names
@@ -728,26 +705,28 @@ server<-function(input,output,session){
     #identify which proteins selected (T/F)
     new_prot_log<-1:6 %>% 
       map_lgl(function(prot){
-        input[[paste("chk_protein",prot,"recipe_popup",sep="_")]]
+        input[[paste("chk_protein",prot,rand_recipe(),"recipe_popup",sep="_")]]
       })
     
     #convert to appliance names
     new_protein<-protein_choices_sheet1[new_prot_log]
     
+    
     #replace recipe info by removing current info & replacing it with new info
     recipe$db<-recipe$db %>%
-      filter(recipe!=nm_update) %>%
+      filter(recipe!=nm_update_recipe) %>%
       add_row(
-        recipe=nm_update,
+        recipe=nm_update_recipe,
         appliance=paste(new_app,collapse=", "),
         protein=paste(new_protein,collapse=", ")
       )
 
+    #display toast notification
     f7Toast(
-      text=paste("Recipe info for",nm_update,"updated in database"),
+      text=paste("Recipe info for",nm_update_recipe,"updated in database"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=3500
+      closeTimeout=2500
     )
   })
   
@@ -758,10 +737,10 @@ server<-function(input,output,session){
     req(input$dialog_confirm_update_ingred_recipe)
     
     #identify row (from DT) being updated
-    updated_row<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
+    updated_row_ingred<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
     
     #grab recipe name
-    nm_update<-dt_df()[[updated_row,"recipe"]]
+    nm_update_ingred<-dt_df()[[updated_row_ingred,"recipe"]]
 
     #identify updated ingredients
     new_ingred<-1:8 %>% 
@@ -769,7 +748,7 @@ server<-function(input,output,session){
         if(nchar(input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]])>0 &
            nchar(input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]])>0) {
         tibble(
-          recipe=nm_update,
+          recipe=nm_update_ingred,
           name=input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]],
           size=input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]],
           n=input[[paste("stp_ingred",x,"n","ingred_popup",sep="_")]]
@@ -779,37 +758,43 @@ server<-function(input,output,session){
     
     #replace ingred info by removing current info & replacing it with new info
     ingred$db<-ingred$db %>%
-      filter(recipe!=nm_update) %>%
+      filter(recipe!=nm_update_ingred) %>%
       bind_rows(new_ingred)
     
+    #display toast notification
     f7Toast(
-      text=paste("Ingredient info for",nm_update,"updated to database"),
+      text=paste("Ingredient info for",nm_update_ingred,"updated to database"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=3500
+      closeTimeout=2500
     )
   })
   
   
-  ### Display toast notification and remove values after confirming deletion
+  ### Display toast notification and remove values after confirming deletion------------------------
   observeEvent(input$dialog_confirm_delete,{
     req(input$dialog_confirm_delete)
+    
+    #id deleted row which can be used to get recipe name
     deleted_row<-as.numeric(strsplit(input$delete_button,"_")[[1]][2])
     nm<-dt_df()[[deleted_row,"recipe"]]
+    
+    #remove recipe and associated ingreds from db
     recipe$db<-recipe$db %>% filter(recipe!=nm)
     ingred$db<-ingred$db %>% filter(recipe!=nm)
     
+    #display toast notification
     f7Toast(
       text=paste(nm,"removed from database"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=3500
+      closeTimeout=2500
     )
   })
   
   
   
-  
+  ### Database saving/copying-----------------------------------------------------------------------
   ## Download copy of database
   output$btn_download_db_recipe <- downloadHandler(
     filename="grocery-assistant-db.csv",
@@ -849,7 +834,7 @@ server<-function(input,output,session){
         text=paste("Copy of database saved to app"),
         position="center",
         closeButton=FALSE,
-        closeTimeout=3000
+        closeTimeout=2500
       )
   })
 
@@ -1004,6 +989,7 @@ server<-function(input,output,session){
     ingred$list %>%
       ungroup() %>%
       mutate(Actions=paste(
+        #add buttons to increase, decrease, or remove items
         shinyInput(actionButton,
           nrow(.),
           id="plus_",
@@ -1120,7 +1106,7 @@ server<-function(input,output,session){
         text=paste("Meal plan and shopping list sent to",input$txt_email_address_list),
         position="center",
         closeButton=FALSE,
-        closeTimeout=3000
+        closeTimeout=2500
       )
   })
   
@@ -1201,7 +1187,7 @@ server<-function(input,output,session){
         text=paste(input$file_upload_recipe_upload$name,"uploaded to database"),
         position="center",
         closeButton=FALSE,
-        closeTimeout=2000
+        closeTimeout=2500
       )
     )
     
@@ -1440,7 +1426,7 @@ server<-function(input,output,session){
       text="Database loaded from app",
       position="center",
       closeButton=FALSE,
-      closeTimeout=2000
+      closeTimeout=2500
     )
   })
   

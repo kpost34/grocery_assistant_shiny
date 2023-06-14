@@ -29,17 +29,17 @@ protein_choices_sheet1<-c(
 ### Generate recipe & ingredient data
 demo_recipeDF <- tibble(
   id=1:3,
-  recipe=c("chicken alfredo","chicken tacos","pot roast"),
-  appliance=c("stove, slow cooker","slow cooker","slow cooker"),
-  protein=c("chicken","chicken","beef")
+  recipe=c("Chicken alfredo","Chicken tacos","Pot roast"),
+  appliance=c("Stove, Slow cooker","Slow cooker","Slow cooker"),
+  protein=c("Chicken","Chicken","Beef")
 )
 
 
 demo_ingredDF <- tibble(
   recipe=c(
-    rep("chicken alfredo",3),
-    rep("chicken tacos",4),
-    rep("pot roast",4)
+    rep("Chicken alfredo",3),
+    rep("Chicken tacos",4),
+    rep("Pot roast",4)
   ),
   name=c(
     "chicken breast","alfredo sauce","pasta",

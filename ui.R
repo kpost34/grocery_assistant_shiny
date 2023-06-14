@@ -429,6 +429,7 @@ ui<-f7Page(
 #---------------------------------------
 # LATER-------------------------
 # UI
+# go through code and replace splitLayout() + two f7Button() with f7Segment()
 # turn any repeated functions into custom functions (e.g., use of splitLayout?)
 # potentially reduce delay() durations
 
@@ -440,8 +441,13 @@ ui<-f7Page(
 # develop custom functions to limit server code
 # see if any observeEvents can be combined
 
-# go through code and delete anything that's extraneous & commented out
-# go through code and replace splitLayout() + two f7Button() with f7Segment()
+
+# Database additions/updates
+# figure out way to close popup after confirming dialog (even better, with a cancel button)
+  # would showModal() & removeModal() work here?
+# for both manual entry and editing, should temp tibble be stored/created at submit button then
+  #added to db after confirm?
+
 
 
 # STYLING
@@ -451,14 +457,7 @@ ui<-f7Page(
 
 
 # NEXT-------------------------
-# get popup to close after submitting update
-# updating multiple recipes (or the same one twice) is non-functional --> need to update
-# figure out way to close popup after confirming dialog (even better, with a cancel button)
-
-
-# for manual entry, combine alert/confirm dialogs into single observeEvent (like the updates)
-# for manual entry, add better logic for alert/confirm (based off of edit info)
-# capitalization of updated items (recipe & ingreds)
+# create logic to update ingredients
 
 
 
@@ -466,8 +465,11 @@ ui<-f7Page(
 
 
 
+
 # LAST COMMIT-------------------
-# developed back-end code to update recipe info in db & display toast notification
-# created warning dialogs if new info is incomplete
-# successfully added logic to display alert/confirm dialog and to add edited ingreds to db
+# fixed inconsistency in capitalization of appliances
+# fixed issue so that DT values update
+# fixed issue so that dialog does not auto-appear when returning to an updated recipe
+# fixed issue such that same recipe can be edited a second time after closing popup
+# cleaned annotations & reduced toast notification lengths
 

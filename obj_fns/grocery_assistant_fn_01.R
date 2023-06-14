@@ -44,37 +44,30 @@ add_ingredients<-function(n_prev=0,n) {
 
 
 ### Create appliance and protein checkboxes with pre-selected values
-edit_recipe_info<-function(app_edit=NA,prot_edit=NA){
-  # Create objects
-  # add_recipe_sheet<-function(type="entry",root_id,app_edit=NA,prot_edit=NA){
-  # if(type=="entry"){
-  #   app_value<-rep(FALSE,5)
-  #   protein_value<-FALSE
-  # }
-  # else if(type=="edit"){
-    app_value<-app_choices_sheet1 %in% app_edit
-    protein_value<-protein_choices_sheet1 %in% prot_edit
-  # }
+edit_recipe_info<-function(app_edit=NA,prot_edit=NA,id){
+  #create objects
+  app_value<-app_choices_sheet1 %in% app_edit
+  protein_value<-protein_choices_sheet1 %in% prot_edit
 
   #create appliance checkboxes
   app_list<-purrr::map2(.x=1:5,.y=app_value,
     function(num,log){
-      p(f7Checkbox(inputId=paste("chk_app",num,"recipe_popup",sep="_"),
+      p(f7Checkbox(inputId=paste("chk_app",num,id,"recipe_popup",sep="_"),
          label=app_choices_sheet1[num],
          value=log))
         # style="font-size: 16px")
     })
 
-  # Create inputs
   #create protein checkboxes
   protein_list<-purrr::map2(.x=1:6,.y=protein_value,
     function(num2,log2){
-      p(f7Checkbox(inputId=paste("chk_protein",num2,"recipe_popup",sep="_"),
+      p(f7Checkbox(inputId=paste("chk_protein",num2,id,"recipe_popup",sep="_"),
          label=protein_choices_sheet1[num2],
          value=log2))
         # style="font-size: 16px")
     })
 
+  #generate app & protein checkboxes
   splitLayout(cellArgs=list(style="padding: 15px"),
     f7Block(
       strong("Appliance(s) used"),
