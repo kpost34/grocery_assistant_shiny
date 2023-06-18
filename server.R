@@ -380,18 +380,98 @@ server<-function(input,output,session){
   })
   
   
-  ### Display popover after hitting view button (NEED TO REVISIT)
+  ### Display popup after hitting view button-------------------------------------------------------
   observeEvent(input$view_button,{
-    addF7Popover(
-      id="test_popover",
-      options=list(
-        content="testing popover text"
+    # Grab correct info
+    view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
+    nm_view_recipe<-dt_df()[[view_row_recipe,"recipe"]]
+    
+    #grab appliance(s)
+    # appliance_view<-recipe$db %>%
+    #   filter(recipe==nm_view_recipe) %>%
+    #   separate_longer_delim(appliance,delim=", ") %>%
+    #   mutate(appliance=str_to_sentence(appliance)) %>%
+    #   pull(appliance) %>%
+    #   paste(collapse=", ")
+    # 
+    # #grab protein(s)
+    # protein_view<-recipe$db %>%
+    #   filter(recipe==nm_view_recipe) %>%
+    #   separate_longer_delim(protein,delim=", ") %>%
+    #   mutate(protein=toTitleCase(protein)) %>%
+    #   pull(protein) %>%
+    #   paste(collapse=", ")
+    
+    
+    # Render components for popup
+    # output$txt_app_view_popup<-renderText({
+    #   appliance_view
+    # })
+    # 
+    # output$txt_protein_view_popup<-renderText({
+    #   protein_view
+    # })
+    
+    if(checkImageExists(user_id, nm_view_recipe)) {
+      older_user_id<-drive_get(input$user_id)$id
+      
+      output$img<-renderImage({
+        f
+        
+        
+      })
+    }
+    
+    # output$img<-renderImage({
+    #   filename<-normalizePath()
+    #   list(src=filename,width="auto",height="400px")
+    #   },deleteFile=FALSE
+    # )
+    
+    # Display popup
+    f7Popup(
+      id="recipe_view_popup",
+      title=splitLayout(
+        cellArgs=list(width=c("35%","35%","30%")),
+        HTML(paste0("<H2>",nm_view_recipe,"</H2>")),
+        f7File(inputId="file_add_view_recipe",
+               label="",
+               buttonLabel=div(f7Icon("folder"),
+                               "Add/update image")),
+        br()
+      ),
+      br(),
+      # HTML("<H3>Appliance(s): </H3>"), 
+      # HTML(paste0("<H4>",textOutput("txt_app_view_popup"),"</H4>")),
+      # HTML("<H3>Protein(s): </H3>"),
+      # HTML(paste0("<H4>",textOutput("txt_protein_view_popup"),"</H4>")),
+      fluidRow(
+        column(
+          width=12,
+          align="center",
+          offset=0,
+          imageOutput("recipe_img")
+        )
       )
     )
   })
   
   
-  ### Display popups--------------------------------------------------------------------------------
+  
+  ### Display view dialog---------------------------------------------------------------------------
+  observeEvent(input$file_add_view_recipe,{
+    if(tools::file_ext(input$file_add_view_recipe$name) %in% img_ext){
+
+      file <- input$file_add_view_recipe
+      filename <- file$datapath
+
+      output$recipe_img<-renderImage({
+        list(src=filename, width="auto", height="400px")
+      }, deleteFile = FALSE)
+    }
+  })
+
+  ### Display edit popups---------------------------------------------------------------------------
   ## Create reactiveVals (for naming inputs uniquely)
   rand_recipe<-reactiveVal()
   rand_ingred<-reactiveVal()
@@ -416,7 +496,7 @@ server<-function(input,output,session){
       separate_longer_delim(protein,delim=", ") %>%
       mutate(protein=toTitleCase(protein)) %>%
       pull(protein)
-    
+     
     #assigns rand_recipe() unique value
     rand_recipe(rnorm(1))
     
@@ -441,6 +521,7 @@ server<-function(input,output,session){
   
   ## Ingredients--after hitting edit2 button
   observeEvent(input$edit2_button, {
+    #grab row number
     edited_row_ingred<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
     #grab recipe name
     nm_edit_ingred<-dt_df()[[edited_row_ingred,"recipe"]]
@@ -448,25 +529,28 @@ server<-function(input,output,session){
     #grab ingred info
     ingred_edit<-ingred$db %>% filter(recipe==nm_edit_ingred)
     
+    #assigns ingred_recipe() unique value
+    rand_ingred(sample(1000,1))
     
     f7Popup(
       id="edit_ingred_popup",
       title=splitLayout(
-        f7Button(inputId="btn_update_ingred_popup",
+        f7Button(inputId=paste0("btn_update_ingred_popup_",rand_ingred()),
                  label="Update ingredients",
                  color="green",
                  size="small"),
         br()
       ),
       h3(nm_edit_ingred),
-      edit_ingred_info(df=ingred_edit)
+      #populates inputs with pre-selected values
+      edit_ingred_info(df=ingred_edit,
+                       id=rand_ingred())
     )
   })
     
 
   ### Display dialogs for recipe/ingredient updates-------------------------------------------------
   ## Recipe info
-  # observeEvent(input$btn_update_recipe_popup,{
   observeEvent(input[[paste0("btn_update_recipe_popup_", rand_recipe())]], {
     req(input$edit_recipe_popup)
 
@@ -503,14 +587,17 @@ server<-function(input,output,session){
   
   
   ## Ingredient info
-  observeEvent(input$btn_update_ingred_popup,{
+  # observeEvent(input$btn_update_ingred_popup,{
+  observeEvent(input[[paste0("btn_update_ingred_popup_",rand_ingred())]],{
+    req(input$edit_ingred_popup)
+    
     #condition needed
     new_ingreds<-1:8 %>%
       map_df(function(x){
         tibble(
           #populates tibble rows if ingredient name & size have 1+ chr
-          nm_pres=nchar(input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]])>0,
-          size_pres=nchar(input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]])>0,
+          nm_pres=nchar(input[[paste("txt_ingred",x,rand_ingred(),"nm","ingred_popup",sep="_")]])>0,
+          size_pres=nchar(input[[paste("txt_ingred",x,rand_ingred(),"size","ingred_popup",sep="_")]])>0,
           none_pres=sum(nm_pres,size_pres)==0,
           one_pres=sum(nm_pres,size_pres)==1,
           both_pres=sum(nm_pres,size_pres)==2
@@ -654,7 +741,7 @@ server<-function(input,output,session){
                    onclick="Shiny.setInputValue(\"edit2_button\",  this.id.concat(\"_\", Math.random()))"),
         shinyInput(actionButton,
                    nrow(.),
-                   id="delete_",
+                   id="delete_", 
                    label="Delete",
                    icon=shiny::icon("trash"),
                    class="btn-primary",
@@ -675,6 +762,9 @@ server<-function(input,output,session){
     caption = htmltools::tags$caption(style = "caption-side: top; text-align: center; color:black;  
                                       font-size:200% ;","Recipe Database")
   )
+
+  
+  ### Add image to db and popup---------------------------------------------------------------------
 
   
   
@@ -736,6 +826,9 @@ server<-function(input,output,session){
   observeEvent(input$dialog_confirm_update_ingred_recipe,{
     req(input$dialog_confirm_update_ingred_recipe)
     
+    #require that popup is open for dialogs to be triggered
+    req(input$edit_ingred_popup)
+    
     #identify row (from DT) being updated
     updated_row_ingred<-as.numeric(strsplit(input$edit2_button,"_")[[1]][2])
     
@@ -745,13 +838,13 @@ server<-function(input,output,session){
     #identify updated ingredients
     new_ingred<-1:8 %>% 
       map_df(function(x){
-        if(nchar(input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]])>0 &
-           nchar(input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]])>0) {
+        if(nchar(input[[paste("txt_ingred",x,rand_ingred(),"nm","ingred_popup",sep="_")]])>0 &
+           nchar(input[[paste("txt_ingred",x,rand_ingred(),"size","ingred_popup",sep="_")]])>0) {
         tibble(
           recipe=nm_update_ingred,
-          name=input[[paste("txt_ingred",x,"nm","ingred_popup",sep="_")]],
-          size=input[[paste("txt_ingred",x,"size","ingred_popup",sep="_")]],
-          n=input[[paste("stp_ingred",x,"n","ingred_popup",sep="_")]]
+          name=input[[paste("txt_ingred",x,rand_ingred(),"nm","ingred_popup",sep="_")]],
+          size=input[[paste("txt_ingred",x,rand_ingred(),"size","ingred_popup",sep="_")]],
+          n=input[[paste("stp_ingred",x,rand_ingred(),"n","ingred_popup",sep="_")]]
         )
         } else{NULL}
       })
@@ -866,7 +959,7 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
-  ## Display database as table
+  ### Display database as table
   output$recipe_db_planner<-renderDT(
     dt_df() %>%
       mutate(Actions=paste(
@@ -888,7 +981,7 @@ server<-function(input,output,session){
   )
   
   
-  ## Add item to meal plan--updates recipes and ingredients--and display toast notification
+  ### Add item to meal plan--updates recipes and ingredients--and display toast notification
   observeEvent(input$add_button,{
     #recipe & ingreds added to meal plan
     added_row<-as.numeric(strsplit(input$add_button,"_")[[1]][2])
@@ -916,7 +1009,7 @@ server<-function(input,output,session){
   })
   
   
-  ## Reset plan and list
+  ### Reset plan and list
   observeEvent(input$dialog_confirm_reset_planList_planner,{
     req(input$dialog_confirm_reset_planList_planner)
     recipe$list<-tibble()

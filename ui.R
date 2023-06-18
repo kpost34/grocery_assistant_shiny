@@ -430,34 +430,33 @@ ui<-f7Page(
 # LATER-------------------------
 # UI
 # go through code and replace splitLayout() + two f7Button() with f7Segment()
-# turn any repeated functions into custom functions (e.g., use of splitLayout?)
 # potentially reduce delay() durations
 
-# view button that displays popovers(?) containing a google image of dish (and option to add manually)
 # update buttons in DTs from actionbuttons to f7buttons?
 
 
 # BACK-END
 # develop custom functions to limit server code
-# see if any observeEvents can be combined
+# see if any observeEvents can be combined--manual data entry?
 
 
 # Database additions/updates
-# figure out way to close popup after confirming dialog (even better, with a cancel button)
-  # would showModal() & removeModal() work here?
 # for both manual entry and editing, should temp tibble be stored/created at submit button then
-  #added to db after confirm?
+  #added to db after confirm? (this would speed up processing as it would separate steps)
 
 
 
 # STYLING
-# slideshow of images (recipe) on main app page [ideally it could fetch this on its own from internet]
+# slideshow of images (recipe) on main app page [could come from image db or internet]
+# bslib or other styling
 
 
+# OVERALL
+# add more annotations
 
 
 # NEXT-------------------------
-# create logic to update ingredients
+# develop code for manual image add
 
 
 
@@ -467,9 +466,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# fixed inconsistency in capitalization of appliances
-# fixed issue so that DT values update
-# fixed issue so that dialog does not auto-appear when returning to an updated recipe
-# fixed issue such that same recipe can be edited a second time after closing popup
-# cleaned annotations & reduced toast notification lengths
+# created logic to update ingredients
+# created popup that holds recipe image
+# added logic to display image
+# began coding to add/update image including having chatGPT help me develop functions
 

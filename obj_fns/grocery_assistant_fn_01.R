@@ -84,11 +84,12 @@ edit_recipe_info<-function(app_edit=NA,prot_edit=NA,id){
 
 
 ### Create ingredient inputs with pre-selected values
-edit_ingred_info<-function(df){
+# edit_ingred_info<-function(df){
+edit_ingred_info<-function(df,id){
 # Create objects
   #recipe, nrows (with values), nblanks (to balance out all ingred slots), 
     #num (track ingred #), nm, size, and ns (ingred data)
-  recipe<-df %>% pull(recipe) %>% unique()
+  # recipe<-df %>% pull(recipe) %>% unique()
 
   nrows<-nrow(df)
   nblanks<-8-nrows
@@ -105,15 +106,18 @@ edit_ingred_info<-function(df){
   pmap(ingred_list,function(w,x,y,z) {
     #all info in one row
     splitLayout(cellWidths=c("40%","35%","25%"),
-      f7Text(inputId=paste("txt_ingred",w,"nm","ingred_popup",sep="_"),
+      # f7Text(inputId=paste("txt_ingred",w,"nm","ingred_popup",sep="_"),
+      f7Text(inputId=paste("txt_ingred",w,id,"nm","ingred_popup",sep="_"),
              label="Name",
              value=x),
-      f7Text(inputId=paste("txt_ingred",w,"size","ingred_popup",sep="_"),
+      # f7Text(inputId=paste("txt_ingred",w,"size","ingred_popup",sep="_"),
+      f7Text(inputId=paste("txt_ingred",w,id,"size","ingred_popup",sep="_"),
              label="Size",
              value=y),
       #aligns stepper with text boxes
       div(class="label-left",
-        f7Stepper(inputId=paste("stp_ingred",w,"n","ingred_popup",sep="_"),
+        # f7Stepper(inputId=paste("stp_ingred",w,"n","ingred_popup",sep="_"),
+        f7Stepper(inputId=paste("stp_ingred",w,id,"n","ingred_popup",sep="_"),
                   label="",
                   min=0.5,
                   max=20,
@@ -137,6 +141,48 @@ shinyInput <- function(FUN, len, id, ...) {
   }
   inputs
 }
+
+
+
+### Check whether an image exists
+checkImageExists <- function(user_id, recipe) {
+  #pull id of user_id image folder
+  folder_user_id<-drive_get(user_id)$id
+  
+  #grab all file basenames
+  img_basenames<-drive_ls(path=folder_id) %>%
+    map(~str_remove(.x,paste0("\\.",image_ext)))
+  
+  #check if matches
+  recipe %in% img_basenames
+}
+
+
+
+### Retrieve image once it is found
+output$img <- renderImage({
+  # Function to retrieve the image file from Google Drive based on user_id and recipe
+  retrieveImage <- function(user_id, recipe) {
+    # Search for the image file in the Google Drive folder
+    query <- paste0("name = '", user_id, "_", recipe, "'")
+    files <- drive_find(query)
+    
+    if (length(files) > 0) {
+      # If an image file is found, download it to a temporary location
+      temp_file <- tempfile()
+      drive_download(as_id(files[1]), path = temp_file)
+      
+      # Return the file path to be displayed in the renderImage function
+      return(temp_file)
+    }
+    
+    return(NULL)  # Return NULL if no image file is found
+  }
+
+
+
+
+
 
 
 

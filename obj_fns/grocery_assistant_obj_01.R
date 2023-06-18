@@ -24,6 +24,28 @@ protein_choices_sheet1<-c(
 
 
 
+##### View Recipes==================================================================================
+#### Add/Update Image by File--image file extensions
+img_ext<-c(
+  "jpg",
+  "png",
+  "gif",
+  "webp",
+  "tiff",
+  "psd",
+  "raw",
+  "bmp",
+  "heif",
+  "indd",
+  "jpeg 2000",
+  "svg",
+  "ai",
+  "eps",
+  "pdf"
+)
+
+
+
 
 #### App Test=======================================================================================
 ### Generate recipe & ingredient data
