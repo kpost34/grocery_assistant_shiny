@@ -76,6 +76,23 @@ ui<-f7Page(
                    label=div(f7Icon("arrow_up_square"),
                              "Load saved database (from file or app)")),
           br(),
+          #set up user id for new/recurring users
+          h3("Enter your user id to save/load your database from/to the app"),
+          f7Row(
+            f7Col(
+              f7Text(inputId="txt_user_id_main",
+                     label=HTML("use <em>firstinitial_lastname</em>, e.g., k_post"))
+            ),
+            f7Col(
+              linebreaks(2),
+              f7Button(inputId="btn_user_id_main",
+                       label="Submit user id",
+                       color="green"),
+              strong("Current user:"),
+              textOutput("txt_out_user_id")
+            )
+          ),
+          br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
           br(),
@@ -208,12 +225,12 @@ ui<-f7Page(
           br(),
           f7Block(
             f7BlockTitle(title="Save a copy to app",size="medium"),
-            f7Text(inputId="txt_sheet_nm_recipe",
-                   #html used to get multiline label
-                   label=HTML("Enter your name
-                              <br />
-                              (use <em>firstinitial_lastname</em>, e.g., k_post)"),
-            ),
+            # f7Text(inputId="txt_sheet_nm_recipe",
+            #        #html used to get multiline label
+            #        label=HTML("Enter your name
+            #                   <br />
+            #                   (use <em>firstinitial_lastname</em>, e.g., k_post)"),
+            # ),
             f7Button(inputId="btn_save_db_recipe",
                      label=div(f7Icon("floppy_disk"),"Save database to app"),
                      color="green")
@@ -282,7 +299,7 @@ ui<-f7Page(
             f7BlockTitle(title="Email plan & list",size="medium"),
             f7Text(inputId="txt_email_address_list",
                    label="Recipient email address"),
-            shinyFeedback::useShinyFeedback(),
+            # shinyFeedback::useShinyFeedback(),
             # textOutput("warn_no_email_address_list"),
             f7Button(inputId="btn_planList_email_list",
                      label=div(f7Icon("envelope"),"Send email"))
@@ -401,10 +418,10 @@ ui<-f7Page(
                                     "Browse for file"))
           ),
           f7Col(
-            f7Text(inputId="txt_sheet_nm_load",
-                   label=HTML("Enter your name
-                              <br />
-                              (use <em>firstinitial_lastname</em>, e.g., k_post)")),
+            # f7Text(inputId="txt_sheet_nm_load",
+            #        label=HTML("Enter your name
+            #                   <br />
+            #                   (use <em>firstinitial_lastname</em>, e.g., k_post)")),
             f7Button(inputId="btn_load_sheet_load",
                      label=div(f7Icon("arrow_up_square"),
                                "Load database from app"))
@@ -457,6 +474,31 @@ ui<-f7Page(
 
 # NEXT-------------------------
 # develop code for manual image add
+# should reset button reset more--user id?
+# check shinyfeedbacks in server code to see if should be blanked out--maybe need renderUI,uiOutput
+# move load db from file & load db from app buttons to main menu (latter should be a renderUI)
+# create user id associated with pre-loaded data (which would have its own pictures)
+# move current user text output to top of main menu
+
+
+#STEPS
+#1. Retrieve user's id--provide a text box for it to be stored
+  #re-purpose existing text_box to make it more global
+  #store that as a reactiveVal()--NEED TO DO
+
+#2. Create checkImageExits function to check for existing images--DONE
+
+#3. Modify code for f7Popup within observeEvent to check whether image exists which would
+  #impact which image it displays--DONE
+#3a. create checkImageExists function--DONE
+#3b. create retrieveImage function--DONE
+
+#4. create f7File [button] to enable user to upload file to google drive--DONE
+
+#5. create observeEvent to handle the file selected
+
+  #5a. upload image to google drive using drive_upload() inside the observeEvent block
+  #drive_upload(file,path="path/to/folder") #adjust the destination folder path
 
 
 
@@ -464,10 +506,8 @@ ui<-f7Page(
 
 
 
-
 # LAST COMMIT-------------------
-# created logic to update ingredients
-# created popup that holds recipe image
-# added logic to display image
-# began coding to add/update image including having chatGPT help me develop functions
+# developed UI for user id input on main menu & code to return warning or store user_id
+# removed shinyfeedbacks associated with manually entering user id in other parts of the app
+# successfully added feature to view images stored in google drive
 

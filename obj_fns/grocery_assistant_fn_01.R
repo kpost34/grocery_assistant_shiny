@@ -146,38 +146,36 @@ shinyInput <- function(FUN, len, id, ...) {
 
 ### Check whether an image exists
 checkImageExists <- function(user_id, recipe) {
-  #pull id of user_id image folder
-  folder_user_id<-drive_get(user_id)$id
   
-  #grab all file basenames
-  img_basenames<-drive_ls(path=folder_id) %>%
-    map(~str_remove(.x,paste0("\\.",image_ext)))
+  #grab and store all recipe names
+  recipes<-drive_ls(user_id) %>%
+    mutate(name=str_extract(name,"^.+(?=\\.)")) %>%
+    pull(name)
   
-  #check if matches
-  recipe %in% img_basenames
+  #check if recipe matches any in files
+  tolower(recipe) %in% recipes
 }
 
 
 
 ### Retrieve image once it is found
-output$img <- renderImage({
-  # Function to retrieve the image file from Google Drive based on user_id and recipe
-  retrieveImage <- function(user_id, recipe) {
-    # Search for the image file in the Google Drive folder
-    query <- paste0("name = '", user_id, "_", recipe, "'")
-    files <- drive_find(query)
+retrieveImage <- function(user_id, recipe) {
+  #search for the image file in the Google Drive folder
+  drive_file<-drive_ls(user_id) %>%
+    mutate(name=str_extract(name,"^.+(?=\\.)")) %>%
+    filter(name==tolower(recipe))
+  
+  if(length(drive_file) > 0) {
+    #if an image file is found, download it to a temporary location
+    temp_file <- tempfile()
+    drive_download(drive_file, path = temp_file)
     
-    if (length(files) > 0) {
-      # If an image file is found, download it to a temporary location
-      temp_file <- tempfile()
-      drive_download(as_id(files[1]), path = temp_file)
-      
-      # Return the file path to be displayed in the renderImage function
-      return(temp_file)
-    }
-    
-    return(NULL)  # Return NULL if no image file is found
+    #return the file path to be displayed in the renderImage function
+    return(temp_file)
   }
+  
+  return(NULL)  #return NULL if no image file is found
+}
 
 
 
