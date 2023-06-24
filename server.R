@@ -423,16 +423,27 @@ server<-function(input,output,session){
   
   
   ### Display popup after hitting view button-------------------------------------------------------
+  view_row<-reactiveVal()
+  
+  
   observeEvent(input$view_button,{
     # Grab correct info
     view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
     nm_view_recipe<-dt_df()[[view_row_recipe,"recipe"]]
+    
+    # Seed view_row()
+    view_row(sample(1000,1))
 
     # Generate a unique ID for the popup
-    popup_id <- paste0("popup_", view_row_recipe)
+    popup_id <- paste0("popup_", view_row())
+    # popup_id <- paste0("popup_", view_row_recipe)
     
     # Generate a unique ID for the output
-    img_output_id <- paste0("recipe_img",view_row_recipe)
+    img_output_id <- paste0("recipe_img",view_row())
+    # img_output_id <- paste0("recipe_img",view_row_recipe)
+    
+    # Generate a unique ID for the button
+    view_btn_id<-paste0("file_add_view_recipe_",view_row())
 
     # Render image
     output[[img_output_id]]<-renderImage({
@@ -452,11 +463,11 @@ server<-function(input,output,session){
       title=splitLayout(
         cellArgs=list(width=c("35%","35%","30%")),
         HTML(paste0("<H2>",nm_view_recipe,"</H2>")),
-        f7File(inputId="file_add_view_recipe",
+        f7File(inputId=view_btn_id,
                label="",
                buttonLabel=div(f7Icon("folder"),
                                "Add/update image")),
-        br()
+        textOutput("txt_out_not_image_popup"),
       ),
       br(),
       fluidRow(
@@ -472,26 +483,58 @@ server<-function(input,output,session){
   
   
   
-  ### Display view dialog---------------------------------------------------------------------------
-  # observeEvent(input$file_add_view_recipe,{
-  #   #if the correct file type is selected then
-  #   if(tools::file_ext(input$file_add_view_recipe$name) %in% img_ext){
-  # 
-  #     file <- input$file_add_view_recipe
-  #     filename <- file$datapath
-  #     
-  #     #upload file
-  #     drive_upload(file, path=user_id())
-  #     
-  #     
-  #   #if no image file is found, you can display a default placeholder image
-  #   } else{filename<-"no_image.png"}
-  #   
-  #     #render image
-  #     output$recipe_img<-renderImage({
-  #       list(src=filename, width="auto", height="400px")
-  #     }, deleteFile = FALSE)
-  # })
+  ### Display uploaded image & add to db------------------------------------------------------------
+  observeEvent(input[[paste0("file_add_view_recipe_",view_row())]],{
+    req(input$view_button)
+    
+    # Grab correct info
+    view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
+    nm_recipe<-dt_df()[[view_row_recipe,"recipe"]]
+    
+    #define objects
+    file <- input[[paste0("file_add_view_recipe_",view_row())]]$name
+    ext <- file_ext(file)
+    filename <- paste0(tolower(nm_recipe),".",ext)
+    filepath <- input[[paste0("file_add_view_recipe_",view_row())]]$datapath
+    
+    #check if the correct file type is selected then
+    if(!ext %in% img_ext){
+      output$txt_out_not_image_popup<-renderText({
+      validate("Please select an image.")
+      })
+    } else{
+
+      #check on whether user has a dir
+      if(drive_find(user_id()) %>% nrow() == 0){
+        folder<-drive_mkdir(user_id())
+      } else{folder<-drive_get(user_id())}
+      
+        #check on whether there is an image in folder
+        if(nrow(drive_ls(path="t_mode",pattern=nm_recipe))>0){
+          #upload file
+          drive_upload(media = filepath, path = folder$id, name = filename)
+        } else{
+          #remove current and upload new file
+          current_img_id<-drive_find(user_id()) %>%
+            filter(str_detect(name,nm_recipe)) %>%
+            pull(id)
+          drive_rm(as_id(current_img_id))
+          drive_upload(media = filepath, path = folder$id, name = filename)
+        }
+      
+      #render image
+      #generate a unique ID for the output
+      img_output_id <- paste0("recipe_img",view_row())
+
+      # Render image
+      output[[img_output_id]]<-renderImage({
+        list(src=filepath, width="auto", height="400px")
+        }, deleteFile = FALSE)
+      
+    }
+      
+
+  })
   
 
   ### Display edit popups---------------------------------------------------------------------------
@@ -662,18 +705,6 @@ server<-function(input,output,session){
   
   ### Display modal/dialog after hitting button to Save db to app-----------------------------------
   observeEvent(input$btn_save_db_recipe, {
-    # #logical object representing whether text matches name formula
-    # name_entered<-str_detect(user_id(),"^[:lower:]{1}_[:lower:]{1,}$")
-    # # name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
-    # 
-    # #warning returned if not entered
-    # shinyFeedback::feedbackWarning("btn_save_db_recipe",
-    # # shinyFeedback::feedbackWarning("txt_sheet_nm_recipe",
-    #                                !name_entered,
-    #                                "Please enter [firstinitial_lastname]")
-    # 
-    # #prevents app from failing if blank/incorrectly formatted name entered
-    # req(name_entered,cancelOutput=TRUE)
     
     #if passes 'name test' then display dialog to confirm
     f7Dialog(
@@ -927,17 +958,6 @@ server<-function(input,output,session){
     req(input$dialog_confirm_save)
     #pull id of Google sheet "main"
     sheet_id<-drive_get("main")$id
-    
-    # #logical object representing whether text matches name formula
-    # name_entered<-str_detect(input$txt_sheet_nm_recipe,"^[:lower:]{1}_[:lower:]{1,}$")
-    # 
-    # #warning returned if not entered
-    # shinyFeedback::feedbackWarning("txt_sheet_nm_recipe",
-    #                                !name_entered,
-    #                                "Please enter [firstinitial_lastname]")
-    # 
-    # #prevents app from failing if blank/incorrectly formatted name entered
-    # req(name_entered,cancelOutput=TRUE)
     
     #if sheet does not exist create it
     if(!user_id() %in% sheet_names(sheet_id)){
@@ -1470,19 +1490,6 @@ server<-function(input,output,session){
   ### Load from app (google sheets)
   ## Display dialog 
   observeEvent(input$btn_load_sheet_load,{
-    # #logical object representing whether text matches name formula
-    # name_entered<-str_detect(user_id(),"^[:lower:]{1}_[:lower:]{1,}$")
-    # # name_entered<-str_detect(input$txt_sheet_nm_load,"^[:lower:]{1}_[:lower:]{1,}$")
-    # 
-    # 
-    # #warning returned if not entered
-    # # shinyFeedback::feedbackWarning("txt_sheet_nm_load",
-    # shinyFeedback::feedbackWarning(btn_load_sheet_load,
-    #                                !name_entered,
-    #                                "Please enter [firstinitial_lastname]")
-    # 
-    # #prevents app from failing if blank/incorrectly formatted name entered
-    # req(name_entered,cancelOutput=TRUE)
     
     #display dialog
     f7Dialog(

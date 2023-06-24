@@ -464,7 +464,6 @@ ui<-f7Page(
 
 
 # STYLING
-# slideshow of images (recipe) on main app page [could come from image db or internet]
 # bslib or other styling
 
 
@@ -474,31 +473,16 @@ ui<-f7Page(
 
 # NEXT-------------------------
 # develop code for manual image add
-# should reset button reset more--user id?
-# check shinyfeedbacks in server code to see if should be blanked out--maybe need renderUI,uiOutput
 # move load db from file & load db from app buttons to main menu (latter should be a renderUI)
-# create user id associated with pre-loaded data (which would have its own pictures)
 # move current user text output to top of main menu
+# pre-render images onto popups??
 
 
-#STEPS
-#1. Retrieve user's id--provide a text box for it to be stored
-  #re-purpose existing text_box to make it more global
-  #store that as a reactiveVal()--NEED TO DO
-
-#2. Create checkImageExits function to check for existing images--DONE
-
-#3. Modify code for f7Popup within observeEvent to check whether image exists which would
-  #impact which image it displays--DONE
-#3a. create checkImageExists function--DONE
-#3b. create retrieveImage function--DONE
-
-#4. create f7File [button] to enable user to upload file to google drive--DONE
-
-#5. create observeEvent to handle the file selected
-
-  #5a. upload image to google drive using drive_upload() inside the observeEvent block
-  #drive_upload(file,path="path/to/folder") #adjust the destination folder path
+#pictures:
+#1) figure out naming/case of uploading/deleting files
+#2) can't use file7input() twice--even after adding random #--try making it a reactiveVal--first 
+  #with then without random number
+#should the recipe being viewed (after hitting view button) be a reactiveVal?
 
 
 
@@ -507,7 +491,6 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# developed UI for user id input on main menu & code to return warning or store user_id
-# removed shinyfeedbacks associated with manually entering user id in other parts of the app
-# successfully added feature to view images stored in google drive
+# recipe images were not displaying if popup re-opened--fixed issue
+# began developing code to add/update image in db & to replace image in popup--now won't 're-fire'
 
