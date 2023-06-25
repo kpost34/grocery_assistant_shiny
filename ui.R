@@ -72,12 +72,17 @@ ui<-f7Page(
                               f7Icon("plus"),
                               "Add recipes from file (computer recommended)")),
           br(),
-          f7Button(inputId="btn_load_db_main",
-                   label=div(f7Icon("arrow_up_square"),
-                             "Load saved database (from file or app)")),
+          f7File(inputId="file_load_file_main",
+                 label=NULL,
+                 buttonLabel= div(f7Icon("folder"),
+                                  "Load database from file"),
+                 width="100%"),
+          # f7Button(inputId="btn_load_db_main",
+          #          label=div(f7Icon("arrow_up_square"),
+          #                    "Load saved database (from file or app)")),
           br(),
           #set up user id for new/recurring users
-          h3("Enter your user id to save/load your database from/to the app"),
+          h3("Enter your user id to save/load your database from/to app"),
           f7Row(
             f7Col(
               f7Text(inputId="txt_user_id_main",
@@ -92,6 +97,8 @@ ui<-f7Page(
               textOutput("txt_out_user_id")
             )
           ),
+          br(),
+          uiOutput("ui_btn_load_sheet_main"),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
@@ -399,40 +406,6 @@ ui<-f7Page(
                  color="purple"),
         style="margin-left:100px; margin-right: 100px"
       )
-    ),
-    
-    
-    
-    ##### Load Database=============================================================================
-    f7Tab(title="Load Database",
-          tabName="load_database",
-          hidden=TRUE,
-      div(
-        strong(h2("Load database from file or app")),
-        br(),
-        f7Row(
-          f7Col(
-            f7File(inputId="file_load_file_load",
-                   label="Load database from file",
-                   buttonLabel= div(f7Icon("folder"),
-                                    "Browse for file"))
-          ),
-          f7Col(
-            # f7Text(inputId="txt_sheet_nm_load",
-            #        label=HTML("Enter your name
-            #                   <br />
-            #                   (use <em>firstinitial_lastname</em>, e.g., k_post)")),
-            f7Button(inputId="btn_load_sheet_load",
-                     label=div(f7Icon("arrow_up_square"),
-                               "Load database from app"))
-          )
-        ),
-        br(),
-        f7Button(inputId="btn_return_main_load",
-                 label=div(f7Icon("return"),"Return to main menu"),
-                 color="purple"),
-        style="margin-left:100px; margin-right: 100px"
-      )
     )
   )
 )
@@ -443,7 +416,7 @@ ui<-f7Page(
 
 
 
-#---------------------------------------
+
 # LATER-------------------------
 # UI
 # go through code and replace splitLayout() + two f7Button() with f7Segment()
@@ -465,15 +438,16 @@ ui<-f7Page(
 
 # STYLING
 # bslib or other styling
+# clean up server outline
 
 
 # OVERALL
 # add more annotations
+# does db need an id field? if so, this should be employed globally--e.g., save/load from file & db
 
 
 # NEXT-------------------------
 # develop code for manual image add
-# move load db from file & load db from app buttons to main menu (latter should be a renderUI)
 # move current user text output to top of main menu
 # pre-render images onto popups??
 
@@ -491,6 +465,7 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# recipe images were not displaying if popup re-opened--fixed issue
-# began developing code to add/update image in db & to replace image in popup--now won't 're-fire'
+# moved load db from file button to main menu & maintained functionality
+# enabled load db from app button to display programmatically on main menu & maintained logic
+# removed extraneous ui & server code
 

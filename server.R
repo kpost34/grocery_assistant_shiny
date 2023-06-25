@@ -28,15 +28,46 @@ server<-function(input,output,session){
   
   
   
-  ## Move to upload tab
+  ## Move to upload multiple recipes tab
   observeEvent(input$btn_upload_recipe_main,{
     updateF7Tabs(id="main_tabset", selected="upload_recipes")
   })
   
   
-  ## Move to load database tab
-  observeEvent(input$btn_load_db_main,{
-    updateF7Tabs(id="main_tabset", selected="load_database")
+  ## Load from file
+  # Display dialog 
+  observeEvent(input$file_load_file_main,{
+    if(tools::file_ext(input$file_load_file_main$name) %in% c("csv","xls","xlsx")){
+      f7Dialog(
+        id="dialog_confirm_file_load_db",
+        title="Confirm load file",
+        type="confirm",
+        text="Click OK to load database from file. Note that any unsaved information will be lost."
+      )
+    }
+  })
+  
+  
+  ## Load from app (google sheets)
+  # Display button
+  observeEvent(user_id(),{
+    output$ui_btn_load_sheet_main<-renderUI({
+      f7Button(inputId="btn_load_sheet_main",
+               label=div(f7Icon("arrow_up_square"),
+                     "Load database from app"))
+    })
+  })
+  
+  ## Display dialog 
+  observeEvent(input$btn_load_sheet_main,{
+    
+    #display dialog
+    f7Dialog(
+      id="dialog_confirm_sheet_load_db",
+      title="Confirm load app",
+      type="confirm",
+      text="Click OK to load database from app. Note that any unsaved information will be lost."
+    )
   })
   
   
@@ -78,8 +109,97 @@ server<-function(input,output,session){
                          upload=tibble())
   
   
-  ### Initialize user_id reactiveVal as empty
+  ### Load from file
+  ## Confirm dialog, load file, & display toast notification
+  observeEvent(input$dialog_confirm_file_load_db,{
+    req(input$dialog_confirm_file_load_db)
+    #save db as temporary DF
+    ext<-tools::file_ext(input$file_load_file_main$name)
+    tmpDF<-switch(ext,
+      csv = read_csv(input$file_load_file_main$datapath,show_col_types=FALSE),
+      xls = read_xls(input$file_load_file_main$datapath),
+      xlsx = read_xlsx(input$file_load_file_main$datapath)
+    ) 
+    #split into two reactiveValues
+    recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
+      distinct()
+    ingred$db<-tmpDF %>% select(recipe,name,size,n)
+    #assign RVs of list as NULL DFs
+    recipe$list<-tibble()
+    ingred$list<-tibble()
+    #display toast notification
+    f7Toast(
+      text="Database loaded from file",
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=2000
+    )
+  })
+  
+  
+  
+  ### user_id reactiveVal
+  ## Initial reactiveVal
   user_id<-reactiveVal()
+  
+  
+  ## Set up reactive for correct name entered
+  observeEvent(input$btn_user_id_main,{
+    #logical object representing whether text matches name formula
+    name_entered<-str_detect(input$txt_user_id_main,"^[:lower:]{1}_[:lower:]{1,}$")
+    
+    #warning returned if not entered
+    shinyFeedback::feedbackWarning("txt_user_id_main",
+                                   !name_entered,
+                                   "Please enter [firstinitial_lastname]")
+    
+    #prevents app from failing if blank/incorrectly formatted name entered
+    req(name_entered,cancelOutput=TRUE)
+    
+    user_id(input$txt_user_id_main)
+    
+  },
+  ignoreInit=TRUE)
+  
+  
+  ## Render text
+  output$txt_out_user_id<-renderText({
+    user_id()
+  })
+  
+  
+  ## Clear input if submitted properly
+  observeEvent(user_id(),{
+    updateF7Text(inputId="txt_user_id_main",
+                 value=NA)
+  })
+  
+  
+  ### Load from app
+  ## Confirm dialog, load from app, & display toast notification
+  observeEvent(input$dialog_confirm_sheet_load_db,{
+    req(input$dialog_confirm_sheet_load_db)
+    #pull id of Google sheet "main"
+    sheet_id<-drive_get("main")$id
+    #save db as a temporary DF
+    tmpDF<-read_sheet(ss=sheet_id,
+                      sheet=user_id())
+               # sheet=input$txt_sheet_nm_load)
+    #split into two reactiveValues
+    recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
+      distinct()
+    ingred$db<-tmpDF %>% select(recipe,name,size,n)
+    #assign RVs of list as NULL DFs
+    recipe$list<-tibble()
+    ingred$list<-tibble()
+    #display toast notification
+    f7Toast(
+      text="Database loaded from app",
+      position="center",
+      closeButton=FALSE,
+      closeTimeout=2500
+    )
+  })
   
   
   ### Pre-loaded data
@@ -114,6 +234,7 @@ server<-function(input,output,session){
   
   
   
+  
   #-------------------------------------------------------
   #### NOTE: TEMP OUTPUT ####
   #temporary--see what's being stored
@@ -142,37 +263,7 @@ server<-function(input,output,session){
   })
 #-------------------------------------------------
   
-  ### user id
-  ## Set up reactive for correct name entered
-  observeEvent(input$btn_user_id_main,{
-    #logical object representing whether text matches name formula
-    name_entered<-str_detect(input$txt_user_id_main,"^[:lower:]{1}_[:lower:]{1,}$")
-    
-    #warning returned if not entered
-    shinyFeedback::feedbackWarning("txt_user_id_main",
-                                   !name_entered,
-                                   "Please enter [firstinitial_lastname]")
-    
-    #prevents app from failing if blank/incorrectly formatted name entered
-    req(name_entered,cancelOutput=TRUE)
-    
-    user_id(input$txt_user_id_main)
-    
-  },
-  ignoreInit=TRUE)
   
-  
-  ## Render text
-  output$txt_out_user_id<-renderText({
-    user_id()
-  })
-  
-  
-  ## Clear input if submitted properly
-  observeEvent(user_id(),{
-    updateF7Text(inputId="txt_user_id_main",
-                 value=NA)
-  })
   
   
   
@@ -1464,104 +1555,6 @@ server<-function(input,output,session){
       uploaded_file(tibble())
     )
   })
-
-  
-  
-  
-
-  
-
-  ##### Load Database Tab #########################################################################
-  #### UI===========================================================================================
-  ### Load from file
-  ## Display dialog 
-  observeEvent(input$file_load_file_load,{
-    if(tools::file_ext(input$file_load_file_load$name) %in% c("csv","xls","xlsx")){
-      f7Dialog(
-        id="dialog_confirm_file_load_db",
-        title="Confirm load file",
-        type="confirm",
-        text="Click OK to load database from file. Note that any unsaved information will be lost."
-      )
-    }
-  })
-  
-  
-  ### Load from app (google sheets)
-  ## Display dialog 
-  observeEvent(input$btn_load_sheet_load,{
-    
-    #display dialog
-    f7Dialog(
-      id="dialog_confirm_sheet_load_db",
-      title="Confirm load app",
-      type="confirm",
-      text="Click OK to load database from app. Note that any unsaved information will be lost."
-    )
-  })
-  
-  
-  ### Return to main menu
-  observeEvent(input$btn_return_main_load,{
-    updateF7Tabs(id="main_tabset",selected="main_tab")
-  })
-  
-  
-  #### Back-end=======================================================================================
-  ### Load from file
-  ## Confirm dialog, load file, & display toast notification
-  observeEvent(input$dialog_confirm_file_load_db,{
-    req(input$dialog_confirm_file_load_db)
-    #save db as temporary DF
-    ext<-tools::file_ext(input$file_load_file_load$name)
-    tmpDF<-switch(ext,
-      csv = read_csv(input$file_load_file_load$datapath,show_col_types=FALSE),
-      xls = read_xls(input$file_load_file_load$datapath),
-      xlsx = read_xlsx(input$file_load_file_load$datapath)
-    ) 
-    #split into two reactiveValues
-    recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
-      distinct()
-    ingred$db<-tmpDF %>% select(recipe,name,size,n)
-    #assign RVs of list as NULL DFs
-    recipe$list<-tibble()
-    ingred$list<-tibble()
-    #display toast notification
-    f7Toast(
-      text="Database loaded from file",
-      position="center",
-      closeButton=FALSE,
-      closeTimeout=2000
-    )
-  })
-  
-  
-  ### Load from app
-  ## Confirm dialog, load from app, & display toast notification
-  observeEvent(input$dialog_confirm_sheet_load_db,{
-    req(input$dialog_confirm_sheet_load_db)
-    #pull id of Google sheet "main"
-    sheet_id<-drive_get("main")$id
-    #save db as a temporary DF
-    tmpDF<-read_sheet(ss=sheet_id,
-                      sheet=user_id())
-               # sheet=input$txt_sheet_nm_load)
-    #split into two reactiveValues
-    recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
-      distinct()
-    ingred$db<-tmpDF %>% select(recipe,name,size,n)
-    #assign RVs of list as NULL DFs
-    recipe$list<-tibble()
-    ingred$list<-tibble()
-    #display toast notification
-    f7Toast(
-      text="Database loaded from app",
-      position="center",
-      closeButton=FALSE,
-      closeTimeout=2500
-    )
-  })
-  
 
 }
 
