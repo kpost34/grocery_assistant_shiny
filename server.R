@@ -58,10 +58,8 @@ server<-function(input,output,session){
     })
   })
   
-  ## Display dialog 
+  # Display dialog 
   observeEvent(input$btn_load_sheet_main,{
-    
-    #display dialog
     f7Dialog(
       id="dialog_confirm_sheet_load_db",
       title="Confirm load app",
@@ -98,10 +96,10 @@ server<-function(input,output,session){
   
   #### Server=======================================================================================
   ### Initialize reactiveValues as empty tibbles
-  recipe<-reactiveValues(tmp=tibble(),
-                         list=tibble(),
-                         db=tibble(),
-                         upload=tibble())
+  recipe<-reactiveValues(tmp=tibble(), #manual add
+                         list=tibble(), #shopping list
+                         db=tibble(), #database
+                         upload=tibble()) #uploaded data
   
   ingred<-reactiveValues(tmp=tibble(),
                          list=tibble(),
@@ -132,14 +130,14 @@ server<-function(input,output,session){
       text="Database loaded from file",
       position="center",
       closeButton=FALSE,
-      closeTimeout=2000
+      closeTimeout=2500
     )
   })
   
   
   
   ### user_id reactiveVal
-  ## Initial reactiveVal
+  ## Initialize reactiveVal
   user_id<-reactiveVal()
   
   
@@ -153,7 +151,7 @@ server<-function(input,output,session){
                                    !name_entered,
                                    "Please enter [firstinitial_lastname]")
     
-    #prevents app from failing if blank/incorrectly formatted name entered
+    #prevents app from failing if blank/incorrectly formatted user_id entered
     req(name_entered,cancelOutput=TRUE)
     
     user_id(input$txt_user_id_main)
@@ -162,7 +160,7 @@ server<-function(input,output,session){
   ignoreInit=TRUE)
   
   
-  ## Render text
+  ## Display user_id on landing page
   output$txt_out_user_id_main<-renderText({
     user_id()
   })
@@ -212,7 +210,7 @@ server<-function(input,output,session){
     recipe$list<-tibble()
     ingred$list<-tibble()
     
-    #update user_id()
+    #update user_id() to t_mode when using pre-loaded data
     user_id("t_mode")
 
     
@@ -223,11 +221,13 @@ server<-function(input,output,session){
   ## Reset app to initial conditions (clear dbs)
   observeEvent(input$dialog_confirm_reset_db_data,{
     req(input$dialog_confirm_reset_db_data)
+    #resets dbs and lists
     recipe$db<-tibble()
     ingred$db<-tibble()
     recipe$list<-tibble()
     ingred$list<-tibble()
     
+    #resets user_id
     user_id(character())
   })
   
@@ -235,8 +235,8 @@ server<-function(input,output,session){
   
   
   
-  #-------------------------------------------------------
-  #### NOTE: TEMP OUTPUT ####
+  #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  #NOTE: TEMP OUTPUT - DBs and Recent Adds ####
   #temporary--see what's being stored
   output$recipe_tab<-renderTable({
     recipe$tmp
@@ -246,11 +246,8 @@ server<-function(input,output,session){
   output$recipe_database<-renderTable({
     recipe$db
   })
-  #--------------------------------------------------------
-  
-  
-  #-----------------------------------------------
-  #### NOTE: TEMP OUTPUT ####
+
+
   #temporary--see what's being stored
   output$ingred_tab<-renderTable({
     ingred$tmp
@@ -261,7 +258,7 @@ server<-function(input,output,session){
   output$ingred_database<-renderTable({
     ingred$db
   })
-#-------------------------------------------------
+
   
   
   
@@ -270,7 +267,7 @@ server<-function(input,output,session){
   ##### Manual Data Sheets##########################################################################
   #### UI===========================================================================================
   
-  ### Recipe Sheet----------------------------------------------------------------------------------
+  ### Recipe Sheet++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## Display ingredient sheet 1 (sheet 2 overall)
   observeEvent(input$btn_ingred_entry_recipeSheet, {
     updateF7Sheet("man_input_ingredSheet1")
@@ -278,7 +275,7 @@ server<-function(input,output,session){
   
   
   
-  ### Ingredients (for recipe) Sheet 1--------------------------------------------------------------
+  ### Ingredients (for recipe) Sheet 1++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## Display recipe name
   output$txt_out_recipe_ingredSheet1<-renderText({
     input$txt_recipe_recipeSheet
@@ -426,7 +423,7 @@ server<-function(input,output,session){
 
   
   
-  ### Ingredients (for recipe) Sheet 2--------------------------------------------------------------
+  ### Ingredients (for recipe) Sheet 2++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## Display recipe name
   output$txt_out_recipe_ingredSheet2<-renderText({
     input$txt_recipe_recipeSheet
@@ -514,9 +511,10 @@ server<-function(input,output,session){
   
   
   ### Display popup after hitting view button
+  ## Initialize view_row()
   view_row<-reactiveVal()
   
-  
+  ## Display view image popup
   observeEvent(input$view_button,{
     # Grab correct info
     view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
@@ -574,7 +572,7 @@ server<-function(input,output,session){
   
   
   
-  ### Display uploaded image & add to db------------------------------------------------------------
+  ### Display uploaded image & add to db++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   observeEvent(input[[paste0("file_add_view_recipe_",view_row())]],{
     req(input$view_button)
     
@@ -628,7 +626,7 @@ server<-function(input,output,session){
   })
   
 
-  ### Display edit popups---------------------------------------------------------------------------
+  ### Display edit popups+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## Create reactiveVals (for naming inputs uniquely)
   rand_recipe<-reactiveVal()
   rand_ingred<-reactiveVal()
@@ -706,7 +704,7 @@ server<-function(input,output,session){
   })
     
 
-  ### Display dialogs for recipe/ingredient updates-------------------------------------------------
+  ### Display dialogs for recipe/ingredient updates+++++++++++++++++++++++++++++++++++++++++++++++++
   ## Recipe info
   observeEvent(input[[paste0("btn_update_recipe_popup_", rand_recipe())]], {
     req(input$edit_recipe_popup)
@@ -782,7 +780,7 @@ server<-function(input,output,session){
   })
   
 
-  ### Display modal/dialog after hitting Delete button----------------------------------------------
+  ### Display modal/dialog after hitting Delete button++++++++++++++++++++++++++++++++++++++++++++++
   observeEvent(input$delete_button,{
     f7Dialog(
       id="dialog_confirm_delete",
@@ -794,7 +792,7 @@ server<-function(input,output,session){
   ignoreInit=TRUE)
   
   
-  ### Display modal/dialog after hitting button to Save db to app-----------------------------------
+  ### Display modal/dialog after hitting button to Save db to app+++++++++++++++++++++++++++++++++++
   observeEvent(input$btn_save_db_recipe, {
     
     #if passes 'name test' then display dialog to confirm
@@ -917,11 +915,8 @@ server<-function(input,output,session){
   )
 
   
-  ### Add image to db and popup---------------------------------------------------------------------
-
   
-  
-  ### Display toast notification and update values after confirming dialog update-------------------
+  ### Display toast notification and update values after confirming dialog update+++++++++++++++++++
   ## Recipe info
   observeEvent(input$dialog_confirm_update_recipe_recipe,{
     req(input$dialog_confirm_update_recipe_recipe)
@@ -1017,7 +1012,7 @@ server<-function(input,output,session){
   })
   
   
-  ### Display toast notification and remove values after confirming deletion------------------------
+  ### Display toast notification and remove values after confirming deletion++++++++++++++++++++++++
   observeEvent(input$dialog_confirm_delete,{
     req(input$dialog_confirm_delete)
     
@@ -1040,7 +1035,7 @@ server<-function(input,output,session){
   
   
   
-  ### Database saving/copying-----------------------------------------------------------------------
+  ### Database saving/copying+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## Download copy of database
   output$btn_download_db_recipe <- downloadHandler(
     filename="grocery-assistant-db.csv",
@@ -1154,7 +1149,7 @@ server<-function(input,output,session){
       text=paste(recipe_nm,"added to meal plan"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=2000
+      closeTimeout=2500
     )
   })
   
@@ -1289,7 +1284,7 @@ server<-function(input,output,session){
       text=paste(nm,"removed from shopping list"),
       position="center",
       closeButton=FALSE,
-      closeTimeout=2000
+      closeTimeout=2500
     )
   })
   

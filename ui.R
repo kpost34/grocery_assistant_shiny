@@ -39,7 +39,7 @@ ui<-f7Page(
     f7Tab(title="Main",
           tabName="main_tab",
           hidden=TRUE,
-      div(
+      div( #to create margins
         strong(h2("Welcome to the Grocery Assistant App!")),
         h4("This application will help you develop a database of recipes, choose weekly menus,
            and generate shopping lists. New features will be added periodically and listed here
@@ -98,18 +98,20 @@ ui<-f7Page(
             )
           ),
           br(),
+          #database load btn appears only after user_id() entered successfully
           uiOutput("ui_btn_load_sheet_main"),
           br(),
           f7Button(inputId="btn_preload_data_main",
                    label="Test App with Pre-Loaded Data"),
           br(),
+          #resets db and user_id
           f7Button(inputId="btn_reset_db_main",
                    label=div(f7Icon("arrow_counterclockwise_circle"),
                              "Reset app"),
                    color="red")
         ),
         br(),
-        #temporary tables to see server function
+        #NOTE: temporary tables to see server function
         h4("recent recipe (manual upload)"),
         tableOutput("recipe_tab"),
         br(),
@@ -163,12 +165,15 @@ ui<-f7Page(
         swipeToStep=TRUE,
         swipeHandler=FALSE, 
         hiddenItems=tagList( 
-          splitLayout(
+          # splitLayout(
+          #segment provides container for buttons
+          f7Segment(
             f7Button(inputId="btn_return_recipe_ingredSheet1",
                      label="Return to recipe info",
                      color="purple"),
             f7Button(inputId="btn_ingred_entry_ingredSheet1",
-                     label="Add more ingredients")
+                     label="Add more ingredients"),
+            container="segment"
           ),
           br(),
           #right-aligns text
@@ -215,7 +220,7 @@ ui<-f7Page(
     ),
     
     ##### View/Edit/Delete/Save Recipes=============================================================
-    ### Page associatted with recipe browser
+    ### Page associated with recipe browser
     f7Tab(title="Recipes",
           tabName="recipe_tab",
           hidden=TRUE,
@@ -255,11 +260,12 @@ ui<-f7Page(
       )
     ),
     
-    ##### Generate Shopping List====================================================================
+    ##### Meal Planner==============================================================================
     f7Tab(title="Meal Planner",
           tabName="planner_tab",
           hidden=TRUE,
       div(
+        #display user_id on all pages
         f7Align(
           strong(textOutput("txt_out_user_id_planner")),
           side="right"
@@ -294,7 +300,8 @@ ui<-f7Page(
     f7Tab(title="Shopping List",
           tabName="list_tab",
           hidden=TRUE,
-      div(        
+      div(     
+        #display user_id on all pages
         f7Align(
           strong(textOutput("txt_out_user_id_list")),
           side="right"
@@ -365,13 +372,14 @@ ui<-f7Page(
           tabName="upload_recipes",
           hidden=TRUE,
       div(
+        #display user_id on all pages
         f7Align(
           strong(textOutput("txt_out_user_id_upload")),
           side="right"
         ),
         strong(h2("Batch add recipes and their ingredients to database by file")),
         br(),
-        #step 1: download copy of tempalte
+        #step 1: download copy of template
         h3("1) Download a copy of the template"),
         splitLayout(cellWidths=c("25%","75%"),
           f7DownloadButton(outputId="btn_template_download_upload",
@@ -389,7 +397,7 @@ ui<-f7Page(
           tags$li(strong("size:"), "size of ingredient"),
           tags$li(strong("n:"), "number of that particular ingredient needed in recipe"),
         br(),
-        #2: input your info
+        #2: input info
         h3("2) Replace example in file with your recipes and ingredients"),
         br(),
         #3; save file
@@ -437,15 +445,12 @@ ui<-f7Page(
 
 # LATER-------------------------
 # UI
-# go through code and replace splitLayout() + two f7Button() with f7Segment()
-# potentially reduce delay() durations
-
-# update buttons in DTs from actionbuttons to f7buttons?
+# after launching on shinyapps--see how DT actionbuttons are working then decide to use in separate
+  #cols if needed
 
 
 # BACK-END
-# develop custom functions to limit server code
-# see if any observeEvents can be combined--manual data entry?
+# see if any observeEvents can be combined--e.g., those that generate alert/confirm dialogs
 
 
 # Database additions/updates
@@ -453,14 +458,11 @@ ui<-f7Page(
   #added to db after confirm? (this would speed up processing as it would separate steps)
 
 
-
 # STYLING
 # bslib or other styling
-# clean up server outline
 
 
 # OVERALL
-# add more annotations
 # does db need an id field? if so, this should be employed globally--e.g., save/load from file & db
 
 
@@ -484,6 +486,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT-------------------
-# display user_id on top of: view/edit/delete/save recipes page, meal planner page, meal plan page,
-  #and batch recipe add page
+# replaced a splitLayout() with two buttons with a f7Segment
+# cleaned annotations and thus outline in server script
+# added annotations to UI & server scripts
+# standardized toast notifications to 2.5 sec
 
