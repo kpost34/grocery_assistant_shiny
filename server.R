@@ -163,7 +163,7 @@ server<-function(input,output,session){
   
   
   ## Render text
-  output$txt_out_user_id<-renderText({
+  output$txt_out_user_id_main<-renderText({
     user_id()
   })
   
@@ -513,7 +513,7 @@ server<-function(input,output,session){
   })
   
   
-  ### Display popup after hitting view button-------------------------------------------------------
+  ### Display popup after hitting view button
   view_row<-reactiveVal()
   
   
@@ -809,6 +809,12 @@ server<-function(input,output,session){
   
 
   #### Back-end=====================================================================================
+  ### Display user_id
+  output$txt_out_user_id_recipe<-renderText({
+    user_id()
+  })
+  
+  
   ### Joined DF of recipes and ingredients
   ## Simple reactive df of the two dbs joined
   db_df<-reactive({
@@ -1098,6 +1104,11 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
+  ### Display user_id
+  output$txt_out_user_id_planner<-renderText({
+    user_id()
+  })
+  
   ### Display database as table
   output$recipe_db_planner<-renderDT(
     dt_df() %>%
@@ -1197,6 +1208,12 @@ server<-function(input,output,session){
 
   
   #### Back-end=====================================================================================
+  ### Display user_id
+  output$txt_out_user_id_list<-renderText({
+    user_id()
+  })
+  
+  
   ### Display meal plan and shopping list
   ## Meal plan
   # datatable
@@ -1458,6 +1475,13 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
+  ### Display user_id
+  output$txt_out_user_id_upload<-renderText({
+    user_id()
+  })
+  
+  
+  
   ### File download template
   ## Create template by code
   templateDF<-tibble(

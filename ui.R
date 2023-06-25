@@ -94,7 +94,7 @@ ui<-f7Page(
                        label="Submit user id",
                        color="green"),
               strong("Current user:"),
-              textOutput("txt_out_user_id")
+              textOutput("txt_out_user_id_main")
             )
           ),
           br(),
@@ -220,6 +220,10 @@ ui<-f7Page(
           tabName="recipe_tab",
           hidden=TRUE,
       div(
+        #display user_id on all pages 
+        f7Align(
+          strong(textOutput("txt_out_user_id_recipe")),
+          side="right"),
         strong(h2("Feel free to browse, search, edit, and delete recipes")),
         DTOutput("recipe_db_recipe"),
         br(),
@@ -256,11 +260,16 @@ ui<-f7Page(
           tabName="planner_tab",
           hidden=TRUE,
       div(
+        f7Align(
+          strong(textOutput("txt_out_user_id_planner")),
+          side="right"
+        ),
+        br(),
         splitLayout(cellWidths=c("75%","25%"),
           strong(h2("Meal planner")),
           f7Button(inputId="btn_view_plan_planner",
-                   label=div(f7Icon("eye"),
-                             "View meal plan/shopping list"))
+                     label=div(f7Icon("eye"),
+                              "View meal plan/shopping list"))
         ),
         h3("Select the recipes to add to your meal plan"),
         DTOutput("recipe_db_planner"),
@@ -285,7 +294,12 @@ ui<-f7Page(
     f7Tab(title="Shopping List",
           tabName="list_tab",
           hidden=TRUE,
-      div(
+      div(        
+        f7Align(
+          strong(textOutput("txt_out_user_id_list")),
+          side="right"
+        ),
+        br(),
         splitLayout(cellWidths=c("75%","25%"),
           strong(h2("Meal plan & shopping list")),
           f7Button(inputId="btn_return_planner_list",
@@ -351,6 +365,10 @@ ui<-f7Page(
           tabName="upload_recipes",
           hidden=TRUE,
       div(
+        f7Align(
+          strong(textOutput("txt_out_user_id_upload")),
+          side="right"
+        ),
         strong(h2("Batch add recipes and their ingredients to database by file")),
         br(),
         #step 1: download copy of tempalte
@@ -448,8 +466,8 @@ ui<-f7Page(
 
 # NEXT-------------------------
 # develop code for manual image add
-# move current user text output to top of main menu
 # pre-render images onto popups??
+
 
 
 #pictures:
@@ -460,12 +478,12 @@ ui<-f7Page(
 
 
 
+
 # DONE--------------------------
 
 
 
 # LAST COMMIT-------------------
-# moved load db from file button to main menu & maintained functionality
-# enabled load db from app button to display programmatically on main menu & maintained logic
-# removed extraneous ui & server code
+# display user_id on top of: view/edit/delete/save recipes page, meal planner page, meal plan page,
+  #and batch recipe add page
 
