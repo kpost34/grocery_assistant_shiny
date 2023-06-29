@@ -443,14 +443,16 @@ ui<-f7Page(
 
 
 
-# LATER-------------------------
+# LATER+++++++++++++++++++++++++++++++++++++++++++++++++++
 # UI
 # after launching on shinyapps--see how DT actionbuttons are working then decide to use in separate
-  #cols if needed
+  #cols if needed--use button labels as colnames and icons on buttons; consider to make
+  #'recipe' a hyperlink for viewing a pic of it
 
 
 # BACK-END
 # see if any observeEvents can be combined--e.g., those that generate alert/confirm dialogs
+# pre-render images onto popups??
 
 
 # Database additions/updates
@@ -464,30 +466,23 @@ ui<-f7Page(
 
 # OVERALL
 # does db need an id field? if so, this should be employed globally--e.g., save/load from file & db
+  #--> remove id field--if user wants to specify different versions, they can add to 
+  #recipe name (e.g., chicken tacos-stove, chicken tacos-slow cooker)
 
-
-# NEXT-------------------------
-# develop code for manual image add
-# pre-render images onto popups??
-
-
-
-#pictures:
-#1) figure out naming/case of uploading/deleting files
-#2) can't use file7input() twice--even after adding random #--try making it a reactiveVal--first 
-  #with then without random number
-#should the recipe being viewed (after hitting view button) be a reactiveVal?
+# NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
+# clean up annotations related to images
 
 
 
 
-# DONE--------------------------
+
+# DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+# LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
+# resolved issue with naming/case when deleting image files
+# resolved issue where img files would not upload for same or different recipe after closing
+  #window (issue caused by having button in title)
+# successfully got images to display, validate message to return, and images to change
 
-# LAST COMMIT-------------------
-# replaced a splitLayout() with two buttons with a f7Segment
-# cleaned annotations and thus outline in server script
-# added annotations to UI & server scripts
-# standardized toast notifications to 2.5 sec
 
