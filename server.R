@@ -234,7 +234,12 @@ server<-function(input,output,session){
     removeUI(selector="#btn_load_sheet_main")
     
     #removes UI input to save database
-    removeUI(selector="$btn_save_db_recipe")
+    removeUI(selector="#btn_save_db_recipe")
+    
+    #removes text associated with above input
+    output$txt_out_save_app_recipe<-renderText({
+      ""
+    })
   })
   
   
@@ -516,10 +521,15 @@ server<-function(input,output,session){
   })
   
   
-  ### Display save database to app button
+  ### Display text and button indicating to save a copy to db
   observeEvent(user_id(),{
     #user_id is from a user and not test mode
     req(user_id()!="t_mode")
+    #text
+    output$txt_out_save_app_recipe<-renderText({
+      "Save a copy to app"
+    })
+    #button
     output$ui_btn_save_db_recipe<-renderUI({
       f7Button(inputId="btn_save_db_recipe",
                label=div(f7Icon("floppy_disk"),"Save database to app"),

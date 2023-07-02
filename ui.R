@@ -240,7 +240,8 @@ ui<-f7Page(
         splitLayout(cellWidths=c("60%","40%"),
           br(),
           f7Block(
-            f7BlockTitle(title="Save a copy to app",size="medium"),
+            h3(strong(textOutput("txt_out_save_app_recipe"))),
+            # f7BlockTitle(title="Save a copy to app",size="medium"),
             # f7Text(inputId="txt_sheet_nm_recipe",
             #        #html used to get multiline label
             #        label=HTML("Enter your name
@@ -473,6 +474,7 @@ ui<-f7Page(
 
 
 
+# LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
 # remove load data from app button after reseting app
 # added requirement that user_id() cannot be "t_mode" to display load data data from app button
 # commented out server and UI code for recent adds and db tracking
