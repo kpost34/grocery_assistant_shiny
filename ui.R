@@ -110,19 +110,19 @@ ui<-f7Page(
                              "Reset app"),
                    color="red")
         ),
-        br(),
-        #NOTE: temporary tables to see server function
-        h4("recent recipe (manual upload)"),
-        tableOutput("recipe_tab"),
-        br(),
-        h4("recipe database"),
-        tableOutput("recipe_database"),
-        br(),
-        h4("recent ingredient (manual upload)"),
-        tableOutput("ingred_tab"),
-        br(),
-        h4("ingred database"),
-        tableOutput("ingred_database"),
+        #NOTE: tables to see server function--uncomment when want to track data
+        # br(),
+        # h4("recent recipe (manual upload)"),
+        # tableOutput("recipe_tab"),
+        # br(),
+        # h4("recipe database"),
+        # tableOutput("recipe_database"),
+        # br(),
+        # h4("recent ingredient (manual upload)"),
+        # tableOutput("ingred_tab"),
+        # br(),
+        # h4("ingred database"),
+        # tableOutput("ingred_database"),
         style="margin-left:100px; margin-right: 100px"
       ),
 
@@ -247,9 +247,7 @@ ui<-f7Page(
             #                   <br />
             #                   (use <em>firstinitial_lastname</em>, e.g., k_post)"),
             # ),
-            f7Button(inputId="btn_save_db_recipe",
-                     label=div(f7Icon("floppy_disk"),"Save database to app"),
-                     color="green")
+            uiOutput("ui_btn_save_db_recipe")
           )
         ),
         br(),
@@ -475,8 +473,8 @@ ui<-f7Page(
 
 
 
-# LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# images were not uploading/displaying a second time around - resolved issue caused by lack of
-  #unique outputId for validate text output
-# removed id field from app
+# remove load data from app button after reseting app
+# added requirement that user_id() cannot be "t_mode" to display load data data from app button
+# commented out server and UI code for recent adds and db tracking
+# conditionally display save db to app and remove btn if app is reset
 

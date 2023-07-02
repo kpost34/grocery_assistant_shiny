@@ -51,6 +51,8 @@ server<-function(input,output,session){
   ## Load from app (google sheets)
   # Display button
   observeEvent(user_id(),{
+    #user_id is from a user and not test mode
+    req(user_id()!="t_mode")
     output$ui_btn_load_sheet_main<-renderUI({
       f7Button(inputId="btn_load_sheet_main",
                label=div(f7Icon("arrow_up_square"),
@@ -212,8 +214,6 @@ server<-function(input,output,session){
     
     #update user_id() to t_mode when using pre-loaded data
     user_id("t_mode")
-
-    
   })
   
   
@@ -229,6 +229,12 @@ server<-function(input,output,session){
     
     #resets user_id
     user_id(character())
+    
+    #removes UI input to load database
+    removeUI(selector="#btn_load_sheet_main")
+    
+    #removes UI input to save database
+    removeUI(selector="$btn_save_db_recipe")
   })
   
   
@@ -236,28 +242,28 @@ server<-function(input,output,session){
   
   
   #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  #NOTE: TEMP OUTPUT - DBs and Recent Adds ####
-  #temporary--see what's being stored
-  output$recipe_tab<-renderTable({
-    recipe$tmp
-  })
-  
-  #temporary--see what's being stored (multiple recipes)
-  output$recipe_database<-renderTable({
-    recipe$db
-  })
-
-
-  #temporary--see what's being stored
-  output$ingred_tab<-renderTable({
-    ingred$tmp
-  })
-  
-  
-  #temporary--see what's being stored (multiple recipes)
-  output$ingred_database<-renderTable({
-    ingred$db
-  })
+  #NOTE: OUTPUT - DBs and Recent Adds ####
+  #temporary--see what's being stored--uncomment when want to track
+  # output$recipe_tab<-renderTable({
+  #   recipe$tmp
+  # })
+  # 
+  # #temporary--see what's being stored (multiple recipes)
+  # output$recipe_database<-renderTable({
+  #   recipe$db
+  # })
+  # 
+  # 
+  # #temporary--see what's being stored
+  # output$ingred_tab<-renderTable({
+  #   ingred$tmp
+  # })
+  # 
+  # 
+  # #temporary--see what's being stored (multiple recipes)
+  # output$ingred_database<-renderTable({
+  #   ingred$db
+  # })
 
   
   
@@ -507,6 +513,18 @@ server<-function(input,output,session){
   ### Return to main menu
   observeEvent(input$btn_return_main_recipe,{
     updateF7Tabs(id="main_tabset",selected="main_tab")
+  })
+  
+  
+  ### Display save database to app button
+  observeEvent(user_id(),{
+    #user_id is from a user and not test mode
+    req(user_id()!="t_mode")
+    output$ui_btn_save_db_recipe<-renderUI({
+      f7Button(inputId="btn_save_db_recipe",
+               label=div(f7Icon("floppy_disk"),"Save database to app"),
+               color="green")
+    })
   })
   
   
