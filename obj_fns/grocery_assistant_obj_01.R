@@ -50,7 +50,7 @@ img_ext<-c(
 #### App Test=======================================================================================
 ### Generate recipe & ingredient data
 demo_recipeDF <- tibble(
-  id=1:3,
+  # id=1:3,
   recipe=c("Chicken alfredo","Chicken tacos","Pot roast"),
   appliance=c("Stove, Slow cooker","Slow cooker","Slow cooker"),
   protein=c("Chicken","Chicken","Beef")

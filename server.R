@@ -205,7 +205,7 @@ server<-function(input,output,session){
   observeEvent(input$dialog_confirm_preload_data,{
     req(input$dialog_confirm_preload_data)
     #update dbs & make shopping list/meal planner empty
-    recipe$db<-demo_recipeDF %>% select(-id)
+    recipe$db<-demo_recipeDF #%>% select(-id)
     ingred$db<-demo_ingredDF
     recipe$list<-tibble()
     ingred$list<-tibble()
@@ -541,7 +541,9 @@ server<-function(input,output,session){
     # # Generate a unique ID for the button
     view_btn_id<-paste0("file_add_img_",rand_view())
     # # view_btn_id<-paste0("file_add_view_recipe_",recipe_view())
-      
+    
+    # Generate a unique ID for validate text output
+    validate_img_id<-paste0("txt_out_not_image_popup_",rand_view())
       
     # Render image
     # output[[img_output_id]]<-renderImage({
@@ -603,14 +605,13 @@ server<-function(input,output,session){
         # textOutput("txt_out_not_image_popup")
       # ),
       # f7File(inputId=paste0("file_add_img_",rand_view()),
-      splitLayout(
-        f7File(inputId=view_btn_id,
-        # f7File(inputId="file_add_view_recipe",
-               label="",
-               buttonLabel=div(f7Icon("folder"),
-                               "Add/update image")),
-        textOutput("txt_out_not_image_popup")
-      ),
+      f7File(inputId=view_btn_id,
+          # f7File(inputId="file_add_view_recipe",
+                 label="",
+                 buttonLabel=div(f7Icon("folder"),
+                                 "Add/update image")),
+      textOutput(validate_img_id),
+      # ),
       br(),
       fluidRow(
         column(
@@ -987,7 +988,7 @@ server<-function(input,output,session){
     file <- input[[paste0("file_add_img_",rand_view())]]$name
     # file <- input[[paste0("file_add_view_recipe_",recipe_view())]]$name
     # file <- input$file_add_view_recipe$name
-    ext <- file_ext(file)
+    ext <- tools::file_ext(file)
     filename <- paste0(recipe_view(),".",ext)
     # filename <- paste0(nm_recipe,".",ext)
     # img_file_path(input[[paste0("file_add_view_recipe_",rand_view())]]$datapath)
@@ -1000,8 +1001,9 @@ server<-function(input,output,session){
     
     #check if the correct file type is selected then
     if(!ext %in% img_ext){
-      output$txt_out_not_image_popup<-renderText({
-      validate("Please select an image.")
+      output[[paste0("txt_out_not_image_popup_",rand_view())]]<-renderText({
+      # output$txt_out_not_image_popup<-renderText({
+      validate("Please select an image file.")
       })
     } else{
       img_file_path(filepath)

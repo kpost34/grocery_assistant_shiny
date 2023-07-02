@@ -2,8 +2,8 @@
 
 
 #load packages
-pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,shinyscreenshot,
-               mailR,htmlTable,readxl,googledrive,gargle,googlesheets4)
+pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,kableExtra,
+               shinyscreenshot,mailR,htmlTable,readxl,googledrive,gargle,googlesheets4)
 
 
 
@@ -388,7 +388,7 @@ ui<-f7Page(
         ),
         br(),
         "File should contain six columns:",
-          tags$li(strong("id:"),"identifer: assign recipes numerically starting with 1"),
+          # tags$li(strong("id:"),"identifer: assign recipes numerically starting with 1"),
           tags$li(strong("recipe:"), "name of recipe"),
           tags$li(strong("appliance:"), "one or more of 'stove', 'oven', 'grill', 'broiler', 'slow cooker'; multiple
              appliances separated by a ', '"),
@@ -464,13 +464,8 @@ ui<-f7Page(
 # bslib or other styling
 
 
-# OVERALL
-# does db need an id field? if so, this should be employed globally--e.g., save/load from file & db
-  #--> remove id field--if user wants to specify different versions, they can add to 
-  #recipe name (e.g., chicken tacos-stove, chicken tacos-slow cooker)
-
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-# clean up annotations related to images
+# clean up annotations related to images--wait to see if any needed
 
 
 
@@ -479,10 +474,9 @@ ui<-f7Page(
 # DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-# LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# resolved issue with naming/case when deleting image files
-# resolved issue where img files would not upload for same or different recipe after closing
-  #window (issue caused by having button in title)
-# successfully got images to display, validate message to return, and images to change
 
+# LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
+# images were not uploading/displaying a second time around - resolved issue caused by lack of
+  #unique outputId for validate text output
+# removed id field from app
 
