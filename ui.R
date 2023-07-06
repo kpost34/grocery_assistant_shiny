@@ -86,7 +86,7 @@ ui<-f7Page(
           f7Row(
             f7Col(
               f7Text(inputId="txt_user_id_main",
-                     label=HTML("use <em>firstinitial_lastname</em>, e.g., k_post"))
+                     label=HTML("use <em>firstinitial_lastname</em><br> e.g., j_doe"))
             ),
             f7Col(
               linebreaks(2),
@@ -242,7 +242,7 @@ ui<-f7Page(
       div(
         #display user_id on all pages 
         f7Align(
-          strong(textOutput("txt_out_user_id_recipe")),
+          htmlOutput("txt_out_user_id_recipe"),
           side="right"),
         strong(h2("Feel free to browse, search, edit, and delete recipes")),
         DTOutput("recipe_db_recipe"),
@@ -282,7 +282,8 @@ ui<-f7Page(
       div(
         #display user_id on all pages
         f7Align(
-          strong(textOutput("txt_out_user_id_planner")),
+          htmlOutput("txt_out_user_id_planner"),
+          # strong(textOutput("txt_out_user_id_planner")),
           side="right"
         ),
         br(),
@@ -318,7 +319,8 @@ ui<-f7Page(
       div(     
         #display user_id on all pages
         f7Align(
-          strong(textOutput("txt_out_user_id_list")),
+          htmlOutput("txt_out_user_id_list"),
+          # strong(textOutput("txt_out_user_id_list")),
           side="right"
         ),
         br(),
@@ -390,7 +392,8 @@ ui<-f7Page(
       div(
         #display user_id on all pages
         f7Align(
-          strong(textOutput("txt_out_user_id_upload")),
+          htmlOutput("txt_out_user_id_upload"),
+          # strong(textOutput("txt_out_user_id_upload")),
           side="right"
         ),
         strong(h2("Batch add recipes and their ingredients to database by file")),
@@ -483,7 +486,7 @@ ui<-f7Page(
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
 # clean up annotations related to images (and other code)--wait to see if any needed
-
+# go into google drive of associated google account and clean up sheets and images
 
 
 
@@ -493,6 +496,5 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# updated file upload check -- for batch reading in recipes
-# adjusted UI for manual ingredient add to display better when on server
+# added "user id: " before each user_id() and made the latter bold using HTML
 

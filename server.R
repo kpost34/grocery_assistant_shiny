@@ -894,8 +894,9 @@ server<-function(input,output,session){
 
   #### Back-end=====================================================================================
   ### Display user_id+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # output$txt_out_user_id_recipe<-renderText({
   output$txt_out_user_id_recipe<-renderText({
-    user_id()
+    HTML(paste0("user id: <b>",user_id(),"</b>"))
   })
   
   
@@ -1290,7 +1291,7 @@ server<-function(input,output,session){
   #### Back-end=====================================================================================
   ### Display user_id
   output$txt_out_user_id_planner<-renderText({
-    user_id()
+    HTML(paste0("user id: <b>",user_id(),"</b>"))
   })
   
   ### Display database as table
@@ -1394,7 +1395,7 @@ server<-function(input,output,session){
   #### Back-end=====================================================================================
   ### Display user_id
   output$txt_out_user_id_list<-renderText({
-    user_id()
+    HTML(paste0("user id: <b>",user_id(),"</b>"))
   })
   
   
@@ -1661,7 +1662,7 @@ server<-function(input,output,session){
   #### Back-end=====================================================================================
   ### Display user_id
   output$txt_out_user_id_upload<-renderText({
-    user_id()
+    HTML(paste0("user id: <b>",user_id(),"</b>"))
   })
   
   
