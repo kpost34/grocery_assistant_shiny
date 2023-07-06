@@ -1710,18 +1710,36 @@ server<-function(input,output,session){
     #check if recipe and app & protein #s are appropriate
     if(!names_check){second_check<-TRUE} else{
 
-    n_recipe<-max(data_upload$id)==n_distinct(data_upload$recipe)
+    
+    # update second check
     data_upload %>%
       group_by(recipe) %>%
       summarize(n_app=n_distinct(appliance),
                 n_protein=n_distinct(protein)) %>%
       ungroup() %>%
-      distinct(n_app,n_protein) %>%
-      .[1,] %>%
-      as.numeric() %>%
-      sum()==2 -> n_app_protein
+      distinct(n_app,n_protein) -> data_upload_tmp
+      
+      second_check1<-nrow(data_upload_tmp)==1
+      second_check2<-data_upload_tmp %>%
+        .[1,] %>%
+        as.integer() %>%
+        sum()==2
+      
+    second_check<-sum(second_check1,second_check2)==2
+      
+      
+    # n_recipe<-max(data_upload$id)==n_distinct(data_upload$recipe)
+    # data_upload %>%
+    #   group_by(recipe) %>%
+    #   summarize(n_app=n_distinct(appliance),
+    #             n_protein=n_distinct(protein)) %>%
+    #   ungroup() %>%
+    #   distinct(n_app,n_protein) %>%
+    #   .[1,] %>%
+    #   as.numeric() %>%
+    #   sum()==2 -> n_app_protein
 
-    second_check<-sum(n_recipe,n_app_protein)==2
+    # second_check<-sum(n_recipe,n_app_protein)==2
     }
 
     #prevents app from failing if incorrectly formatted file

@@ -110,6 +110,7 @@ ui<-f7Page(
                              "Reset app"),
                    color="red")
         ),
+        
         #NOTE: tables to see server function--uncomment when want to track data
         # br(),
         # h4("recent recipe (manual upload)"),
@@ -123,7 +124,10 @@ ui<-f7Page(
         # br(),
         # h4("ingred database"),
         # tableOutput("ingred_database"),
-        style="margin-left:100px; margin-right: 100px"
+        
+        #percentages help with different display sizes
+        style="margin-left: 1%; margin-right: 1%"
+        # style="margin-left:100px; margin-right: 100px"
       ),
 
       
@@ -175,12 +179,13 @@ ui<-f7Page(
                      label="Add more ingredients"),
             container="segment"
           ),
-          br(),
+          # br(),
           #right-aligns text
           p("Click outside sheet to return to main menu",style="text-align: right"),
           h2(strong(textOutput("txt_out_recipe_ingredSheet1"))),
           add_ingredients(n=4),
-          linebreaks(2),
+          br(),
+          # linebreaks(2),
           f7Button(inputId="btn_submit_recipe_ingred_ingredSheet1",
                    label="Submit recipe info & ingredients",
                    color="green")
@@ -196,6 +201,16 @@ ui<-f7Page(
         swipeToStep=TRUE,
         swipeHandler=FALSE,
         hiddenItems=tagList(
+          #use segment instead of splitLayout
+          # f7Segment(
+          #   f7Button(inputId="btn_return_recipe_ingredSheet2",
+          #            label="Return to recipe info",
+          #            color="purple"),
+          #   f7Button(inputId="btn_previous_ingred_ingredSheet2",
+          #            label="Previous ingredients"),
+          #   container="segment"
+          # ),
+          
           splitLayout( 
             f7Button(inputId="btn_previous_ingred_ingredSheet2",
                      label="Previous ingredients"),
@@ -255,7 +270,8 @@ ui<-f7Page(
         f7Button(inputId="btn_return_main_recipe",
                  label=div(f7Icon("return"),"Return to main menu"),
                  color="purple"),
-        style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 1%; margin-right: 1%"
+        # style="margin-left:100px; margin-right: 100px"
       )
     ),
     
@@ -320,7 +336,7 @@ ui<-f7Page(
         ),
         br(),
         #email it
-        splitLayout(cellWidths=c("75%","25%"),
+        splitLayout(cellWidths=c("60%","40%"),
           br(),
           f7Block(
             f7BlockTitle(title="Email plan & list",size="medium"),
@@ -334,21 +350,21 @@ ui<-f7Page(
         ),
         br(),
         #take a screenshot
-        splitLayout(cellWidths=c("75%","25%"),
+        splitLayout(cellWidths=c("60%","40%"),
           br(),
           f7Button(inputId="btn_planList_screenshot_list",
                    label=div(f7Icon("camera"),"Screenshot plan & list"))
         ),
         br(),
         #export to pdf
-        splitLayout(cellWidths=c("75%","25%"),            
+        splitLayout(cellWidths=c("60%","40%"),            
           br(),
           f7DownloadButton(outputId="btn_planList_export_list",
                            label="Export plan & list to pdf")
         ),
         br(),
         #reset
-        splitLayout(cellWidths=c("75%","25%"),
+        splitLayout(cellWidths=c("60%","40%"),
           br(),
           f7Button(inputId="btn_reset_planList_list",
                    label=div(f7Icon("arrow_counterclockwise_circle"),"Reset plan/list"),
@@ -359,7 +375,8 @@ ui<-f7Page(
         f7Button(inputId="btn_return_main_list",
                  label=div(f7Icon("return"),"Return to main menu"),
                  color="purple"),
-        style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 1%; margin-right: 1%"
+        # style="margin-left:100px; margin-right: 100px"
       )
     ),
     
@@ -429,7 +446,8 @@ ui<-f7Page(
                  label=div(f7Icon("return"),
                            "Return to main menu"),
                  color="purple"),
-        style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 1%; margin-right: 1%"
+        # style="margin-left:100px; margin-right: 100px"
       )
     )
   )
@@ -464,7 +482,7 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-# clean up annotations related to images--wait to see if any needed
+# clean up annotations related to images (and other code)--wait to see if any needed
 
 
 
@@ -475,8 +493,6 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# remove load data from app button after reseting app
-# added requirement that user_id() cannot be "t_mode" to display load data data from app button
-# commented out server and UI code for recent adds and db tracking
-# conditionally display save db to app and remove btn if app is reset
+# updated file upload check -- for batch reading in recipes
+# adjusted UI for manual ingredient add to display better when on server
 
