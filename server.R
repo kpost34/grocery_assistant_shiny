@@ -184,7 +184,6 @@ server<-function(input,output,session){
     #save db as a temporary DF
     tmpDF<-read_sheet(ss=sheet_id,
                       sheet=user_id())
-               # sheet=input$txt_sheet_nm_load)
     #split into two reactiveValues
     recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
       distinct()
@@ -207,13 +206,14 @@ server<-function(input,output,session){
   observeEvent(input$dialog_confirm_preload_data,{
     req(input$dialog_confirm_preload_data)
     #update dbs & make shopping list/meal planner empty
-    recipe$db<-demo_recipeDF #%>% select(-id)
+    recipe$db<-demo_recipeDF 
     ingred$db<-demo_ingredDF
     recipe$list<-tibble()
     ingred$list<-tibble()
     
     #update user_id() to t_mode when using pre-loaded data
     user_id("t_mode")
+    
   })
   
   
@@ -240,6 +240,30 @@ server<-function(input,output,session){
     output$txt_out_save_app_recipe<-renderText({
       ""
     })
+    
+    #makes uplaoded_file() empty
+    uploaded_file(tibble())
+    
+    #removes UI input associated with confirming file upload
+    removeUI(selector="#ui_btn_confirm_upload_upload")
+    
+    #removes text associated with uploading file
+    output$ui_txt_preview_upload_upload<-renderText({
+      ""
+    })
+    
+    output$txt_warning_upload<-renderText({
+      ""
+    })
+    
+    output$ui_txt_confirm_upload_upload<-renderText({
+      ""
+    })
+    
+    output$ui_txt_another_upload_upload<-renderText({
+      ""
+    })
+    
   })
   
   
@@ -505,7 +529,6 @@ server<-function(input,output,session){
   ## Add ingredients from new recipe to database
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
-    # newrows<-ingred_tmpDF()
     ingred$db<-bind_rows(ingred$db,ingred$tmp)
     }
   )
@@ -543,7 +566,6 @@ server<-function(input,output,session){
   recipe_view<-reactiveVal()
   rand_view<-reactiveVal()
   img_file_path<-reactiveVal()
-  # img_file_path<-reactiveVal("img/no_image.png")
   
   ## Display view image popup
   observeEvent(input$view_button,{
@@ -552,41 +574,18 @@ server<-function(input,output,session){
     view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
     nm_view_recipe<-dt_df()[[view_row_recipe,"recipe"]]
     recipe_view(tolower(nm_view_recipe))
-
-
-    ## NOTE: delay() is so that a new rand_view() is populated before ids are generated
-    # Generate a unique ID for the popup
-    # popup_id <-paste0("popup_", rand_view())
-    # # popup_id <- paste0("popup_", view_row_recipe)
     
     # Seed rand_view()
     rand_view(sample(1000,1))
-    # 
-    # # Generate a unique ID for the output
+    
+    # Generate a unique ID for the output
     img_output_id <- paste0("recipe_img_",rand_view())
-    # # img_output_id <- paste0("recipe_img",view_row_recipe)
-    # 
-    # # Generate a unique ID for the button
+ 
+    # Generate a unique ID for the button
     view_btn_id<-paste0("file_add_img_",rand_view())
-    # # view_btn_id<-paste0("file_add_view_recipe_",recipe_view())
     
     # Generate a unique ID for validate text output
     validate_img_id<-paste0("txt_out_not_image_popup_",rand_view())
-      
-    # Render image
-    # output[[img_output_id]]<-renderImage({
-    # output[[img_output_id]]<-renderImage({
-    #   if(checkImageExists(user_id=user_id(), recipe=recipe_view())) {
-    #     #call the retrieveImage function to get the file path
-    #     img_file_path(retrieveImage(user_id=user_id(), recipe=recipe_view()))
-    #     # file_path <- retrieveImage(user_id=user_id(), recipe=nm_view_recipe)
-    #     list(src = img_file_path(), width = "auto", height = "400px")
-    #     # list(src = file_path, width = "auto", height = "400px")
-    #   }
-    #   else{
-    #     list(src = "img/no_image.png", width = "auto", height = "400px")
-    #   }
-    # }, deleteFile=FALSE)
     
     # Populate img_file_path() with recipe img or blank
     #conditions: 1) user has folder & 2) image for recipe exists in folder
@@ -595,51 +594,26 @@ server<-function(input,output,session){
       filepath<-retrieveImage(user_id=user_id(), recipe=recipe_view())
       # file_path <- retrieveImage(user_id=user_id(), recipe=nm_view_recipe)
       img_file_path(filepath)
-      # list(src = img_file_path(), width = "auto", height = "400px")
-      # list(src = file_path, width = "auto", height = "400px")
     }
     else{
       img_file_path("img/no_image.png")
-      # list(src = "img/no_image.png", width = "auto", height = "400px")
     }
     
     
-
-    
-    
     # Render image
-    # delay(250,
     output[[img_output_id]]<-renderImage({
       list(src=img_file_path(), width="auto", height="400px")
       }, deleteFile = FALSE)
-    # )
       
     # Display popup
-    # delay(500,
     f7Popup(
-      # id=paste0("popup_", rand_view()),
-      # id=popup_id,
       id="popup_id",
-      # title=splitLayout(
-      #   cellArgs=list(width=c("35%","35%","30%")),
       title=HTML(paste0("<H2>",str_to_sentence(recipe_view()),"</H2>")),
-        # HTML(paste0("<H2>",nm_view_recipe,"</H2>")),
-        # f7File(inputId=paste0("file_add_img_",rand_view()),
-        # # f7File(inputId=view_btn_id,
-        # # f7File(inputId="file_add_view_recipe",
-        #        label="",
-        #        buttonLabel=div(f7Icon("folder"),
-        #                        "Add/update image")),
-        # textOutput("txt_out_not_image_popup")
-      # ),
-      # f7File(inputId=paste0("file_add_img_",rand_view()),
       f7File(inputId=view_btn_id,
-          # f7File(inputId="file_add_view_recipe",
-                 label="",
-                 buttonLabel=div(f7Icon("folder"),
-                                 "Add/update image")),
+             label="",
+             buttonLabel=div(f7Icon("folder"),
+                         "Add/update image")),
       textOutput(validate_img_id),
-      # ),
       br(),
       fluidRow(
         column(
@@ -647,69 +621,11 @@ server<-function(input,output,session){
           align="center",
           offset=0,
           imageOutput(img_output_id)
-            # imageOutput("recipe_img")
-            
-          )
         )
       )
-    # )
+    )
   })
-  
-  
-  
-  ### Display uploaded image & add to db++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  # observeEvent(input[[paste0("file_add_view_recipe_",rand_view())]],{
-  #   req(input$view_button)
-  #   
-  #   # Grab correct info
-  #   view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
-  #   nm_recipe<-dt_df()[[view_row_recipe,"recipe"]] %>% tolower()
-  #   
-  #   #define objects
-  #   file <- input[[paste0("file_add_view_recipe_",rand_view())]]$name
-  #   ext <- file_ext(file)
-  #   filename <- paste0(nm_recipe,".",ext)
-  #   filepath <- input[[paste0("file_add_view_recipe_",rand_view())]]$datapath
-  #   
-  #   #check if the correct file type is selected then
-  #   if(!ext %in% img_ext){
-  #     output$txt_out_not_image_popup<-renderText({
-  #     validate("Please select an image.")
-  #     })
-  #   } else{
-  # 
-  #     #check on whether user has a dir
-  #     if(drive_find(user_id()) %>% nrow() == 0){
-  #       folder<-drive_mkdir(user_id())
-  #     } else{folder<-drive_get(user_id())}
-  #     
-  #       #check on whether there is an image in folder
-  #       if(nrow(drive_ls(path=user_id(),pattern=nm_recipe))>0){
-  #         #upload file
-  #         drive_upload(media = filepath, path = folder$id, name = filename)
-  #       } else{
-  #         #remove current img and upload new file
-  #         current_img_id<-drive_ls(user_id()) %>%
-  #           filter(str_detect(name,nm_recipe)) %>%
-  #           drive_rm()
-  #         #   pull(id)
-  #         # drive_rm(as_id(current_img_id))
-  #         drive_upload(media = filepath, path = folder$id, name = filename)
-  #       }
-  #     
-  #     #render image
-  #     #generate a unique ID for the output
-  #     img_output_id <- paste0("recipe_img",rand_view())
-  # 
-  #     # Render image
-  #     output[[img_output_id]]<-renderImage({
-  #       list(src=filepath, width="auto", height="400px")
-  #       }, deleteFile = FALSE)
-  #     
-  #   }
-  #     
-  # 
-  # })
+
   
 
   ### Display edit popups+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -828,7 +744,6 @@ server<-function(input,output,session){
   
   
   ## Ingredient info
-  # observeEvent(input$btn_update_ingred_popup,{
   observeEvent(input[[paste0("btn_update_ingred_popup_",rand_ingred())]],{
     req(input$edit_ingred_popup)
     
@@ -896,7 +811,7 @@ server<-function(input,output,session){
   ### Display user_id+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   # output$txt_out_user_id_recipe<-renderText({
   output$txt_out_user_id_recipe<-renderText({
-    HTML(paste0("user id: <b>",user_id(),"</b>"))
+    HTML(paste0("Current user: <b>",user_id(),"</b>"))
   })
   
   
@@ -932,27 +847,7 @@ server<-function(input,output,session){
     }
   })
   
-  
-  # ## Create reactive of recipe df joined with ingredient df (DELETE?)
-  # dt_df<-reactive({
-  #   #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
-  #   if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
-  #     tibble()
-  #   }
-  #   #but if there are data in each, then a combined table is made
-  #   else if(nrow(recipe$db)>0 & nrow(ingred$db)>0){
-  #     recipe$db %>%
-  #       left_join(ingred$db) %>%
-  #       unite(col="ingredient",n,size,name,sep=" ") %>%
-  #       mutate(ingredient=str_replace(ingredient,"(?<=[0-9]) (?=[0-9])","-")) %>%
-  #       group_by(recipe,appliance,protein) %>%
-  #       summarize(ingredients=toString(ingredient)) %>%
-  #       ungroup() 
-  #   }
-  # })
-  
-  
-  
+
   ## Display database as table
   output$recipe_db_recipe<-renderDT(
     dt_df() %>%
@@ -993,7 +888,6 @@ server<-function(input,output,session){
       dom="Bfrtip",
       pageLength=10,
       buttons=list(
-        # list(extend="excel",title="Grocery Assistant Database",filename="grocery_assistant"),
         list(extend="print",title="Grocery Assistant Database")
       )
     ),
@@ -1005,33 +899,16 @@ server<-function(input,output,session){
   ### View functionality++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## Add image to db
   observeEvent(input[[paste0("file_add_img_",rand_view())]],{
-  # observeEvent(input[[paste0("file_add_view_recipe_",recipe_view())]],{
-  # observeEvent(input$file_add_view_recipe,{
-    # req(input$view_button)
-    
-    # Grab correct info
-    # view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
-    # nm_recipe<-dt_df()[[view_row_recipe,"recipe"]] %>% tolower()
     
     #define objects
     file <- input[[paste0("file_add_img_",rand_view())]]$name
-    # file <- input[[paste0("file_add_view_recipe_",recipe_view())]]$name
-    # file <- input$file_add_view_recipe$name
     ext <- tools::file_ext(file)
     filename <- paste0(recipe_view(),".",ext)
-    # filename <- paste0(nm_recipe,".",ext)
-    # img_file_path(input[[paste0("file_add_view_recipe_",rand_view())]]$datapath)
-    # img_file_path(input[[paste0("file_add_view_recipe_",recipe_view())]]$datapath)
-    # img_file_path(input$file_add_view_recipe$datapath)
     filepath <- input[[paste0("file_add_img_",rand_view())]]$datapath
     
-    # img_file_path(filepath)
-    
-    
-    #check if the correct file type is selected then
+    #check if the correct file type is selected 
     if(!ext %in% img_ext){
       output[[paste0("txt_out_not_image_popup_",rand_view())]]<-renderText({
-      # output$txt_out_not_image_popup<-renderText({
       validate("Please select an image file.")
       })
     } else{
@@ -1043,66 +920,18 @@ server<-function(input,output,session){
       
         #check on whether there is an image in folder
         if(nrow(drive_ls(path=user_id(),pattern=recipe_view()))==0){
-        # if(nrow(drive_ls(path=user_id(),pattern=nm_recipe))>0){
           #upload file
           drive_upload(media = img_file_path(), path = folder$id, name = filename)
-          # drive_upload(media = filepath, path = folder$id, name = filename)
         } else{
           #remove current img and upload new file
-          # current_img_id<-
-            drive_ls(user_id()) %>%
+           drive_ls(user_id()) %>%
             filter(str_detect(name,recipe_view())) %>%
-            # filter(str_detect(name,nm_recipe)) %>%
             drive_rm()
-          #   pull(id)
-          # drive_rm(as_id(current_img_id))
-          drive_upload(media = img_file_path(), path = folder$id, name = filename)
-          # drive_upload(media = filepath, path = folder$id, name = filename)
+
+            drive_upload(media = img_file_path(), path = folder$id, name = filename)
         }
-      
-      # #render image
-      # #generate a unique ID for the output
-      # img_output_id <- paste0("recipe_img_",rand_view())
-      # 
-      # Render image
-      # output[[img_output_id]]<-renderImage({
-      #   list(src=filepath, width="auto", height="400px")
-      #   }, deleteFile = FALSE)
-      
     }
-    
-    # img_file_path("img/no_image.png")
-    
-    # delay(500,
-    #   img_file_path(character(0))
-    # )
   })
-  
-  
-  ## Render image
-  # output[[paste0("recipe_img_",rand_view())]]<-renderImage({
-  # # output$recipe_img<-renderImage({
-  #   list(src=img_file_path(), width="auto", height="400px")
-  #   }, deleteFile = FALSE)
-  
-  
-  # Render image
-  # output[[paste0("recipe_img",rand_view())]]<-renderImage({
-  #   if(checkImageExists(user_id=user_id(), recipe=recipe_view())) {
-  #     #call the retrieveImage function to get the file path
-  #     img_file_path(retrieveImage(user_id=user_id(), recipe=recipe_view()))
-  #     # file_path <- retrieveImage(user_id=user_id(), recipe=nm_view_recipe)
-  #     list(src = img_file_path(), width = "auto", height = "400px")
-  #     # list(src = file_path, width = "auto", height = "400px")
-  #   }
-  #   else{
-  #     list(src = "img/no_image.png", width = "auto", height = "400px")
-  #   }
-  # }, deleteFile=FALSE)
-  
-  
-  
-  
   
   
   
@@ -1291,7 +1120,7 @@ server<-function(input,output,session){
   #### Back-end=====================================================================================
   ### Display user_id
   output$txt_out_user_id_planner<-renderText({
-    HTML(paste0("user id: <b>",user_id(),"</b>"))
+    HTML(paste0("Current user: <b>",user_id(),"</b>"))
   })
   
   ### Display database as table
@@ -1395,7 +1224,7 @@ server<-function(input,output,session){
   #### Back-end=====================================================================================
   ### Display user_id
   output$txt_out_user_id_list<-renderText({
-    HTML(paste0("user id: <b>",user_id(),"</b>"))
+    HTML(paste0("Current user: <b>",user_id(),"</b>"))
   })
   
   
@@ -1662,7 +1491,7 @@ server<-function(input,output,session){
   #### Back-end=====================================================================================
   ### Display user_id
   output$txt_out_user_id_upload<-renderText({
-    HTML(paste0("user id: <b>",user_id(),"</b>"))
+    HTML(paste0("Current user: <b>",user_id(),"</b>"))
   })
   
   
@@ -1727,20 +1556,6 @@ server<-function(input,output,session){
         sum()==2
       
     second_check<-sum(second_check1,second_check2)==2
-      
-      
-    # n_recipe<-max(data_upload$id)==n_distinct(data_upload$recipe)
-    # data_upload %>%
-    #   group_by(recipe) %>%
-    #   summarize(n_app=n_distinct(appliance),
-    #             n_protein=n_distinct(protein)) %>%
-    #   ungroup() %>%
-    #   distinct(n_app,n_protein) %>%
-    #   .[1,] %>%
-    #   as.numeric() %>%
-    #   sum()==2 -> n_app_protein
-
-    # second_check<-sum(n_recipe,n_app_protein)==2
     }
 
     #prevents app from failing if incorrectly formatted file

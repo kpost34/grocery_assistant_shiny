@@ -77,9 +77,6 @@ ui<-f7Page(
                  buttonLabel= div(f7Icon("folder"),
                                   "Load database from file"),
                  width="100%"),
-          # f7Button(inputId="btn_load_db_main",
-          #          label=div(f7Icon("arrow_up_square"),
-          #                    "Load saved database (from file or app)")),
           br(),
           #set up user id for new/recurring users
           h3("Enter your user id to save/load your database from/to app"),
@@ -126,8 +123,7 @@ ui<-f7Page(
         # tableOutput("ingred_database"),
         
         #percentages help with different display sizes
-        style="margin-left: 1%; margin-right: 1%"
-        # style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 3%; margin-right: 3%"
       ),
 
       
@@ -179,13 +175,11 @@ ui<-f7Page(
                      label="Add more ingredients"),
             container="segment"
           ),
-          # br(),
           #right-aligns text
           p("Click outside sheet to return to main menu",style="text-align: right"),
           h2(strong(textOutput("txt_out_recipe_ingredSheet1"))),
           add_ingredients(n=4),
           br(),
-          # linebreaks(2),
           f7Button(inputId="btn_submit_recipe_ingred_ingredSheet1",
                    label="Submit recipe info & ingredients",
                    color="green")
@@ -201,16 +195,6 @@ ui<-f7Page(
         swipeToStep=TRUE,
         swipeHandler=FALSE,
         hiddenItems=tagList(
-          #use segment instead of splitLayout
-          # f7Segment(
-          #   f7Button(inputId="btn_return_recipe_ingredSheet2",
-          #            label="Return to recipe info",
-          #            color="purple"),
-          #   f7Button(inputId="btn_previous_ingred_ingredSheet2",
-          #            label="Previous ingredients"),
-          #   container="segment"
-          # ),
-          
           splitLayout( 
             f7Button(inputId="btn_previous_ingred_ingredSheet2",
                      label="Previous ingredients"),
@@ -256,13 +240,6 @@ ui<-f7Page(
           br(),
           f7Block(
             h3(strong(textOutput("txt_out_save_app_recipe"))),
-            # f7BlockTitle(title="Save a copy to app",size="medium"),
-            # f7Text(inputId="txt_sheet_nm_recipe",
-            #        #html used to get multiline label
-            #        label=HTML("Enter your name
-            #                   <br />
-            #                   (use <em>firstinitial_lastname</em>, e.g., k_post)"),
-            # ),
             uiOutput("ui_btn_save_db_recipe")
           )
         ),
@@ -270,8 +247,7 @@ ui<-f7Page(
         f7Button(inputId="btn_return_main_recipe",
                  label=div(f7Icon("return"),"Return to main menu"),
                  color="purple"),
-        style="margin-left: 1%; margin-right: 1%"
-        # style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 3%; margin-right: 3%"
       )
     ),
     
@@ -283,7 +259,6 @@ ui<-f7Page(
         #display user_id on all pages
         f7Align(
           htmlOutput("txt_out_user_id_planner"),
-          # strong(textOutput("txt_out_user_id_planner")),
           side="right"
         ),
         br(),
@@ -320,7 +295,6 @@ ui<-f7Page(
         #display user_id on all pages
         f7Align(
           htmlOutput("txt_out_user_id_list"),
-          # strong(textOutput("txt_out_user_id_list")),
           side="right"
         ),
         br(),
@@ -344,8 +318,6 @@ ui<-f7Page(
             f7BlockTitle(title="Email plan & list",size="medium"),
             f7Text(inputId="txt_email_address_list",
                    label="Recipient email address"),
-            # shinyFeedback::useShinyFeedback(),
-            # textOutput("warn_no_email_address_list"),
             f7Button(inputId="btn_planList_email_list",
                      label=div(f7Icon("envelope"),"Send email"))
           )
@@ -377,8 +349,7 @@ ui<-f7Page(
         f7Button(inputId="btn_return_main_list",
                  label=div(f7Icon("return"),"Return to main menu"),
                  color="purple"),
-        style="margin-left: 1%; margin-right: 1%"
-        # style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 3%; margin-right: 3%"
       )
     ),
     
@@ -393,7 +364,6 @@ ui<-f7Page(
         #display user_id on all pages
         f7Align(
           htmlOutput("txt_out_user_id_upload"),
-          # strong(textOutput("txt_out_user_id_upload")),
           side="right"
         ),
         strong(h2("Batch add recipes and their ingredients to database by file")),
@@ -407,7 +377,6 @@ ui<-f7Page(
         ),
         br(),
         "File should contain six columns:",
-          # tags$li(strong("id:"),"identifer: assign recipes numerically starting with 1"),
           tags$li(strong("recipe:"), "name of recipe"),
           tags$li(strong("appliance:"), "one or more of 'stove', 'oven', 'grill', 'broiler', 'slow cooker'; multiple
              appliances separated by a ', '"),
@@ -434,7 +403,6 @@ ui<-f7Page(
         br(),
         #5: preview uploaded data
         htmlOutput("ui_txt_preview_upload_upload"),
-        # h3("5) Preview upload"),
         DTOutput("file_upload_table"),
         textOutput("txt_warning_upload"),
         #6: confirm upload
@@ -449,8 +417,7 @@ ui<-f7Page(
                  label=div(f7Icon("return"),
                            "Return to main menu"),
                  color="purple"),
-        style="margin-left: 1%; margin-right: 1%"
-        # style="margin-left:100px; margin-right: 100px"
+        style="margin-left: 3%; margin-right: 3%"
       )
     )
   )
@@ -485,7 +452,6 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-# clean up annotations related to images (and other code)--wait to see if any needed
 # go into google drive of associated google account and clean up sheets and images
 
 
@@ -496,5 +462,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# added "user id: " before each user_id() and made the latter bold using HTML
+# made margins slightly narrower--from 1% to 3%
+# removed all extraneous annotations
+# chnged "user_id:" to "Current user:"
+# removed additional inputs & outputs when app reset is confirmed
 
