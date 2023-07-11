@@ -140,7 +140,7 @@ server<-function(input,output,session){
   
   ### user_id reactiveVal
   ## Initialize reactiveVal
-  user_id<-reactiveVal()
+  user_id<-reactiveVal(character())
   
   
   ## Set up reactive for correct name entered
@@ -214,6 +214,30 @@ server<-function(input,output,session){
     #update user_id() to t_mode when using pre-loaded data
     user_id("t_mode")
     
+    #makes uplaoded_file() empty
+    uploaded_file(tibble())
+    
+    #removes UI input associated with confirming file upload
+    removeUI(selector="#btn_confirm_upload_upload")
+    
+    #removes text associated with uploading file
+    output$ui_txt_preview_upload_upload<-renderText({
+      ""
+    })
+    
+    output$txt_warning_upload<-renderText({
+      ""
+    })
+    
+    output$ui_txt_confirm_upload_upload<-renderText({
+      ""
+    })
+    
+    output$ui_txt_another_upload_upload<-renderText({
+      ""
+    })
+    
+    
   })
   
   
@@ -245,7 +269,7 @@ server<-function(input,output,session){
     uploaded_file(tibble())
     
     #removes UI input associated with confirming file upload
-    removeUI(selector="#ui_btn_confirm_upload_upload")
+    removeUI(selector="#btn_confirm_upload_upload")
     
     #removes text associated with uploading file
     output$ui_txt_preview_upload_upload<-renderText({
@@ -1420,6 +1444,8 @@ server<-function(input,output,session){
   #### UI===========================================================================================
   ### Display text and button programmatically
   observeEvent(input$file_upload_recipe_upload, {
+    req(user_id()!="t_mode")
+    
     #preview upload text
     output$ui_txt_preview_upload_upload<-renderUI({
       HTML("<H3>5) Preview upload</H3>")
@@ -1520,7 +1546,9 @@ server<-function(input,output,session){
   
   ## Read in uploaded file 
   observeEvent(input$file_upload_recipe_upload,{
-    req(input$file_upload_recipe_upload)
+    req(input$file_upload_recipe_upload)  
+    req(user_id()!="t_mode")
+          
     
     ext<-tools::file_ext(input$file_upload_recipe_upload$name)
     switch(ext,

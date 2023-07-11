@@ -450,9 +450,14 @@ ui<-f7Page(
 # STYLING
 # bslib or other styling
 
+# MUCH LATER
+# if user chooses "t_mode" then an error is returned and a message to use pre-loaded data button
+
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
 # go into google drive of associated google account and clean up sheets and images
+# styling--perhaps some banner when test_mode is running
+# downgrade image quality to get pics to load quicker
 
 
 
@@ -462,8 +467,9 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# made margins slightly narrower--from 1% to 3%
-# removed all extraneous annotations
-# chnged "user_id:" to "Current user:"
-# removed additional inputs & outputs when app reset is confirmed
+# fixed issue where resting app prevented user from adding recipes to their db
+# add nuance such that if a user selects a valid user_id and batch uploads recipes, then switches
+  #to pre-loaded data (aka t_mode) then #5 and #6 (and their associated inputs/outputs) disappear
+# app now designed such that user cannot select pre-loaded data and even preview data if they
+  #batch upload
 
