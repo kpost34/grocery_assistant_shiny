@@ -447,18 +447,24 @@ ui<-f7Page(
   #added to db after confirm? (this would speed up processing as it would separate steps)
 
 
-# STYLING
-# bslib or other styling
-
 # MUCH LATER
 # if user chooses "t_mode" then an error is returned and a message to use pre-loaded data button
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-# go into google drive of associated google account and clean up sheets and images
-# styling--perhaps some banner when test_mode is running
-# downgrade image quality to get pics to load quicker
+#1) Working on now...
+  #Want user to add recipes, load db from file, and save db to file (and create meal plans) 
+    #without a user_id--but right now can't batch upload recipes.
+    #try fixing by 1. seeding user_id (perhaps with character(0)) then adding this to a few
+      #req()s such that length(user_id()>0 & user_id()!="t_mode") but unsure if
+    #seeding with character(0) will cause problems
+###UPDATE--it is null to start (by default) so logic could be !is.null() & !="t_mode"
 
+#2) go into google drive of associated google account and clean up sheets and images
+
+#3) downgrade image quality to get pics to load quicker
+
+#4) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
 
 
@@ -467,9 +473,11 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# fixed issue where resting app prevented user from adding recipes to their db
-# add nuance such that if a user selects a valid user_id and batch uploads recipes, then switches
-  #to pre-loaded data (aka t_mode) then #5 and #6 (and their associated inputs/outputs) disappear
-# app now designed such that user cannot select pre-loaded data and even preview data if they
-  #batch upload
+# initialized user_id() with NA_character_ and added is.na() logic to req() so that
+  #an 'id-less' user can add recipes by file
+# reset user_id() to NA_character_ (instead of character()) after reseting app to continue
+  #functionality
+# fixed unexpected issue where batch-upload confirm button would appear after batch-uploading
+  #then manual uploading (whether without user_id or with custom user_id)
+# combined observeEvents and improved dialog-displaying logic of manual recipe/ingred entry
 

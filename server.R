@@ -53,6 +53,7 @@ server<-function(input,output,session){
   observeEvent(user_id(),{
     #user_id is from a user and not test mode
     req(user_id()!="t_mode")
+    
     output$ui_btn_load_sheet_main<-renderUI({
       f7Button(inputId="btn_load_sheet_main",
                label=div(f7Icon("arrow_up_square"),
@@ -113,6 +114,7 @@ server<-function(input,output,session){
   ## Confirm dialog, load file, & display toast notification
   observeEvent(input$dialog_confirm_file_load_db,{
     req(input$dialog_confirm_file_load_db)
+    
     #save db as temporary DF
     ext<-tools::file_ext(input$file_load_file_main$name)
     tmpDF<-switch(ext,
@@ -120,13 +122,16 @@ server<-function(input,output,session){
       xls = read_xls(input$file_load_file_main$datapath),
       xlsx = read_xlsx(input$file_load_file_main$datapath)
     ) 
+    
     #split into two reactiveValues
     recipe$db<-tmpDF %>% select(recipe,appliance,protein) %>%
       distinct()
     ingred$db<-tmpDF %>% select(recipe,name,size,n)
+    
     #assign RVs of list as NULL DFs
     recipe$list<-tibble()
     ingred$list<-tibble()
+    
     #display toast notification
     f7Toast(
       text="Database loaded from file",
@@ -140,7 +145,7 @@ server<-function(input,output,session){
   
   ### user_id reactiveVal
   ## Initialize reactiveVal
-  user_id<-reactiveVal(character())
+  user_id<-reactiveVal(NA_character_)
   
   
   ## Set up reactive for correct name entered
@@ -252,7 +257,7 @@ server<-function(input,output,session){
     ingred$list<-tibble()
     
     #resets user_id
-    user_id(character())
+    user_id(NA_character_)
     
     #removes UI input to load database
     removeUI(selector="#btn_load_sheet_main")
@@ -354,11 +359,12 @@ server<-function(input,output,session){
   })
   
   ## Confirm submission of manual addition of recipe/ingredient info
-  # Display alert modal/dialog if recipe info is absent 
+  # Display alert modal/dialog if ingredient info is missing & confirm if present
   observeEvent(eventExpr={
     input$btn_submit_recipe_ingred_ingredSheet1|
     input$btn_submit_recipe_ingred_ingredSheet2
     }, {
+      
     #condition: recipe info must all be present; otherwise alert given
     if(sum(map(
       c(input$txt_recipe_recipeSheet,
@@ -371,90 +377,69 @@ server<-function(input,output,session){
         type="alert",
         text="Please enter all recipe information before submitting to database.")
       }
-  },
-  ignoreInit=TRUE)
-  
-  
-  # Display alert modal/dialog if ingredient info is missing
-  observeEvent(eventExpr={
-    input$btn_submit_recipe_ingred_ingredSheet1|
-    input$btn_submit_recipe_ingred_ingredSheet2
-    }, {
-    #recipe check necessary (so that only one dialog displayed)
-    req(sum(map(
-      c(input$txt_recipe_recipeSheet,
-        input$chkGrp_app_recipeSheet,
-        input$chkGrp_protein_recipeSheet),
-      nchar)>0)==3)
-    #condition needed
-    if(1:8 %>%
-      map_lgl(function(x){
-        #populates tibble rows if ingredient name & size have 1+ chr
-        nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
-        nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0
-      }) %>%
-      sum(.)==0)
+
+      else{
+        new_ingreds<-1:8 %>%
+          map_df(function(x){
+            tibble(
+              #populates tibble rows if ingredient name & size have 1+ chr
+              nm_pres=nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0,
+              size_pres=nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0,
+              none_pres=sum(nm_pres,size_pres)==0,
+              one_pres=sum(nm_pres,size_pres)==1,
+              both_pres=sum(nm_pres,size_pres)==2
+            )
+          }) 
+        
+        #condition: if all info missing or if any info missing for one ingred -> alert dialog
+        if(any(new_ingreds$one_pres)|all(!new_ingreds$both_pres)) {
           f7Dialog(
             id="dialog_alert_manual_ingred_add",
             title="Invalid entry",
             type="alert",
             text="Please enter all information for at least one ingredient before submitting to database.")
-    },
+          }
+      
+          #condition: all ingred info present -> confirm dialog
+          else if(all(!new_ingreds$one_pres) & any(new_ingreds$both_pres)) {
+            f7Dialog(
+              id="dialog_confirm_manual_add",
+              title="Confirm submission",
+              type="confirm",
+              text="Click OK to submit recipe and ingredient information.")
+          }
+        }
+      },
   ignoreInit=TRUE)
   
-  
-  
-  # Display confirm modal/dialog
-  #both submit buttons in {} for observeEvent to listen to them
-  observeEvent(eventExpr={
-    input$btn_submit_recipe_ingred_ingredSheet1|
-    input$btn_submit_recipe_ingred_ingredSheet2
-    }, {
-    req(sum(map(
-      c(input$txt_recipe_recipeSheet,
-        input$chkGrp_app_recipeSheet,
-        input$chkGrp_protein_recipeSheet),
-      nchar)>0)==3)
-    req(1:8 %>%
-      map_lgl(function(x){
-        #populates tibble rows if ingredient name & size have 1+ chr
-        nchar(input[[paste0("txt_ingred",x,"_nm_ingredSheets")]])>0 &
-        nchar(input[[paste0("txt_ingred",x,"_size_ingredSheets")]])>0
-      }) %>%
-        sum(.)>0)
-    f7Dialog(
-      id="dialog_confirm_manual_add",
-      title="Confirm submission",
-      type="confirm",
-      text="Click OK to submit recipe and ingredient information."
-    )
-  },
-  ignoreInit=TRUE)
   
   # Display toast notification & reset values after confirming submission
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
+    
+    #toast notification
     f7Toast(
       text=paste(input$txt_recipe_recipeSheet,"added to database"),
       position="center",
       closeButton=FALSE,
       closeTimeout=2500
     )
-    # Recipe sheet
+    
+    # Recipe sheet (reset values)
     #delay used because dialog confirm triggers eventReactive (moves data to db) and observeEvent
       #(clears values)
     delay(1000,
-          updateF7Text(inputId="txt_recipe_recipeSheet",
-                       value=character(0))
+      updateF7Text(inputId="txt_recipe_recipeSheet",
+                   value=character(0))
     )
     
     c("chkGrp_app_recipeSheet","chkGrp_protein_recipeSheet") %>%
       map(function(x){
         delay(1000,
-              updateF7Checkbox(x,value=character(0)))
+          updateF7Checkbox(x,value=character(0)))
       })
     
-    # Ingred sheets
+    # Ingred sheets (reset values)
     c(
       paste0("txt_ingred",1:8,"_nm_ingredSheets"),
       paste0("txt_ingred",1:8,"_size_ingredSheets"),
@@ -470,6 +455,10 @@ server<-function(input,output,session){
                 updateF7Stepper(inputId=x,value=1))
         }
       })
+    
+    #remove confirm btn for batch uploads (which unexpectedly appears & uploaded_file() rv)
+    reactiveVal(tibble())
+    removeUI(selector="#btn_confirm_upload_upload")
   })
   
   
@@ -503,33 +492,30 @@ server<-function(input,output,session){
   
   
   #### Back-end=====================================================================================
-  ### Temp recipe info
-  ## Submit recipe info (after confirming in dialog)
+  ### Recipe info: add new recipe to temp list and db 
   observeEvent(input$dialog_confirm_manual_add, {
     req(input$dialog_confirm_manual_add)
+    
+    #add to temp list
     recipe$tmp<-tibble(
       recipe=input$txt_recipe_recipeSheet,
       appliance=toString(sort(input$chkGrp_app_recipeSheet)),
       protein=toString(sort(input$chkGrp_protein_recipeSheet))
     )
+    
+    #add to db
+    delay(200,
+      recipe$db<-bind_rows(recipe$db,recipe$tmp)
+    )
+
   })
   
   
-  ### Recipe database info
-  ## Add new recipe to database
+  ### Ingredient info: add ingreds of new recipe to temp list and db 
   observeEvent(input$dialog_confirm_manual_add,{
     req(input$dialog_confirm_manual_add)
-    # newrows<-recipe_tmpDF()
-    recipe$db<-bind_rows(recipe$db,recipe$tmp)
-    }
-  )
-  
-
-  
-  ### Temp ingredient info
-  ## Submit ingredient info
-  observeEvent(input$dialog_confirm_manual_add,{
-    req(input$dialog_confirm_manual_add)
+    
+    #add to temp list
     1:8 %>%
       map_df(function(x){
         #populates tibble rows if ingredient name & size have 1+ chr
@@ -544,19 +530,13 @@ server<-function(input,output,session){
           )
         } else {NULL}
         }) -> ingred$tmp
+    
+    #add to db
+    delay(200,
+      ingred$db<-bind_rows(ingred$db,ingred$tmp)
+    )
     }
   )
-  
-  
-  
-  ### Ingredient database info
-  ## Add ingredients from new recipe to database
-  observeEvent(input$dialog_confirm_manual_add,{
-    req(input$dialog_confirm_manual_add)
-    ingred$db<-bind_rows(ingred$db,ingred$tmp)
-    }
-  )
-  
   
 
 
@@ -1444,7 +1424,7 @@ server<-function(input,output,session){
   #### UI===========================================================================================
   ### Display text and button programmatically
   observeEvent(input$file_upload_recipe_upload, {
-    req(user_id()!="t_mode")
+    req(is.na(user_id())|user_id()!="t_mode")
     
     #preview upload text
     output$ui_txt_preview_upload_upload<-renderUI({
@@ -1547,7 +1527,8 @@ server<-function(input,output,session){
   ## Read in uploaded file 
   observeEvent(input$file_upload_recipe_upload,{
     req(input$file_upload_recipe_upload)  
-    req(user_id()!="t_mode")
+    req(is.na(user_id())|user_id()!="t_mode")
+    # req(user_id()!="t_mode")
           
     
     ext<-tools::file_ext(input$file_upload_recipe_upload$name)
