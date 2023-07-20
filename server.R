@@ -9,6 +9,40 @@ server<-function(input,output,session){
   
   ##### Main Tab####################################################################################
   #### UI===========================================================================================
+  ### Header buttons
+  ## Developer info
+  # Create urls for links
+  url_repo <- a("GitHub repo",
+                href="https://github.com/kpost34/grocery_assistant_shiny")
+  
+  url_profile <- a("GitHub Profile",
+                   href="https://github.com/kpost34")
+  
+  url_linkedin <- a("LinkedIn",
+                    href = "https://www.linkedin.com/in/keith-post")
+  
+  # Display popup with developer info
+  observeEvent(input$btn_dev_info_main, {
+    f7Popup(
+      id="popup_display_dev_info",
+      title=HTML("<h1>Developer info</h1>"),
+      #create text and links using tagList()
+      tagList(tags$h2("Keith Post"),
+              tags$h3("If you would like to see the code for this Shiny app, please visit the",
+                      url_repo,
+                      "for this project."),
+              tags$br(),
+              tags$h3("Also check out..."),
+              tags$h3(url_profile),
+              tags$h3(url_linkedin)
+      )
+    )
+  })
+  
+  
+  
+  
+  
   ### Main menu buttons
   ## Display recipe sheet
   observeEvent(input$btn_add1_recipe_main, {
@@ -1151,18 +1185,23 @@ server<-function(input,output,session){
   
   ### Add item to meal plan--updates recipes and ingredients--and display toast notification
   observeEvent(input$add_button,{
+    
     #recipe & ingreds added to meal plan
     added_row<-as.numeric(strsplit(input$add_button,"_")[[1]][2])
+    
     #new recipe name
     recipe_nm<-dt_df()[[added_row,"recipe"]]
+    
     #new ingredients that will be added to list
     ingreds<-ingred$db %>% 
       filter(recipe==recipe_nm) %>%
       select(-recipe) 
+    
     #add ingredients to list
     ingred$list<-bind_rows(ingred$list,ingreds) %>%
       group_by(name,size) %>%
       summarize(n=sum(n) %>% ceiling)
+    
     #new recipe added to list
     recipe_new<-as_tibble_col(recipe_nm,column_name="recipe")
     recipe$list<-bind_rows(recipe$list,recipe_new)
@@ -1411,6 +1450,7 @@ server<-function(input,output,session){
   ### Reset plan and list
   observeEvent(input$dialog_confirm_reset_planList_list,{
     req(input$dialog_confirm_reset_planList_list)
+    
     recipe$list<-tibble()
     ingred$list<-tibble()
   })
@@ -1528,7 +1568,6 @@ server<-function(input,output,session){
   observeEvent(input$file_upload_recipe_upload,{
     req(input$file_upload_recipe_upload)  
     req(is.na(user_id())|user_id()!="t_mode")
-    # req(user_id()!="t_mode")
           
     
     ext<-tools::file_ext(input$file_upload_recipe_upload$name)
@@ -1593,14 +1632,17 @@ server<-function(input,output,session){
   
   ### Add uploaded files to database & clear uploaded_file()
   observeEvent(input$btn_confirm_upload_upload,{
+    
     #adding to db
     recipe$db<-uploaded_file() %>%
       select(recipe:protein) %>%
       distinct() %>%
       bind_rows(recipe$db)
+    
     ingred$db<-uploaded_file() %>%
       select(recipe,name:n) %>%
       bind_rows(ingred$db)
+    
     #clearing DF
     delay(100,
       uploaded_file(tibble())

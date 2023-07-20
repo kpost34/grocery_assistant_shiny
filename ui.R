@@ -39,7 +39,20 @@ ui<-f7Page(
     f7Tab(title="Main",
           tabName="main_tab",
           hidden=TRUE,
+  
       div( #to create margins
+        #developer info & instructions buttons
+        splitLayout(cellWidths=c("10%","75%","15%"),
+          f7Button(inputId="btn_dev_info_main",
+                   label=f7Icon("info_circle"),
+                   color="deeppurple"),
+          br(),
+          f7Button(inputId="btn_instructions_main",
+                   label=f7Icon("book_fill"),
+                   color="deeppurple")
+          ),
+          br(),
+        #opening text
         strong(h2("Welcome to the Grocery Assistant App!")),
         h4("This application will help you develop a database of recipes, choose weekly menus,
            and generate shopping lists. New features will be added periodically and listed here
@@ -419,6 +432,19 @@ ui<-f7Page(
                  color="purple"),
         style="margin-left: 3%; margin-right: 3%"
       )
+    ),
+    
+    
+    ##### Upload Files to Database==================================================================
+    f7Tab(title="App instructions",
+          tabName="instructions_tab",
+          hidden=TRUE,
+      div(
+        h2("Overview"),
+        
+        
+        style="margin-left: 3%; margin-right: 3%"
+      )
     )
   )
 )
@@ -448,36 +474,25 @@ ui<-f7Page(
 
 
 # MUCH LATER
-# if user chooses "t_mode" then an error is returned and a message to use pre-loaded data button
+# embed dish image in DT as thumbnail which can enlarge when user clicks on it
+#slide show of dishe images--hint: use image_animate() from {magick}
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-#1) Working on now...
-  #Want user to add recipes, load db from file, and save db to file (and create meal plans) 
-    #without a user_id--but right now can't batch upload recipes.
-    #try fixing by 1. seeding user_id (perhaps with character(0)) then adding this to a few
-      #req()s such that length(user_id()>0 & user_id()!="t_mode") but unsure if
-    #seeding with character(0) will cause problems
-###UPDATE--it is null to start (by default) so logic could be !is.null() & !="t_mode"
+#1) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
 
-#2) go into google drive of associated google account and clean up sheets and images
+#2) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
-#3) downgrade image quality to get pics to load quicker
+#3) documentation: developer info & instructions--add instructions as accordions?
+#next: need to put into an accordion form with subtitles
 
-#4) general work on UI/UX--styling--perhaps some banner when test_mode is running
-
-
+#4) remove ability to update images in test mode (or without user_id)??
 
 # DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# initialized user_id() with NA_character_ and added is.na() logic to req() so that
-  #an 'id-less' user can add recipes by file
-# reset user_id() to NA_character_ (instead of character()) after reseting app to continue
-  #functionality
-# fixed unexpected issue where batch-upload confirm button would appear after batch-uploading
-  #then manual uploading (whether without user_id or with custom user_id)
-# combined observeEvents and improved dialog-displaying logic of manual recipe/ingred entry
+# developed a popup of developer info
+# wrote rough drafts of the information for an instructions page
 
