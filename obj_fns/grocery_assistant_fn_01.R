@@ -6,6 +6,28 @@
 linebreaks <- function(n){HTML(strrep(br(), n))}
 
 
+
+### Create block of accordion inputs
+add_accordions <- function(list_input) {
+  purrr::imap(list_input,function(x,y) {
+    f7AccordionItem(
+      title=em(y),
+      div(
+        x,
+        linebreaks(2),
+        style="margin-left: 2%; margin-right: 2%"
+      )
+    )
+  })
+}
+
+
+list_example <- list(planner_list_txt) %>%
+  set_names("Plan meals and build a grocery list")
+
+
+
+
 ### Create blocks of ingredients
 add_ingredients<-function(n_prev=0,n) {
   
@@ -133,6 +155,9 @@ edit_ingred_info<-function(df,id){
 }
 
 
+
+
+#### Server Functions===============================================================================
 ### Create inputs programmatically
 shinyInput <- function(FUN, len, id, ...) {
   inputs <- character(len)
@@ -141,7 +166,6 @@ shinyInput <- function(FUN, len, id, ...) {
   }
   inputs
 }
-
 
 
 ### Check whether an image exists

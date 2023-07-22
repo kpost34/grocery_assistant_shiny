@@ -231,6 +231,61 @@ ui<-f7Page(
       )
     ),
     
+    
+    ##### Application Instructions==================================================================
+    f7Tab(title="App instructions",
+          tabName="instruct_tab",
+          hidden=TRUE,
+      #div is to set up margins
+      div(
+        h2("How to use the Grocery Assistant App"),
+        #build out UI using accordions
+        f7Accordion(
+          multiCollapse=TRUE,
+          inputId="overview_accord",
+          f7AccordionItem(
+            title=em("Overview"),
+            div(
+              objective_txt,
+              linebreaks(2),
+              style="margin-left: 2%; margin-right: 2%"
+            )
+          )
+        ),
+        
+        h3("How to..."),
+        f7Accordion(
+          multiCollapse=TRUE,
+          inputId="howto_accord",
+          f7AccordionItem(
+            title=em("Add recipes"),
+            div(
+              recipe_add_intro_txt,
+              linebreaks(2),
+              f7Block(
+                f7BlockHeader(strong("Manually")),
+                recipe_add_manual_txt
+              ),
+              br(),
+              f7Block(
+                f7BlockHeader(strong("By file")),
+                recipe_add_file_txt
+              ),
+            linebreaks(2),
+            style="margin-left: 2%; margin-right: 2%"
+            )
+          ),
+          #programmatically add list of accordiions
+          add_accordions(list_instruct)
+        ),
+        linebreaks(2),
+        f7Button(inputId="btn_return_main_instruct",
+                 label=div(f7Icon("return"),"Return to main menu"),
+                 color="purple"),
+        style="margin-left: 10%; margin-right: 10%"
+      )
+    ),
+    
     ##### View/Edit/Delete/Save Recipes=============================================================
     ### Page associated with recipe browser
     f7Tab(title="Recipes",
@@ -432,19 +487,6 @@ ui<-f7Page(
                  color="purple"),
         style="margin-left: 3%; margin-right: 3%"
       )
-    ),
-    
-    
-    ##### Upload Files to Database==================================================================
-    f7Tab(title="App instructions",
-          tabName="instructions_tab",
-          hidden=TRUE,
-      div(
-        h2("Overview"),
-        
-        
-        style="margin-left: 3%; margin-right: 3%"
-      )
     )
   )
 )
@@ -475,7 +517,8 @@ ui<-f7Page(
 
 # MUCH LATER
 # embed dish image in DT as thumbnail which can enlarge when user clicks on it
-#slide show of dishe images--hint: use image_animate() from {magick}
+# slide show of dishe images--hint: use image_animate() from {magick}
+# formatting of instructions--e.g., bullets
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -483,16 +526,15 @@ ui<-f7Page(
 
 #2) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
-#3) documentation: developer info & instructions--add instructions as accordions?
-#next: need to put into an accordion form with subtitles
+#3) remove ability to update images in test mode (or without user_id)??
 
-#4) remove ability to update images in test mode (or without user_id)??
 
 # DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# developed a popup of developer info
-# wrote rough drafts of the information for an instructions page
+# created instructions tab
+# added buttons to go between main tab and instructions tab
+# programmatically built out UI of instructions tab using accordions
 

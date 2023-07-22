@@ -40,6 +40,10 @@ server<-function(input,output,session){
   })
   
   
+  ## Instructions
+  observeEvent(input$btn_instructions_main, {
+    updateF7Tabs(id="main_tabset",selected="instruct_tab")
+  })
   
   
   
@@ -358,8 +362,22 @@ server<-function(input,output,session){
   # })
 
   
+  ##### Application Instructions ###################################################################
+  #### UI===========================================================================================
+  ### Return to main menu
+  observeEvent(input$btn_return_main_instruct,{
+    updateF7Tabs(id="main_tabset",selected="main_tab")
+  })
   
   
+  ### Back-end======================================================================================
+  observe({
+    print(
+      list(
+        overview_accord = input$overview_accord
+      )
+    )
+  })
   
   
   ##### Manual Data Sheets##########################################################################
@@ -1648,6 +1666,7 @@ server<-function(input,output,session){
       uploaded_file(tibble())
     )
   })
+  
 
 }
 

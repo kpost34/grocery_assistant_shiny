@@ -188,7 +188,7 @@ as a csv file using `View/Edit/Delete/Save Recipes` -> 'Download a Copy', then s
 database browser, your dishes and associated ingredients should be in the table."
 
 
-## User Id mode
+## Engage in user id mode
 user_id_txt <- "The Grocery Assistant App is designed to with and without a user id. If operating 
 anonymously, a user can add recipes (via info sheets or file), edit recipe and ingredient info,
 delete dishes, save a copy of the database (via file download), build meal plans and grocery
@@ -228,6 +228,21 @@ reset_txt <- "To reset the recipes loaded into the app, the meal plan, and the u
 'Reset App' and confirm. Note that this does not delete information saved to the app."
 
 
+### Put together objects
+## Develop vector of names
+nm_instruct <- c("View, edit, save, and delete recipes",
+                 "Plan meals & build a grocery list",
+                 "Load database from file",
+                 "Engage in user id mode",
+                 "Save and load database from app",
+                 "Test app with pre-loaded data",
+                 "Reset app")
+
+### Develop list of character vectors with names
+
+list_instruct <- list(recipe_browser_txt,planner_list_txt,file_load_db_txt,user_id_txt,
+                      app_save_load_txt,preload_txt,reset_txt) %>%
+  set_names(nm_instruct)
 
 
 
