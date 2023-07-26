@@ -3,7 +3,8 @@
 
 #load packages
 pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,kableExtra,
-               shinyscreenshot,mailR,htmlTable,readxl,googledrive,gargle,googlesheets4)
+               shinyscreenshot,mailR,htmlTable,readxl,googledrive,gargle,googlesheets4,
+               magick)
 
 
 
@@ -522,19 +523,57 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-#1) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
+##1) fine-tune the recipe images--no viewing when no user id (update cancelOutput/req
+  #code) and viewing but no updating when in t_mode
 
-#2) general work on UI/UX--styling--perhaps some banner when test_mode is running
+#2) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
 
-#3) remove ability to update images in test mode (or without user_id)??
+#3) general work on UI/UX--styling--perhaps some banner when test_mode is running
+
 
 
 # DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
+
+
+
+# library(magick)
+# tiger <- image_read_svg('http://jeroen.github.io/images/tiger.svg', width = 350)
+# tiger_lowfi <- image_read('http://jeroen.github.io/images/tiger.svg', density = "20 x 20")
+# print(tiger)
+# print(tiger_lowfi)
+# 
+# image_write(tiger,here("img","tiger.svg"),quality=100)
+# image_write(tiger,here("img","tiger_lofi.jpg"),quality=75)
+# tiger_lowfi_jpg <- image_read(here("img","tiger_lofi.jpg"))
+# print(tiger_lowfi_jpg)
+# 
+# object.size(tiger) #296 bytes
+# 
+# 
+# pot_roast <- image_read(here("img","pot roast.png"))
+# print(pot_roast)
+# 
+# image_convert(pot_roast,format="jpg") %>%
+#   image_write(here("img","pot_roast_convert.jpg"),quality=50)
+# 
+# pot_roast_jpg <- image_read(here("img","pot_roast_convert.jpg"))
+# print(pot_roast_jpg)
+# 
+# image_write(pot_roast_jpg,here("img","pot_roast_jpg.jpg"))
+# 
+# file_ext("williamstown-1057646.jpg")
+# 
+# 
+# if(file_ext(image) !="jpg") {
+#   image_convert(image,format="jpg") 
+# }
+
+
+
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# created instructions tab
-# added buttons to go between main tab and instructions tab
-# programmatically built out UI of instructions tab using accordions
+# removed ability to view (and thus add) recipe images when not in user_mode or t_mode
+# fixed warning/error caused by unnecessary delay()s used when manually adding recipes
 

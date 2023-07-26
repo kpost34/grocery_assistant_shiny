@@ -418,7 +418,7 @@ server<-function(input,output,session){
     }, {
       
     #condition: recipe info must all be present; otherwise alert given
-    if(sum(map(
+    if(sum(purrr::map(
       c(input$txt_recipe_recipeSheet,
         input$chkGrp_app_recipeSheet,
         input$chkGrp_protein_recipeSheet),
@@ -508,8 +508,8 @@ server<-function(input,output,session){
         }
       })
     
-    #remove confirm btn for batch uploads (which unexpectedly appears & uploaded_file() rv)
-    reactiveVal(tibble())
+    #remove confirm btn for batch uploads (which unexpectedly appears) & uploaded_file() rv
+    uploaded_file(tibble())
     removeUI(selector="#btn_confirm_upload_upload")
   })
   
@@ -556,9 +556,7 @@ server<-function(input,output,session){
     )
     
     #add to db
-    delay(200,
-      recipe$db<-bind_rows(recipe$db,recipe$tmp)
-    )
+    recipe$db<-bind_rows(recipe$db,recipe$tmp)
 
   })
   
@@ -584,9 +582,7 @@ server<-function(input,output,session){
         }) -> ingred$tmp
     
     #add to db
-    delay(200,
-      ingred$db<-bind_rows(ingred$db,ingred$tmp)
-    )
+    ingred$db<-bind_rows(ingred$db,ingred$tmp)
     }
   )
   
@@ -625,6 +621,9 @@ server<-function(input,output,session){
   
   ## Display view image popup
   observeEvent(input$view_button,{
+    
+    #prevents app from failing if no user_id or user_id = "t_mode"
+    req(!is.na(user_id()) & user_id()!="t_mode",cancelOutput=TRUE)
     
     # Grab correct info
     view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
