@@ -189,17 +189,18 @@ database browser, your dishes and associated ingredients should be in the table.
 
 
 ## Engage in user id mode
-user_id_txt <- "The Grocery Assistant App is designed to with and without a user id. If operating 
+user_id_txt <- "The Grocery Assistant App is designed to use with or without a user id. If operating 
 anonymously, a user can add recipes (via info sheets or file), edit recipe and ingredient info,
 delete dishes, save a copy of the database (via file download), build meal plans and grocery
 lists, and communicate them in multiple ways (e.g., screenshot, email, pdf). If the user wants
-to maintain a database is this manner, they would need to remember to save a copy of their
-database each time before exiting and load it at the start of session.
+to maintain a database in this manner, they would need to remember to save a copy of their
+database each time before exiting and load it at the start of session. Please note that without
+a user id, dish images are disabled.
 
-However, with the user id mode, all the above features are available PLUS the user can save/load
-the database directly to/from the app (see below). A user id is simply '[firstinitial]_[lastname]'.
-Enter this in the field on the main page, and click `Submit User Id`. It will now appear as 
-'Current User' on the main page as well as many pages of the app."
+However, with the user id mode, all the above features are available PLUS the user can view and
+update recipe images and save/load the database directly to/from the app (see below). A user id is 
+simply '[firstinitial]_[lastname]'. Enter this in the field on the main page, and click `Submit 
+User Id`. It will now appear as 'Current User' on the main page as well as many pages of the app."
 
 ## Save/load database from app
 app_save_load_txt <- "As explained above, one convenient feature of this app is the ability to save 
@@ -218,9 +219,10 @@ the blue 'Load Database from App' button will appear. Simply click it and confir
 preload_txt <- "To test the app without having to manually enter information, select 'Test App with
 Pre-Loaded Data' from the main menu and confirm the entry. Now the current user becomes 'test mode',
 which is displayed as 't_mode' in the app. Three recipes have been loaded, which can be found in
-the 'View/Edit/Delete/Save Recipes` page. Specifically, an image of each dish can be viewed (and
-replaced), recipe and ingredient information can be modified, and the dish can be deleted. A copy
-of the recipes "
+the 'View/Edit/Delete/Save Recipes` page. Specifically, an image of each dish can be viewed (but not
+replaced), recipe and ingredient information can be modified, and the dish can be deleted. No 
+changes are permanent, and the user does not have the ability to save or load data for 't_mode'
+to/from the app. However, a copy of 't_mode's' database can be downloaded."
 
 
 ## Reset app

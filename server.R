@@ -623,7 +623,7 @@ server<-function(input,output,session){
   observeEvent(input$view_button,{
     
     #prevents app from failing if no user_id or user_id = "t_mode"
-    req(!is.na(user_id()) & user_id()!="t_mode",cancelOutput=TRUE)
+    req(!is.na(user_id()),cancelOutput=TRUE)
     
     # Grab correct info
     view_row_recipe<-as.numeric(strsplit(input$view_button,"_")[[1]][2])
@@ -632,6 +632,11 @@ server<-function(input,output,session){
     
     # Seed rand_view()
     rand_view(sample(1000,1))
+    
+    # Check on whether user has a dir & make one if absent
+    if(drive_find(user_id()) %>% nrow() == 0){
+      drive_mkdir(user_id())
+    }
     
     # Generate a unique ID for the output
     img_output_id <- paste0("recipe_img_",rand_view())
@@ -664,11 +669,16 @@ server<-function(input,output,session){
     f7Popup(
       id="popup_id",
       title=HTML(paste0("<H2>",str_to_sentence(recipe_view()),"</H2>")),
-      f7File(inputId=view_btn_id,
-             label="",
-             buttonLabel=div(f7Icon("folder"),
-                         "Add/update image")),
-      textOutput(validate_img_id),
+      if(user_id()!="t_mode"){ #conditional: user_id is present but not test mode
+        list( #list is necessary b/c ui code separates fns by ","s
+          f7File(inputId=view_btn_id,
+               label="",
+               buttonLabel=div(f7Icon("folder"),
+                           "Add/update image")),
+          textOutput(validate_img_id)
+        )
+      },
+      #even if in test mode, (standard) image can be viewed
       br(),
       fluidRow(
         column(
@@ -968,10 +978,14 @@ server<-function(input,output,session){
       })
     } else{
       img_file_path(filepath)
-      #check on whether user has a dir
-      if(drive_find(user_id()) %>% nrow() == 0){
-        folder<-drive_mkdir(user_id())
-      } else{folder<-drive_get(user_id())}
+      
+      #store user id's drive as folder
+      folder<-drive_get(user_id())
+      
+      # #check on whether user has a dir --> moved to view_button observeEvent
+      # if(drive_find(user_id()) %>% nrow() == 0){
+      #   folder<-drive_mkdir(user_id())
+      # } else{folder<-drive_get(user_id())}
       
         #check on whether there is an image in folder
         if(nrow(drive_ls(path=user_id(),pattern=recipe_view()))==0){

@@ -523,12 +523,9 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-##1) fine-tune the recipe images--no viewing when no user id (update cancelOutput/req
-  #code) and viewing but no updating when in t_mode
+#1) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
 
-#2) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
-
-#3) general work on UI/UX--styling--perhaps some banner when test_mode is running
+#2) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
 
 
@@ -574,6 +571,7 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# removed ability to view (and thus add) recipe images when not in user_mode or t_mode
-# fixed warning/error caused by unnecessary delay()s used when manually adding recipes
+# updated image functionality: can't view if no user_id, can view but can't update if in
+  #test mode, and can view and update if using a different user id
+# updated instructions to reflect update to functionality
 
