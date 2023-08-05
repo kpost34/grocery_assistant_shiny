@@ -867,7 +867,7 @@ server<-function(input,output,session){
       title="Confirm save",
       type="confirm",
       text="Click OK to save a copy of your recipe database to the app. Note: this will ovewrite any previously 
-      saved data")
+      saved data and remove images that are not associated with entries in database.")
   },
   ignoreInit=TRUE)
   
@@ -885,7 +885,17 @@ server<-function(input,output,session){
   db_df<-reactive({
     #if reactiveValues for the recipe & ingred dbs are empty, then no dt_df is an empty tibble
     if(nrow(recipe$db)==0 & nrow(ingred$db)==0){
-      tibble()
+      #create col headers for empty tibble
+      headers <- c("recipe","appliance","protein","name","size","n")
+      
+      character(0) %>% 
+        list() %>% 
+        rep(5) %>% 
+        append(list(numeric(0))) %>%
+        bind_cols() %>%
+        set_names(headers)
+      
+      # tibble()
     }
     #but if there are data in each, then a combined table is made
     else if(nrow(recipe$db)>0 & nrow(ingred$db)>0){
@@ -895,7 +905,7 @@ server<-function(input,output,session){
   })
   
   
-  ## Builds off db_df() and displays info in a psuedo-wide format with ingredient list as one string
+  ## Builds off db_df() and displays info in a pseudo-wide format with ingredient list as one string
   dt_df<-reactive({
     if(nrow(db_df())==0){
       tibble()
@@ -994,7 +1004,7 @@ server<-function(input,output,session){
           #upload file
           drive_upload(media = img_file_path(), path = folder$id, name = new_filename)
           #remove temp file
-          # file.remove(new_fp)
+          delay(5000,file.remove(new_fp))
           
           #upload file
           # drive_upload(media = img_file_path(), path = folder$id, name = filename)
@@ -1006,7 +1016,7 @@ server<-function(input,output,session){
 
             drive_upload(media = img_file_path(), path = folder$id, name = new_filename)
             #remove temp file
-            # file.remove(new_fp)
+            delay(5000,file.remove(new_fp))
         }
     }
   })
@@ -1198,6 +1208,28 @@ server<-function(input,output,session){
     #(over)write sheet
     googlesheets4::write_sheet(data=db_df(),ss=sheet_id,sheet = user_id())
     # googlesheets4::write_sheet(data=db_df(),ss=sheet_id,sheet = input$txt_sheet_nm_recipe)
+    
+    #remove extraneous images
+    #grab all current dishes in db
+    current_recipes <- db_df() %>%
+      pull(recipe) %>%
+      unique()
+    
+    #grab all dishes with an image
+    dish_imgs <- drive_ls(user_id()) %>%
+      mutate(name = str_remove(name, "\\.jpg$")) %>%
+      pull(name) %>%
+      unique()
+    
+    #store the difference (could be empty if there is an image for each dish)
+    extraneous_img <- setdiff(dish_imgs, current_recipes)
+    
+    #if there is at least 1 extraneous image, it will be removed from google drive
+    if(length(extraneous_img > 0)){
+      drive_ls(user_id()) %>%
+        filter(str_detect(name,extraneous_img)) %>%
+        drive_rm()
+    }
     
     #create toast notification
     f7Toast(

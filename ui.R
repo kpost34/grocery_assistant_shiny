@@ -4,7 +4,7 @@
 #load packages
 pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,kableExtra,
                shinyscreenshot,mailR,htmlTable,readxl,googledrive,gargle,googlesheets4,
-               magick)
+               magick,waiter)
 
 
 
@@ -508,7 +508,6 @@ ui<-f7Page(
 
 # BACK-END
 # see if any observeEvents can be combined--e.g., those that generate alert/confirm dialogs
-# pre-render images onto popups??
 
 
 # Database additions/updates
@@ -518,22 +517,16 @@ ui<-f7Page(
 
 # MUCH LATER
 # embed dish image in DT as thumbnail which can enlarge when user clicks on it
-# slide show of dishe images--hint: use image_animate() from {magick}
+# slide show of dish images--hint: use image_animate() from {magick}
 # formatting of instructions--e.g., bullets
 # add waiters (spinners) during image changes
 
 
+
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-#1) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
-#4. test for non t_mode users
-
-#2) general work on UI/UX--styling--perhaps some banner when test_mode is running
+#1) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
 
-#issues....
-#working on #1. Got a decent function to convert, downgrade, and save file before uploading it...
-  #but now image won't display
-  #might be that file is locked
 
 
 # DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -544,11 +537,7 @@ ui<-f7Page(
 
 
 
-
-
-
-
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-#Updated annotations in ui and incorporated new function into pipeline which will, if necessary 
-  #convert then, downgrade image before uploading to google drive
-
+# if no dishes in db_df() then tibble is empty but with colheaders so that it can still be
+  #saved to googledrive
+# app deletes any extraneous images of dishes once data saved to app
