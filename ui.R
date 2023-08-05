@@ -549,7 +549,6 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# updated image functionality: can't view if no user_id, can view but can't update if in
-  #test mode, and can view and update if using a different user id
-# updated instructions to reflect update to functionality
+#Updated annotations in ui and incorporated new function into pipeline which will, if necessary 
+  #convert then, downgrade image before uploading to google drive
 

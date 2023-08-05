@@ -203,6 +203,32 @@ retrieveImage <- function(user_id, recipe) {
 
 
 
+### Convert and downgrade image before uploading to Google drive
+reduce_image_size <- function(name, img_fp, extension){
+  
+  #grab and change filename
+  new_filename <- str_replace(name, paste0(extension,"$"),"jpg")
+  
+  #create output dir (if does not exist)
+  out_dir <- file.path(tempdir(), "temp")
+  
+  if(!dir.exists(out_dir)){
+    dir.create(out_dir)
+  } 
+  
+  out_fp <- file.path(out_dir, new_filename)
+    
+  
+  #read selected file, convert to jpg (if nec), and write a compressed version to temp dir
+  img_fp %>%
+    image_read() %>%
+    {if(extension!="jpg") image_convert(.,format="jpg") else .} %>%
+    image_write(out_fp,quality=50)
+  
+  #return output dir
+  return(out_fp)
+}
+
 
 
 
