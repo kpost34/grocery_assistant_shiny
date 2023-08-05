@@ -962,7 +962,7 @@ server<-function(input,output,session){
 
   
   ### View functionality++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  ## Add image to db
+  ## Add image to db [OLD]
   observeEvent(input[[paste0("file_add_img_",rand_view())]],{
     
     #define objects
@@ -977,30 +977,77 @@ server<-function(input,output,session){
       validate("Please select an image file.")
       })
     } else{
-      img_file_path(filepath)
+      # img_file_path(filepath)
+      
+      #run fp through function to reduce its size and save to tempdir
+      new_fp <- reduce_image_size(name=filename, img_fp=filepath, extension=ext)
+      new_filename <- basename(new_fp)
+      img_file_path(new_fp)
       
       #store user id's drive as folder
       folder<-drive_get(user_id())
       
-      # #check on whether user has a dir --> moved to view_button observeEvent
-      # if(drive_find(user_id()) %>% nrow() == 0){
-      #   folder<-drive_mkdir(user_id())
-      # } else{folder<-drive_get(user_id())}
-      
         #check on whether there is an image in folder
         if(nrow(drive_ls(path=user_id(),pattern=recipe_view()))==0){
           #upload file
-          drive_upload(media = img_file_path(), path = folder$id, name = filename)
+          drive_upload(media = img_file_path(), path = folder$id, name = new_filename)
+          #remove temp file
+          # file.remove(new_fp)
+          
+          #upload file
+          # drive_upload(media = img_file_path(), path = folder$id, name = filename)
         } else{
           #remove current img and upload new file
            drive_ls(user_id()) %>%
             filter(str_detect(name,recipe_view())) %>%
             drive_rm()
 
-            drive_upload(media = img_file_path(), path = folder$id, name = filename)
+            drive_upload(media = img_file_path(), path = folder$id, name = new_filename)
+            #remove temp file
+            # file.remove(new_fp)
         }
     }
   })
+  
+  # ## Add image to db [OLD]
+  # observeEvent(input[[paste0("file_add_img_",rand_view())]],{
+  #   
+  #   #define objects
+  #   file <- input[[paste0("file_add_img_",rand_view())]]$name
+  #   ext <- tools::file_ext(file)
+  #   filename <- paste0(recipe_view(),".",ext)
+  #   filepath <- input[[paste0("file_add_img_",rand_view())]]$datapath
+  #   
+  #   #check if the correct file type is selected 
+  #   if(!ext %in% img_ext){
+  #     output[[paste0("txt_out_not_image_popup_",rand_view())]]<-renderText({
+  #     validate("Please select an image file.")
+  #     })
+  #   } else{
+  #     img_file_path(filepath)
+  #     
+  #     #store user id's drive as folder
+  #     folder<-drive_get(user_id())
+  #     
+  #     # #check on whether user has a dir --> moved to view_button observeEvent
+  #     # if(drive_find(user_id()) %>% nrow() == 0){
+  #     #   folder<-drive_mkdir(user_id())
+  #     # } else{folder<-drive_get(user_id())}
+  #     
+  #       #check on whether there is an image in folder
+  #       if(nrow(drive_ls(path=user_id(),pattern=recipe_view()))==0){
+  #         #upload file
+  #         drive_upload(media = img_file_path(), path = folder$id, name = filename)
+  #       } else{
+  #         #remove current img and upload new file
+  #          drive_ls(user_id()) %>%
+  #           filter(str_detect(name,recipe_view())) %>%
+  #           drive_rm()
+  # 
+  #           drive_upload(media = img_file_path(), path = folder$id, name = filename)
+  #       }
+  #   }
+  # })
   
   
   

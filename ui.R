@@ -520,13 +520,20 @@ ui<-f7Page(
 # embed dish image in DT as thumbnail which can enlarge when user clicks on it
 # slide show of dishe images--hint: use image_animate() from {magick}
 # formatting of instructions--e.g., bullets
+# add waiters (spinners) during image changes
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
 #1) downgrade image quality to get pics to load quicker (~L925-L936 in server) [see {magick}]
+#4. test for non t_mode users
 
 #2) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
+
+#issues....
+#working on #1. Got a decent function to convert, downgrade, and save file before uploading it...
+  #but now image won't display
+  #might be that file is locked
 
 
 # DONE++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -536,37 +543,8 @@ ui<-f7Page(
 
 
 
-# library(magick)
-# tiger <- image_read_svg('http://jeroen.github.io/images/tiger.svg', width = 350)
-# tiger_lowfi <- image_read('http://jeroen.github.io/images/tiger.svg', density = "20 x 20")
-# print(tiger)
-# print(tiger_lowfi)
-# 
-# image_write(tiger,here("img","tiger.svg"),quality=100)
-# image_write(tiger,here("img","tiger_lofi.jpg"),quality=75)
-# tiger_lowfi_jpg <- image_read(here("img","tiger_lofi.jpg"))
-# print(tiger_lowfi_jpg)
-# 
-# object.size(tiger) #296 bytes
-# 
-# 
-# pot_roast <- image_read(here("img","pot roast.png"))
-# print(pot_roast)
-# 
-# image_convert(pot_roast,format="jpg") %>%
-#   image_write(here("img","pot_roast_convert.jpg"),quality=50)
-# 
-# pot_roast_jpg <- image_read(here("img","pot_roast_convert.jpg"))
-# print(pot_roast_jpg)
-# 
-# image_write(pot_roast_jpg,here("img","pot_roast_jpg.jpg"))
-# 
-# file_ext("williamstown-1057646.jpg")
-# 
-# 
-# if(file_ext(image) !="jpg") {
-#   image_convert(image,format="jpg") 
-# }
+
+
 
 
 
