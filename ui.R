@@ -4,7 +4,7 @@
 #load packages
 pacman::p_load(shiny,here,shinyMobile,english,tidyverse,shinyjs,DT,tools,rmarkdown,kableExtra,
                shinyscreenshot,mailR,htmlTable,readxl,googledrive,gargle,googlesheets4,
-               magick,waiter)
+               magick)
 
 
 
@@ -25,10 +25,13 @@ options(
 
 
 
+
 #--------------------------------------------------------------------------------------------------#
 ###### Define UI====================================================================================
 #--------------------------------------------------------------------------------------------------#
 ui<-f7Page(
+  options = list(
+    theme = "aurora"),
   useShinyjs(),
   shinyFeedback::useShinyFeedback(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
@@ -524,7 +527,6 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-#1) general work on UI/UX--styling--perhaps some banner when test_mode is running
 
 
 
@@ -538,6 +540,4 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# if no dishes in db_df() then tibble is empty but with colheaders so that it can still be
-  #saved to googledrive
-# app deletes any extraneous images of dishes once data saved to app
+# added aurora theme to app
