@@ -169,7 +169,8 @@ ui<-f7Page(
                             choices=protein_choices_sheet1)
           ),
           f7Button(inputId="btn_ingred_entry_recipeSheet",
-                   label="Enter ingredients")
+                   label="Enter ingredients",
+                   color="lightblue")
         )
       ),
       
@@ -538,9 +539,6 @@ ui<-f7Page(
 
 
 
-
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# fixed vertical alignment of ingredient info after changing style
-# add second requirement to display load db from app button - user id must already have
-  # a sheet in db
-# turned on dark mode
+# fixed vertical alignment of ingredient & number on ingredient sheet
+# changed color of enter ingredients button on form to light blue

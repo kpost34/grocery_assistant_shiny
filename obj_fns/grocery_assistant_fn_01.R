@@ -53,7 +53,7 @@ add_ingredients<-function(n_prev=0,n) {
               size="large",
               raised=TRUE),
           #provides margins around text (which helps center stepper label with input)
-          style="padding: 40px 0px 0px 0px; font-size: 20px;"
+          style="padding: 30px 0px 0px 0px; font-size: 20px;"
         ),
         #aligns stepper input with text input
         tags$style(type='text/css', paste0("#stp_ingred",y,"_n_ingredSheets"," { vertical-align: middle;
