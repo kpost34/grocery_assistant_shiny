@@ -92,6 +92,11 @@ server<-function(input,output,session){
     #user_id is from a user and not test mode
     req(user_id()!="t_mode")
     
+    #check that user has sheet in in google sheets
+    #pull id of Google sheet "main"
+    sheet_id<-drive_get("main")$id
+    req(user_id() %in% sheet_names(sheet_id))
+    
     output$ui_btn_load_sheet_main<-renderUI({
       f7Button(inputId="btn_load_sheet_main",
                label=div(f7Icon("arrow_up_square"),

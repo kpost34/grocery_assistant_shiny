@@ -31,7 +31,8 @@ options(
 #--------------------------------------------------------------------------------------------------#
 ui<-f7Page(
   options = list(
-    theme = "aurora"),
+    theme = "aurora",
+    dark = TRUE),
   useShinyjs(),
   shinyFeedback::useShinyFeedback(),
 # ui<-f7TabLayout(title=NULL,navbar=NULL,
@@ -538,6 +539,8 @@ ui<-f7Page(
 
 
 
-
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# added aurora theme to app
+# fixed vertical alignment of ingredient info after changing style
+# add second requirement to display load db from app button - user id must already have
+  # a sheet in db
+# turned on dark mode

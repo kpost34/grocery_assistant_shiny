@@ -148,7 +148,7 @@ edit_ingred_info<-function(df,id){
                   size="large",
                   raised=TRUE),
         #provides margins around text (which helps center stepper label with input)
-        style="padding: 45px 0px 0px 0px; font-size: 18px;"
+        style="padding: 25px 0px 0px 0px; font-size: 18px;"
       )
     )
   })
