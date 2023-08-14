@@ -10,31 +10,20 @@ server<-function(input,output,session){
   ##### Main Tab####################################################################################
   #### UI===========================================================================================
   ### Header buttons
-  ## Developer info
-  # Create urls for links
-  url_repo <- a("GitHub repo",
-                href="https://github.com/kpost34/grocery_assistant_shiny")
-  
-  url_profile <- a("GitHub Profile",
-                   href="https://github.com/kpost34")
-  
-  url_linkedin <- a("LinkedIn",
-                    href = "https://www.linkedin.com/in/keith-post")
-  
-  # Display popup with developer info
+  ## Display popup with developer info
   observeEvent(input$btn_dev_info_main, {
     f7Popup(
-      id="popup_display_dev_info",
+      id="sheet_display_dev_info",
       title=HTML("<h1>Developer info</h1>"),
       #create text and links using tagList()
-      tagList(tags$h2("Keith Post"),
-              tags$h3("If you would like to see the code for this Shiny app, please visit the",
+      tagList(h2("Keith Post"),
+              h3("If you would like to see the code for this Shiny app, please visit the",
                       url_repo,
                       "for this project."),
-              tags$br(),
-              tags$h3("Also check out..."),
-              tags$h3(url_profile),
-              tags$h3(url_linkedin)
+              br(),
+              h3("Also check out..."),
+              h3(url_profile),
+              h3(url_linkedin)
       )
     )
   })
@@ -1025,46 +1014,6 @@ server<-function(input,output,session){
         }
     }
   })
-  
-  # ## Add image to db [OLD]
-  # observeEvent(input[[paste0("file_add_img_",rand_view())]],{
-  #   
-  #   #define objects
-  #   file <- input[[paste0("file_add_img_",rand_view())]]$name
-  #   ext <- tools::file_ext(file)
-  #   filename <- paste0(recipe_view(),".",ext)
-  #   filepath <- input[[paste0("file_add_img_",rand_view())]]$datapath
-  #   
-  #   #check if the correct file type is selected 
-  #   if(!ext %in% img_ext){
-  #     output[[paste0("txt_out_not_image_popup_",rand_view())]]<-renderText({
-  #     validate("Please select an image file.")
-  #     })
-  #   } else{
-  #     img_file_path(filepath)
-  #     
-  #     #store user id's drive as folder
-  #     folder<-drive_get(user_id())
-  #     
-  #     # #check on whether user has a dir --> moved to view_button observeEvent
-  #     # if(drive_find(user_id()) %>% nrow() == 0){
-  #     #   folder<-drive_mkdir(user_id())
-  #     # } else{folder<-drive_get(user_id())}
-  #     
-  #       #check on whether there is an image in folder
-  #       if(nrow(drive_ls(path=user_id(),pattern=recipe_view()))==0){
-  #         #upload file
-  #         drive_upload(media = img_file_path(), path = folder$id, name = filename)
-  #       } else{
-  #         #remove current img and upload new file
-  #          drive_ls(user_id()) %>%
-  #           filter(str_detect(name,recipe_view())) %>%
-  #           drive_rm()
-  # 
-  #           drive_upload(media = img_file_path(), path = folder$id, name = filename)
-  #       }
-  #   }
-  # })
   
   
   

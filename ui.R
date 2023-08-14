@@ -529,7 +529,7 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-
+# resolve issue--when reducing quantity of one ingredient in meal plan, it decreases others
 
 
 
@@ -540,5 +540,4 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# fixed vertical alignment of ingredient & number on ingredient sheet
-# changed color of enter ingredients button on form to light blue
+# resolved hyperlink issue

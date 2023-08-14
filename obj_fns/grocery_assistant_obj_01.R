@@ -1,6 +1,20 @@
 #Created by Keith Post on 3/19/23
 
 
+#### Developer Info=================================================================================
+## Developer info
+# Create urls for links
+url_repo <- f7Link("GitHub repo",
+              href="https://github.com/kpost34/grocery_assistant_shiny")
+
+url_profile <- f7Link("GitHub Profile",
+                  href="https://github.com/kpost34")
+
+url_linkedin <- f7Link("LinkedIn",
+                   href = "https://www.linkedin.com/in/keith-post")
+
+
+
 #### Recipe Sheet Choices===========================================================================
 ### Appliance Choices
 app_choices_sheet1<-c(
