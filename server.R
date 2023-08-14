@@ -1430,7 +1430,7 @@ server<-function(input,output,session){
     minus_row<-as.numeric(strsplit(input$minus_button,"_")[[1]][2])
     nm_minus<-ingred$list[[minus_row,"name"]]
     ingred$list<-ingred$list %>%
-      mutate(n=ifelse(n>=2,
+      mutate(n=ifelse(name==nm_minus & n>=2,
                       n-1,
                       n))
   })

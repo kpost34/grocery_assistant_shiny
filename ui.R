@@ -529,7 +529,7 @@ ui<-f7Page(
 
 
 # NEXT+++++++++++++++++++++++++++++++++++++++++++++++++++
-# resolve issue--when reducing quantity of one ingredient in meal plan, it decreases others
+
 
 
 
@@ -540,4 +540,4 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# resolved hyperlink issue
+# resolved issue--when reducing quantity of one ingredient in meal plan, it decreases others
