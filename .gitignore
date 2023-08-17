@@ -1,0 +1,17 @@
+#file types
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+config.R
+*.pdf
+*.log
+*.tex
+*.Rproj
+
+#dirs
+/img
+/archive
+.secrets
+/rsconnect
