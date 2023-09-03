@@ -156,7 +156,7 @@ ui<-f7Page(
         swipeHandler=FALSE,
         hiddenItems=tagList(
           #right-aligns text
-          p("Click outside sheet to return to main menu",style="text-align: right"),
+          p("Click below sheet to return to main menu",style="text-align: right"),
           #inputs for recipe info
           f7Text(inputId="txt_recipe_recipeSheet",
                  label="Recipe:"),
@@ -195,7 +195,7 @@ ui<-f7Page(
             container="segment"
           ),
           #right-aligns text
-          p("Click outside sheet to return to main menu",style="text-align: right"),
+          p("Click below sheet to return to main menu",style="text-align: right"),
           h2(strong(textOutput("txt_out_recipe_ingredSheet1"))),
           add_ingredients(n=4),
           br(),
@@ -227,7 +227,7 @@ ui<-f7Page(
             br()
           ),
           #right-aligns text
-          p("Click outside sheet to return to main menu",style="text-align: right"),
+          p("Click below sheet to return to main menu",style="text-align: right"),
           h2(strong(textOutput("txt_out_recipe_ingredSheet2"))),
           add_ingredients(n_prev=4,n=4),
           f7Button(inputId="btn_submit_recipe_ingred_ingredSheet2",
@@ -540,4 +540,8 @@ ui<-f7Page(
 
 
 # LAST COMMIT+++++++++++++++++++++++++++++++++++++++++++++++
-# resolved issue--when reducing quantity of one ingredient in meal plan, it decreases others
+#updated message from click "outside" to "below" sheet to return to main menu
+#changed manual recipe add sheet into two columns of 2
+
+
+

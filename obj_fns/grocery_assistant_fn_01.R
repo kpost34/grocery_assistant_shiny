@@ -29,18 +29,19 @@ list_example <- list(planner_list_txt) %>%
 
 
 ### Create blocks of ingredients
-add_ingredients<-function(n_prev=0,n) {
+add_ingredients<-function(n_prev=0,n=4) {
   
   ns<-(n_prev+1):(n_prev+n)
   
   pos<-ordinal(ns)
   
-  map2(pos,ns,function(x,y) {
+  #create multiple blocks of ingred info boxes
+  ingred_block <- map2(pos,ns,function(x,y) {
     f7Block(h3(paste("Enter",x,"ingredient")),
             hairlines=FALSE,
       f7Text(inputId=paste0("txt_ingred",y,"_nm_ingredSheets"),
            label="Name"),
-      splitLayout(cellWidths=c("75%","25%"),
+      splitLayout(cellWidths=c("65%","35%"),
         f7Text(inputId=paste0("txt_ingred",y,"_size_ingredSheets"),
            label="Size (e.g., 12 oz can)"),
         div(class="label-left",
@@ -60,8 +61,15 @@ add_ingredients<-function(n_prev=0,n) {
                    width: 80%}"))
       ),
       hr(),
-    )
-    })
+    ) 
+    }) 
+  
+  #outputs them together into two splitLayouts of two blocks
+  tagList(
+    splitLayout(ingred_block[1], ingred_block[2]),
+    splitLayout(ingred_block[3], ingred_block[4])
+  )
+
 }
 
 
