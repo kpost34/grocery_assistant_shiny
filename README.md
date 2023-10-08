@@ -1,4 +1,4 @@
-#**Grocery Assistant Shiny App**
+# **Grocery Assistant Shiny App**
 App helps someone maintain a database of dishes, create meal plans, and output grocery lists
 
 ## Summary
