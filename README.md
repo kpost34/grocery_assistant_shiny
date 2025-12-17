@@ -33,4 +33,5 @@ This app is the ultimate helper for someone who loves cooking but doesn't want t
 #### **Project Creator: Keith Post**
 + [Github Profile](https://github.com/kpost34) 
 + [LinkedIN Profile](https://www.linkedin.com/in/keith-post/)
-+ [Email](mailto:keithhpost@gmail.com)
++ [Email](mailto:keithpost.kp@gmail.com)
+
